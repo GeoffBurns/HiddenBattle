@@ -1,0 +1,39 @@
+.status {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    margin-top: 45px;
+    color: #111;
+    font-size: 150%;
+}
+
+.status.medium {
+    font-weight: bold;
+    margin-bottom: 15px;
+    margin-top: 15px;
+    color: #111;
+    font-size: 115%;
+}
+
+.status.small {
+    font-weight: bold;
+    height: 30px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    color: #111;
+    font-size: 90%;
+}
+
+.status.hidden {
+    display: none;
+}
+
+.game-status {
+    text-align: left;
+}
+
+.mode-status {
+    text-align: right;
+}

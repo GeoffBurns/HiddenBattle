@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Geoff's Hidden Battles Create Custom Map</title>
+    <meta
+      name="description"
+      content="Play a challenging version of Battleship with no-touch placement rules and special ships."
+    />
+    <link rel="icon" type="image/png" href="../favicon.png" />
+    <link rel="stylesheet" href="animation.css" />
+    <link rel="stylesheet" href="tab.css" />
+    <link rel="stylesheet" href="battle.css" />
+    <link rel="stylesheet" href="panel.css" />
+    <link rel="stylesheet" href="cells.css" />
+    <link rel="stylesheet" href="status.css" />
+    <link rel="stylesheet" href="battlehide.css" />
+    <link rel="stylesheet" media="print" href="print.css" />
+  </head>
+  <body>
+    <div class="battleship" id="battleship-game">
+      <div id="navbar"></div>
+      <div class="game-container">
+        <div class="player-container" id="custom-container">
+          <div class="title-wrap">
+            <h2 class="centered-title">Customizing Waters</h2>
+          </div>
+          <div class="player-body">
+            <div class="player-main">
+              <div class="board-wrap">
+                <div class="board" id="custom-board"></div>
+              </div>
+              <div class="info-wrap" id="statusLine-wrap">
+                <div class="status medium" id="statusLine">
+                  <div id="gameStatus" class="game-status"></div>
+                  <div id="modeStatus" class="mode-status"></div>
+                </div>
+              </div>
+              <div class="board-wrap alt trays" id="tray-container">
+                <div id="brushTray" class="tray"></div>
+                <div id="shipTray" class="tray"></div>
+                <div id="planeTray" class="tray"></div>
+                <div id="specialTray" class="tray"></div>
+                <div id="buildingTray" class="tray"></div>
+                <div id="weaponTray" class="tray"></div>
+              </div>
+            </div>
+            <div class="panel-container">
+              <div class="board-wrap" id="panel-board">
+                <div class="panel">
+                  <div class="panel-controls" id="place-controls">
+                    <button
+                      class="place-control"
+                      id="newPlacement"
+                      type="button"
+                    >
+                      <span class="shortcut">C</span>lear Waters
+                    </button>
+                    <button class="place-control" id="resetBtn" type="button">
+                      Clear <span class="shortcut">S</span>hips
+                    </button>
+                    <button
+                      class="place-control"
+                      id="reuseBtn"
+                      type="button"
+                      disabled
+                    >
+                      Use <span class="shortcut">D</span>efault
+                    </button>
+                    <button
+                      class="place-control"
+                      id="acceptBtn"
+                      type="button"
+                      disabled
+                    >
+                      <span class="shortcut">A</span>ccept
+                    </button>
+                    <button
+                      class="place-control"
+                      id="rotateBtn"
+                      type="button"
+                      disabled
+                    >
+                      <span class="shortcut">R</span>otate
+                    </button>
+                    <button
+                      class="place-control"
+                      id="flipBtn"
+                      type="button"
+                      disabled
+                    >
+                      <span class="shortcut">F</span>lip
+                    </button>
+                    <button
+                      class="place-control"
+                      id="rotateLeftBtn"
+                      type="button"
+                      disabled
+                    >
+                      <span class="shortcut">L</span>eft Rotate
+                    </button>
+                    <button
+                      class="place-control"
+                      id="publishBtn"
+                      type="button"
+                      disabled
+                    >
+                      <span class="shortcut">P</span>lay
+                    </button>
+                    <button
+                      class="place-control hidden"
+                      id="saveBtn"
+                      type="button"
+                      disabled
+                    >
+                      Sa<span class="shortcut">v</span>e
+                    </button>
+                    <button
+                      class="place-control"
+                      id="undoBtn"
+                      type="button"
+                      disabled
+                    >
+                      <span class="shortcut">U</span>ndo
+                    </button>
+                    <button
+                      class="place-control"
+                      id="testBtn"
+                      type="button"
+                      disabled
+                    >
+                      <span class="shortcut">T</span>est
+                    </button>
+                    <button
+                      class="place-control hidden"
+                      id="stopBtn"
+                      type="button"
+                      disabled
+                    >
+                      <span class="shortcut">S</span>top
+                    </button>
+                    <button
+                      class="place-control"
+                      id="seekBtn"
+                      type="button"
+                      disabled
+                    >
+                      <span class="shortcut">H</span>ide and Seek
+                    </button>
+
+                    <button class="place-control" id="autoBtn" type="button">
+                      <span class="shortcut">A</span>uto
+                    </button>
+                  </div>
+                  <div class="tally-box-container" id="custom-tally-container">
+                    <h4 class="tally-title" id="tally-title">Tally Boxes</h4>
+                    <div id="custom-tallyBox"></div>
+                  </div>
+                  <div class="info-container">
+                    <div class="info" id="custom-zone"></div>
+                    <div class="info" id="custom-placed-label">
+                      Ships Added: <span id="custom-placed">0 </span>
+                    </div>
+                    <div class="info hidden" id="custom-weapons-label">
+                      Weapons Added: <span id="custom-weapons">0 </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="./CellsToBePlaced.js"></script>
+    <script type="module" src="./variants.js"></script>
+    <script type="module" src="./map.js"></script>
+    <script type="module" src="./Shape.js"></script>
+    <script type="module" src="./maps.js"></script>
+    <script type="module" src="./chooseUI.js"></script>
+    <script type="module" src="./utils.js"></script>
+    <script type="module" src="./ScoreUI.js"></script>
+    <script type="module" src="./StatusUI.js"></script>
+    <script type="module" src="./playerUI.js"></script>
+    <script type="module" src="./Score.js"></script>
+    <script type="module" src="./Ship.js"></script>
+    <script type="module" src="./player.js"></script>
+    <script type="module" src="./placementUI.js"></script>
+    <script type="module" src="./selection.js"></script>
+    <script type="module" src="./navbar.js"></script>
+    <script type="module" src="./battlebuild.js"></script>
+  </body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Geoff's Hidden Battle Custom Maps List</title>
+    <meta
+      name="description"
+      content="Play a challenging version of Battleship with no-touch placement rules and special ships."
+    />
+
+    <link rel="icon" type="image/png" href="../favicon.png" />
+    <link rel="stylesheet" href="animation.css" />
+    <link rel="stylesheet" href="tab.css" />
+    <link rel="stylesheet" href="battle.css" />
+    <link rel="stylesheet" href="panel.css" />
+    <link rel="stylesheet" href="cells.css" />
+    <link rel="stylesheet" href="status.css" />
+    <link rel="stylesheet" href="battlehide.css" />
+    <link rel="stylesheet" media="print" href="print.css" />
+  </head>
+  <body>
+    <div class="battleship" id="battleship-game">
+      <div id="navbar"></div>
+      <div class="title-wrap">
+        <h2 class="centered-title screen-only">Custom Waters List</h2>
+      </div>
+      <div id="list-container"></div>
+      <div class="input-section hidden" id="inputDiv">
+        <label for="inputField">New Name:</label>
+        <input type="text" id="inputField" name="inputField" />
+        <button type="button" id="okBtn">OK</button>
+        <button type="button" id="cancelBtn">Cancel</button>
+      </div>
+    </div>
+
+    <script type="module" src="./maps.js"></script>
+    <script type="module" src="./navbar.js"></script>
+    <script type="module" src="./maplist.js"></script>
+  </body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Folder listing</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto,
+          'Helvetica Neue', Arial;
+        padding: 28px;
+        max-width: 820px;
+      }
+      header {
+        margin-bottom: 18px;
+      }
+      ul {
+        padding-left: 1.1rem;
+      }
+      li {
+        margin: 6px 0;
+      }
+      .meta {
+        color: #666;
+        font-size: 0.9rem;
+        margin-left: 8px;
+      }
+      .error {
+        color: #b00020;
+      }
+      .loading {
+        color: #333;
+      }
+      .folder {
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module" src="../../../src/navbar.js"></script>
+    <script type="module">
+      import { GA_ID, initGA } from '../../../src/navbar.js'
+      initGA(GA_ID)
+    </script>
+    <header>
+      <h1>Folder contents</h1>
+      <p id="desc">Listing files in <code id="path"></code></p>
+      <div id="status" class="loading">Loading…</div>
+    </header>
+
+    <main>
+      <ul id="fileList"></ul>
+    </main>
+
+    <script>
+      /*
+  Configure these values:
+  - OWNER: GitHub username or org (e.g. "username")
+  - REPO: repo name (e.g. "project")
+  - FOLDER_PATH: path inside repo to list (use "" for repo root, or "docs/images")
+  - BRANCH: optional branch name (default: "main" or "master" depending on repo)
+  - GITHUB_TOKEN: OPTIONAL - a personal access token string for higher rate limits. 
+    WARNING: Do NOT commit a private token to a public repo. Prefer server-side auth if you need secrecy.
+*/
+      const OWNER = 'geoffburns'
+      const REPO = 'battleship'
+      const FOLDER_PATH = 'docs/gamesheets/SeaAndLand' // e.g. "assets" or "" for root
+      const BRANCH = 'main'
+      const GITHUB_TOKEN = '' // optional
+
+      const apiUrl = `https://api.github.com/repos/${encodeURIComponent(
+        OWNER
+      )}/${encodeURIComponent(REPO)}/contents/${encodeURIComponent(
+        FOLDER_PATH
+      )}?ref=${encodeURIComponent(BRANCH)}`
+
+      document.getElementById('path').textContent = `${OWNER}/${REPO}/${
+        FOLDER_PATH || '.'
+      }`
+
+      const statusEl = document.getElementById('status')
+      const listEl = document.getElementById('fileList')
+
+      async function fetchFolder() {
+        // small helpers to keep main flow simple
+        function setStatus(text, cls = '') {
+          statusEl.className = cls
+          statusEl.textContent = text
+        }
+
+        function createLink(href, text, cls) {
+          const a = document.createElement('a')
+          a.href = href
+          a.target = '_blank'
+          a.rel = 'noopener'
+          a.textContent = text
+          if (cls) a.className = cls
+          return a
+        }
+
+        function renderItem(item) {
+          const li = document.createElement('li')
+
+          if (item.type === 'dir') {
+            // link to a subfolder index (GitHub UI)
+            const folderLink = createLink(
+              item.html_url,
+              item.name + '/',
+              'folder'
+            )
+            li.appendChild(folderLink)
+            li.appendChild(document.createTextNode(' — (folder) '))
+            return li
+          }
+
+          // file item
+          const href = item.download_url || item.html_url
+          const fileLink = createLink(href, item.name)
+          li.appendChild(fileLink)
+
+          if (typeof item.size === 'number') {
+            const meta = document.createElement('span')
+            meta.className = 'meta'
+            meta.textContent = `(${item.size} bytes)`
+            li.appendChild(meta)
+          }
+
+          return li
+        }
+
+        try {
+          const headers = { Accept: 'application/vnd.github.v3+json' }
+          if (GITHUB_TOKEN) headers['Authorization'] = `token ${GITHUB_TOKEN}`
+
+          const res = await fetch(apiUrl, { headers })
+
+          if (res.status === 404) {
+            setStatus(
+              'Folder not found (404) — check OWNER, REPO, FOLDER_PATH and BRANCH.',
+              'error'
+            )
+            return
+          }
+          if (res.status === 403) {
+            setStatus(
+              'API rate-limited or forbidden (403). Consider adding a token or try later.',
+              'error'
+            )
+            return
+          }
+          if (!res.ok) {
+            setStatus(
+              `GitHub API error: ${res.status} ${res.statusText}`,
+              'error'
+            )
+            return
+          }
+
+          const items = await res.json()
+
+          if (!Array.isArray(items)) {
+            setStatus(
+              'The path is not a folder. It might be a file. The API returned an object.',
+              'error'
+            )
+            return
+          }
+
+          if (items.length === 0) {
+            setStatus('Folder is empty.')
+            return
+          }
+
+          // Clear status and render list
+          statusEl.textContent = ''
+
+          // Sort: directories first, then files alphabetically
+          items.sort((a, b) => {
+            if (a.type === b.type)
+              return a.name.localeCompare(b.name, undefined, {
+                sensitivity: 'base'
+              })
+            return a.type === 'dir' ? -1 : 1
+          })
+
+          const frag = document.createDocumentFragment()
+          for (const item of items) {
+            frag.appendChild(renderItem(item))
+          }
+          listEl.appendChild(frag)
+        } catch (err) {
+          setStatus(`Fetch failed: ${err.message}`, 'error')
+          console.error(err)
+        }
+      }
+
+      fetchFolder()
+    </script>
+  </body>
+</html>

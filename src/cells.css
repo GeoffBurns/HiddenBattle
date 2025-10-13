@@ -1,0 +1,156 @@
+.board-wrap {
+    background: #0e1530;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #1b2746;
+}
+
+.info-wrap {
+    background: rgb(255, 255, 238, 0.76);
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #ffc;
+}
+
+.info-wrap.alt {
+    background: rgb(255, 240, 220, 0.69);
+    border: 1px solid #fea;
+}
+
+.info-wrap.info-top {
+    border-radius: 0 0 10px 10px;
+}
+
+.info-wrap.info-top.sub-tabs {
+    padding: 0 12px 0 0;
+}
+
+.title-wrap {
+    box-sizing: border-box;
+    background: rgb(255, 255, 238, 0.4);
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ffc;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), var(--boxSize));
+    grid-template-rows: repeat(var(--rows), var(--boxSize));
+    gap: 0px;
+    cursor: var(--cross-cursor-image) 16 16, auto;
+}
+
+.board.bomb {
+    cursor: var(--bomb-cursor-image) 26 26, pointer;
+}
+
+.board.strike {
+    cursor: var(--strike-cursor-image) 6 26, pointer;
+}
+
+.board.satelite {
+    cursor: var(--satelite-cursor-image) 10 20, pointer;
+}
+
+.board.cluster {
+    cursor: var(--cluster-cursor-image) 10 20, pointer;
+}
+
+.board.torpedo {
+    cursor: var(--torpedo-cursor-image) 8 16, pointer;
+}
+
+
+.board.periscope {
+    cursor: var(--periscope-cursor-image) 20 16, pointer;
+}
+
+
+.board.dish {
+    cursor: var(--dish-cursor-image) 16 16, pointer;
+}
+
+.board.sweep {
+    cursor: var(--sweep-cursor-image) 16 16, pointer;
+}
+
+/* destroyed (desaturated) board   */
+.board.destroyed .land.light,
+.board.destroyed .sea.light {
+    background: #777;
+}
+
+.board.destroyed .land.dark,
+.board.destroyed .sea.dark {
+    background: #555;
+}
+
+.cell {
+    width: var(--boxSize);
+    height: var(--boxSize);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    box-sizing: border-box;
+    position: relative;
+    overflow: clip;
+    text-align: center;
+
+    z-index: 1;
+}
+
+
+.cell.land.light {
+    background: #348239;
+}
+
+.cell.land.dark {
+    background: #296334;
+}
+
+.cell.sea.light {
+    background: #1a78d6;
+}
+
+.cell.sea.dark {
+    background: #1761b0;
+}
+
+
+.cell.rightEdge.light {
+    border-right: 2px solid #024;
+}
+
+.cell.bottomEdge.light {
+    border-bottom: 2px solid #024;
+}
+
+.cell.rightEdge.dark {
+    border-right: 2px solid #000;
+}
+
+.cell.bottomEdge.dark {
+    border-bottom: 2px solid #000;
+}
+
+.cell.leftEdge.light {
+    border-left: 2px solid #000;
+}
+
+.cell.leftEdge.dark {
+    border-left: 2px solid #000;
+}
+
+.cell.empty {
+    background: transparent
+}
+
+.cell.empty,
+.cell.row-label,
+.cell.col-label {
+    border: 0 none !important;
+}

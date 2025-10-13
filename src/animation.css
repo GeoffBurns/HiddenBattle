@@ -1,0 +1,197 @@
+:root {
+    --flame1-image: url('flame_20.png');
+    --flame2-image: url('flame_24.png');
+    --flame-duration: 0.4s;
+    --flame2-duration: 0.7s;
+    --content-width: 600px;
+    --bomb-cursor-image: url('./bomb32.png');
+    --strike-cursor-image: url('./strike32.png');
+    --satelite-cursor-image: url('./sat32.png');
+    --cluster-cursor-image: url('./cluster32.png');
+    --dish-cursor-image: url('./dish32.png');
+    --sweep-cursor-image: url('./sweep32.png');
+    --torpedo-cursor-image: url('./torpedo32.png');
+    --periscope-cursor-image: url('./periscope32.png');
+    --cross-cursor-image: url('./cross32.png');
+    --background-image: url('./fleet.png');
+    --logo-image: url('./logo2.png');
+}
+
+.cell.flames::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    /* slight bleed for edges */
+    pointer-events: none;
+    background:
+        /* a subtle animated glow texture underneath */
+        radial-gradient(closest-side, rgba(255, 200, 0, 0.22), transparent 70%) 0 0/33% 33%,
+        radial-gradient(closest-side, rgba(255, 120, 0, 0.18), transparent 70%) 16% 20%/40% 40%,
+        var(--flame1-image) center/cover no-repeat;
+    mix-blend-mode: screen;
+    /* lets the flames “light” the content */
+    opacity: 0;
+    /* will be set by animation */
+    filter: saturate(1.15);
+    animation: flameFade var(--flame-duration, 0.3s) ease-out forwards;
+}
+
+.cell.hit.flames::before {
+    background:
+        radial-gradient(closest-side, rgba(255, 200, 0, 0.22), transparent 70%) 0 0/33% 33%,
+        radial-gradient(closest-side, rgba(255, 120, 0, 0.18), transparent 70%) 16% 20%/40% 40%,
+        var(--flame2-image) center/cover no-repeat;
+    animation: flameFade var(--flame2-duration, 0.45s) ease-out forwards;
+}
+
+.cell.miss::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #91a3c6;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.cell.wake::after,
+.cell.semi-miss::after {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    content: '';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    overflow: clip;
+    width: 25px;
+    height: 25px;
+    border-radius: 30%;
+    background: rgba(180, 180, 200, 0.3);
+    transition: opacity 0.2s ease-in-out;
+}
+
+.cell.special::after {
+    content: '';
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #CCCC33;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.cell.hit {
+    color: #ff3b3b
+}
+
+.cell.hit::after {
+    content: 'X';
+    font-size: 90%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 900;
+    color: #ff3b3b;
+    transition: opacity 0.1s ease-in-out;
+}
+
+.cell.semi {
+    position: relative;
+    /* positioning context for the pseudo */
+}
+
+.cell.semi::after {
+    content: '?';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    /* vertical center the '?' */
+    justify-content: center;
+    /* horizontal center the '?' */
+    background-color: rgba(255, 255, 255, 0.3);
+    font-size: 150%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 900;
+    color: #334;
+    pointer-events: none;
+    /* clicks go through to underlying content */
+    transition: opacity 0.1s ease-in-out;
+    z-index: 2;
+    /* sits above cell content */
+}
+
+
+.cell.frd-hit::after {
+    content: 'X';
+    font-size: 130%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 900;
+    color: #380101;
+    transition: opacity 0.1s ease-in-out;
+}
+
+.cell.frd-sunk {
+    border: 2px solid black;
+}
+
+@keyframes flameFade {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0) saturate(1.2);
+    }
+
+    20% {
+        opacity: 0.9;
+        transform: scale(1.05);
+        filter: blur(0) saturate(1.3);
+    }
+
+    40% {
+        opacity: 0.7;
+        transform: scale(0.9);
+        filter: blur(0.5px) saturate(1.25)
+    }
+
+    60% {
+        opacity: 0.5;
+        transform: scale(1.15);
+        filter: blur(0.5px) saturate(1.4)
+    }
+
+    100% {
+        opacity: 0.15;
+        transform: scale(1.3);
+        filter: blur(1.5px) saturate(1.3)
+    }
+}
+
+.burst {
+    animation: burstLighten 0.75s ease-out forwards;
+}
+
+@keyframes burstLighten {
+    0% {
+        filter: brightness(200%);
+        box-shadow: 0 0 30px rgba(255, 255, 255, 0.9);
+    }
+
+    100% {
+        filter: brightness(100%);
+        box-shadow: none;
+    }
+}
+
+.flash {
+    animation: flashLighten 0.55s ease-out forwards;
+}
+
+
+@keyframes flashLighten {
+    0% {
+        filter: brightness(160%);
+    }
+
+    100% {
+        filter: brightness(100%);
+    }
+}
