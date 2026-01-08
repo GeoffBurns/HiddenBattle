@@ -9,6 +9,7 @@ import {
   fetchNavBar,
   trackClick
 } from './navbar.js'
+import { terrain } from './Shape.js'
 
 class MapList {
   constructor (id) {
@@ -221,6 +222,8 @@ class MapList {
   }
 
   makeList (listIncludes) {
+    const title = document.getElementById('list-title')
+    title.textContent = 'Custom ' + terrain.current.mapHeading + ' List'
     listIncludes = listIncludes || this.listIncludes
     this.listIncludes = listIncludes
 

@@ -39,13 +39,29 @@
       display: flex;
       align-items: center;
       gap: 8px;
-
       color: #f1f5f9;
       font-weight: 700;
       text-align: left;
       width: auto;
       flex: 0 0 auto;
       font-size: 120%;
+    }
+
+    .choose-title-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      color: #f1f5f9;
+      font-weight: 700;
+      text-align: left;
+      width: auto;
+      flex-wrap: wrap;
+      font-size: 120%;
+    }
+
+    div#choose-terrain-container {
+      flex: 0 0 auto;
     }
 
     .tab-bar-container .logo {

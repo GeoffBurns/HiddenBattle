@@ -188,7 +188,8 @@ export const spaceAndAsteroids = new Terrain(
   spaceShips,
   [space, asteroid],
   'SpaceAndAsteroid',
-  spaceWeapons
+  spaceWeapons,
+  'Sector'
 )
 
 class Installation extends Shape {

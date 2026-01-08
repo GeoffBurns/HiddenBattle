@@ -1,4 +1,5 @@
 import { enemy } from './enemy.js'
+import { terrain } from './Shape.js'
 
 let otherboard = null
 const newGameBtn = document.getElementById('newGame')
@@ -7,6 +8,8 @@ export function newGame () {
   enemy.resetModel()
   enemy.resetUI(enemy.ships)
   enemy.updateMode()
+  const title = document.getElementById('enemy-title')
+  title.textContent = 'Enemy ' + terrain.current.mapHeading
 }
 
 function setupSeekShortcuts (placement) {

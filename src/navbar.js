@@ -279,8 +279,30 @@ function setupMapControl (mapName, boardSetup, refresh) {
     null,
     mapName
   )
-
+  terrainSelect(boardSetup, refresh)
   maps.setTo(mapName)
+}
+
+function terrainSelect (boardSetup, refresh) {
+  const terrainTitles = (() => {
+    try {
+      return TerrainMaps.titleList()
+    } catch (error) {
+      console.error('An error occurred:', error.message, terrain)
+      return []
+    }
+  })()
+  const terrainUI = new ChooseFromListUI(terrainTitles, 'chooseTerrain')
+  terrainUI.setup(
+    function (_index, title) {
+      TerrainMaps.setByTitle(title)
+      setTerrainParams(terrain.current)
+      boardSetup()
+      refresh()
+    },
+    null,
+    terrain?.current?.title
+  )
 }
 
 function setupMapSelectionPrint (boardSetup, refresh) {
@@ -303,7 +325,6 @@ function setupMapSelection (boardSetup, refresh) {
   let targetMap = null
   try {
     targetMap = maps.getMap(mapName)
-    console.log(targetMap)
     mapName = targetMap?.title
   } catch (error) {
     console.log(error)
@@ -418,43 +439,48 @@ function setupTerrain (urlParams) {
   const terrainTag = urlParams.getAll('terrain')[0]
   const newTerrainMap = TerrainMaps.setByTag(terrainTag)
   const newTerrainTag = newTerrainMap?.terrain?.tag
-  const bodyTag = newTerrainMap?.terrain?.bodyTag
   if ((terrainTag !== newTerrainTag, newTerrainTag)) {
-    const url = new URL(globalThis.location)
-    const urlParams = url.searchParams
-    urlParams.set('terrain', newTerrainTag)
-
-    const mode = isEditMode(urlParams) ? 'edit' : 'create'
-    let mapName = getParamMap(urlParams)
-    let [height, width] = getParamSize(urlParams)
-    const mapType = urlParams.getAll('mapType')[0]
-    let h = ''
-    let w = ''
-    let x = ''
-    if (mapName && (Number.isNaN(height) || Number.isNaN(width))) {
-      const map = gameMap()
-      height = map?.rows
-      width = map?.cols
-    }
-    if (height && width && !Number.isNaN(height) && !Number.isNaN(width)) {
-      h = height.toString(10)
-      w = width.toString(10)
-      x = 'x'
-    }
-    updateState(
-      [
-        ['mode', mode],
-        ['mapName', mapName || ''],
-        ['height', h],
-        ['width', w],
-        ['x', x],
-        ['terrain', bodyTag],
-        ['mapType', mapType || '']
-      ],
-      url
-    )
+    setTerrainParams(newTerrainTag, newTerrainMap)
   }
+}
 
+function setTerrainParams (newTerrainMap) {
+  const url = new URL(globalThis.location)
+  const urlParams = url.searchParams
+
+  const bodyTag = newTerrainMap?.terrain?.bodyTag
+  const newTerrainTag = newTerrainMap?.terrain?.tag
+
+  urlParams.set('terrain', newTerrainTag)
+  const mode = isEditMode(urlParams) ? 'edit' : 'create'
+  let mapName = getParamMap(urlParams)
+  let [height, width] = getParamSize(urlParams)
+  const mapType = urlParams.getAll('mapType')[0]
+  let h = ''
+  let w = ''
+  let x = ''
+  if (mapName && (Number.isNaN(height) || Number.isNaN(width))) {
+    const map = gameMap()
+    height = map?.rows
+    width = map?.cols
+  }
+  if (height && width && !Number.isNaN(height) && !Number.isNaN(width)) {
+    h = height.toString(10)
+    w = width.toString(10)
+    x = 'x'
+  }
+  updateState(
+    [
+      ['mode', mode],
+      ['mapName', mapName || ''],
+      ['height', h],
+      ['width', w],
+      ['x', x],
+      ['terrain', bodyTag],
+      ['mapType', mapType || '']
+    ],
+    url
+  )
   const body = document.getElementsByTagName('body')[0]
   if (body) {
     body.classList.remove(...terrain.allBodyTags())
@@ -475,6 +501,7 @@ function setupMapOptions (boardSetup, refresh, huntMode = 'build') {
     huntMode === 'build' ? setSizeParams : Function.prototype
 
   setupTerrain(urlParams)
+  terrainSelect(boardSetup, refresh)
 
   widthUI = new ChooseNumberUI(
     terrain.minWidth,
@@ -588,6 +615,8 @@ export function setupMapListOptions (refresh) {
     refresh(index, text)
     setMapTypeParams(text)
   }, mapTypeIdx)
+
+  terrainSelect(Function.prototype, refresh)
 }
 
 export function setupGameOptions (boardSetup, refresh) {

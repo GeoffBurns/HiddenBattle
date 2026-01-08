@@ -15,6 +15,7 @@ import { enemy } from './enemy.js'
 import { setupEnemy, newGame } from './enemySetup.js'
 import { gameStatus } from './playerUI.js'
 import { randomPlaceShape } from './utils.js'
+import { terrain } from './Shape.js'
 
 const friend = new Friend(friendUI)
 placedShipsInstance.registerUndo(friendUI.undoBtn)
@@ -211,6 +212,8 @@ function newPlacement () {
   friendUI.flipBtn.disabled = true
   friendUI.rotateLeftBtn.disabled = true
   friendUI.undoBtn.disabled = true
+  const title = document.getElementById('friendly-title')
+  title.textContent = 'Friendly ' + terrain.current.mapHeading
 }
 // wire buttons
 wireupButtons()

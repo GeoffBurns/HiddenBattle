@@ -55,6 +55,14 @@ const terrainsMaps = {
     }
     return null
   },
+  setByTitle (title) {
+    if (title) {
+      const newTerrain = this.list.find(t => t?.terrain?.title === title)
+      if (newTerrain) this.setCurrent(newTerrain)
+      return newTerrain
+    }
+    return null
+  },
   setToDefault () {
     const newTerrain = this.default
     if (newTerrain) this.setCurrent(newTerrain)
@@ -531,6 +539,17 @@ export class TerrainMaps {
     }
 
     return result || terrainsMaps.setToDefault() || terrainsMaps.setByIndex(0)
+  }
+  static setByTitle (title) {
+    let result = null
+    if (title) {
+      result = terrainsMaps.setByTitle(title)
+    }
+
+    return result || terrainsMaps.setToDefault() || terrainsMaps.setByIndex(0)
+  }
+  static titleList () {
+    return terrainsMaps.list.map(t => t?.terrain?.title)
   }
   static setByIndex (idx) {
     if (idx) {
