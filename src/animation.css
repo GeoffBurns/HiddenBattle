@@ -14,7 +14,8 @@
     --periscope-cursor-image: url('./periscope32.png');
     --cross-cursor-image: url('./cross32.png');
     --background-image: url('./fleet.png');
-    --logo-image: url('./logo2.png');
+    --background-image-space: url('./spacefleet.png');
+    --logo-image-space: url('./space-logo.png');
 }
 
 .cell.flames::before {

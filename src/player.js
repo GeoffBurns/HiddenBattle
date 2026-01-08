@@ -1,4 +1,4 @@
-import { gameMaps } from './maps.js'
+import { gameMap, gameMaps } from './maps.js'
 import { gameStatus } from './playerUI.js'
 import { Score } from './Score.js'
 import { LoadOut, terrain } from './Shape.js'
@@ -43,7 +43,7 @@ export class Waters {
     return {
       ships: this.ships,
       shipCellGrid: this.shipCellGrid,
-      map: gameMaps.current.title
+      map: gameMap().title
     }
   }
 
@@ -76,7 +76,7 @@ export class Waters {
     }
   }
   loadForEdit (map) {
-    map = map || gameMaps.current
+    map = map || gameMap()
     const placedShips = map.example
     if (!placedShips) {
       this.autoPlace()
@@ -102,9 +102,16 @@ export class Waters {
   }
 
   load (placedShips) {
+    const map = gameMap()
     placedShips =
       placedShips || JSON.parse(localStorage.getItem(this.clipboardKey()))
-    if (!placedShips || gameMaps.current.title !== placedShips.map) return
+    if (!placedShips || map.title !== placedShips.map) {
+      placedShips = map.example
+      if (!placedShips) {
+        this.autoPlace()
+        return
+      }
+    }
 
     const matchableShips = [...this.ships]
     for (const ship of placedShips.ships) {
@@ -127,10 +134,10 @@ export class Waters {
         }
       }
     }
-    if (matchableShips.length !== 0) {
-      console.log(`${matchableShips.length} ships not matched`)
-    } else {
+    if (matchableShips.length === 0) {
       this.UI.resetTrays()
+    } else {
+      console.log(`${matchableShips.length} ships not matched`)
     }
   }
   resetMap (map) {
@@ -139,20 +146,21 @@ export class Waters {
     this.setMap(map)
   }
   armWeapons (map) {
-    map = map || gameMaps.current
+    map = map || gameMap()
     this.loadOut = new LoadOut(map.weapons)
     if (this.cursorChange)
       this.loadOut.onCursorChange = this.cursorChange.bind(this)
   }
   setMap (map) {
-    map = map || gameMaps.current
+    map = map || gameMap()
     this.ships = this.createShips(map)
     this.armWeapons(map)
   }
   getHitCandidates (effect) {
     const candidates = []
+    const map = gameMap()
     for (const [r, c, power] of effect) {
-      if (gameMaps.inBounds(r, c) && this.score.newShotKey(r, c) !== null) {
+      if (map.inBounds(r, c) && this.score.newShotKey(r, c) !== null) {
         const cell = this.UI.gridCellAt(r, c)
         if (
           !cell.classList.contains('frd-hit') &&
@@ -171,7 +179,7 @@ export class Waters {
   getStrikeSplash (weapon, candidates) {
     const pick = Math.floor(Math.random() * candidates.length)
 
-    return weapon.splash(gameMaps.current, candidates[pick])
+    return weapon.splash(gameMap(), candidates[pick])
   }
   shipsSunk () {
     return this.ships.filter(s => s.sunk)
@@ -186,10 +194,11 @@ export class Waters {
     return this.shapesUnsunk().filter(s => s.canBeOn(subterrain, zone))
   }
   createShips (map) {
-    map = map || gameMaps.current
+    map = map || gameMap()
+    const terrain = map.terrain
     const ships = []
     let id = 1
-    for (const base of map.terrain.ships.baseShapes) {
+    for (const base of terrain.ships.baseShapes) {
       const num = map.shipNum[base.letter]
       for (let i = 0; i < num; i++) {
         ships.push(Ship.createFromShape(base, id))
@@ -199,14 +208,15 @@ export class Waters {
     return ships
   }
   createCandidateWeapons () {
-    const candidates = gameMaps.terrain.weapons.weapons
+    const candidates = gameMap().terrain.weapons.weapons
 
     return candidates
   }
   createCandidateShips () {
     const candidates = []
+    const map = gameMaps()
     let id = 1
-    for (const base of gameMaps.baseShapes) {
+    for (const base of map.baseShapes) {
       candidates.push(Ship.createFromShape(base, id))
       id++
     }
@@ -215,8 +225,9 @@ export class Waters {
     return candidates
   }
   resetShipCells () {
-    this.shipCellGrid = Array.from({ length: gameMaps.current.rows }, () =>
-      Array(gameMaps.current.cols).fill(null)
+    const map = gameMap()
+    this.shipCellGrid = Array.from({ length: map.rows }, () =>
+      new Array(map.cols).fill(null)
     )
   }
   recordAutoMiss (r, c) {
@@ -300,7 +311,7 @@ export class Waters {
       return { hit: false, sunk: '', reveal: false }
     }
 
-    const shape = gameMaps.shapesByLetter[shipCell.letter]
+    const shape = gameMap().shapesByLetter[shipCell.letter]
     const protection = shape.protectionAgainst(weapon.letter)
     if (power === 1 && protection === 2 && hitShip) {
       this.score.shotReveal(key)
@@ -360,8 +371,7 @@ export class Waters {
     }
   }
 
-  updateResultsOfBomb (hits, sunks, reveals) {
-    reveals = reveals || 0
+  updateResultsOfBomb (hits, sunks, reveals = 0) {
     if (this.boardDestroyed) {
       // already handled  in updateUI
     } else if (hits === 0 && reveals > 0) {

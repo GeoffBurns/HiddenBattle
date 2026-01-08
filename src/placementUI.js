@@ -1,10 +1,11 @@
-import { gameMaps } from './maps.js'
+import { gameMap, gameMaps } from './maps.js'
 import { WatersUI } from './playerUI.js'
 import { ScoreUI } from './ScoreUI.js'
 import { ClickedShip } from './selection.js'
 import { cursor } from './cursor.js'
 import { Ship } from './Ship.js'
 import { dragNDrop } from './dragndrop.js'
+import { terrain } from './Shape.js'
 
 export class PlacementUI extends WatersUI {
   constructor (terroritory) {
@@ -352,7 +353,7 @@ export class PlacementUI extends WatersUI {
 
     if (shipElement === null) return
 
-    const shipId = parseInt(shipElement.dataset.id)
+    const shipId = Number.parseInt(shipElement.dataset.id)
     const ship = ships.find(s => s.id === shipId)
     if (ship && shipElement) this.assignClicked(ship, shipElement)
   }
@@ -362,7 +363,7 @@ export class PlacementUI extends WatersUI {
     this.flipBtn.disabled = true
   }
   assignClicked (ship, clicked) {
-    const variantIndex = parseInt(clicked.dataset.variant)
+    const variantIndex = Number.parseInt(clicked.dataset.variant)
     this.removeClicked()
     const shape = ship.shape()
     this.showNotice(shape.tip)
@@ -413,19 +414,20 @@ export class PlacementUI extends WatersUI {
     )
     for (let r = 0; r < size; r++) {
       for (let c = 0; c < size; c++) {
-        this.appendBrushCell(brush, r, c, subterrain.lightColor)
+        this.appendBrushCell(brush, r, c, subterrain.lightColor, subterrain.tag)
       }
     }
   }
 
   createDragShipCell (dragShip, cells, letter, r, c, special) {
+    const maps = gameMaps()
     if (cells.some(shipcell => shipcell[0] === r && shipcell[1] === c)) {
       this.appendCell(
         dragShip,
         r,
         c,
-        gameMaps.shipColors[letter],
-        gameMaps.shipLetterColors[letter],
+        maps.shipColors[letter],
+        maps.shipLetterColors[letter],
         letter,
         special
       )
@@ -448,11 +450,16 @@ export class PlacementUI extends WatersUI {
     cell.classList.add('empty')
     dragItem.appendChild(cell)
   }
-  appendBrushCell (dragItem, r, c, bg) {
+  appendBrushCell (dragItem, r, c, bg, tag) {
     const cell = this.makeCell(r, c)
 
-    cell.style.background = bg || 'rgba(255, 209, 102, 0.3)'
-
+    const checker = (r + c) % 2 === 0
+    cell.classList.add(checker ? 'light' : 'dark')
+    if (tag) {
+      cell.classList.add(tag)
+    } else {
+      cell.style.background = bg || 'rgba(255, 209, 102, 0.3)'
+    }
     dragItem.appendChild(cell)
   }
   appendCell (dragItem, r0, c0, bg, fg, letter, special) {
@@ -471,9 +478,9 @@ export class PlacementUI extends WatersUI {
 
   displayAsPlaced (cell, letter) {
     cell.textContent = letter
-    cell.style.color = gameMaps.shipLetterColors[letter] || '#fff'
-    cell.style.background =
-      gameMaps.shipColors[letter] || 'rgba(255,255,255,0.2)'
+    const maps = gameMaps()
+    cell.style.color = maps.shipLetterColors[letter] || '#fff'
+    cell.style.background = maps.shipColors[letter] || 'rgba(255,255,255,0.2)'
 
     this.clearCell(cell)
     cell.classList.add('placed')
@@ -604,7 +611,7 @@ export class PlacementUI extends WatersUI {
     this.checkTrays()
   }
   buildWeaponTray () {
-    const weapons = gameMaps.terrain.weapons.weapons
+    const weapons = terrain.current.weapons.weapons
     for (const weapon of weapons) {
       this.buildTrayItemWeapon(weapon, this.weaponTray)
     }
@@ -704,7 +711,11 @@ export class PlacementUI extends WatersUI {
 
   addShipToTrays (ships, ship) {
     const type = ship.type()
-    this.buildTrayItem(ships, ship, this.getTrayOfType(type))
+    if (type) {
+      this.buildTrayItem(ships, ship, this.getTrayOfType(type))
+    } else {
+      throw new Error('Unknown type for ship ' + ship.letter)
+    }
   }
 
   placeShipBox (ship) {
@@ -716,8 +727,9 @@ export class PlacementUI extends WatersUI {
     } else {
       box.textContent = letter
     }
-    box.style.background = gameMaps.shipColors[letter] || '#333'
-    box.style.color = gameMaps.shipLetterColors[letter] || '#fff'
+    const map = gameMap()
+    box.style.background = map.shipColors[letter] || '#333'
+    box.style.color = map.shipLetterColors[letter] || '#fff'
     return box
   }
 
@@ -746,7 +758,7 @@ export class PlacementUI extends WatersUI {
     model.nextId++
     model.ships.push(ship)
 
-    gameMaps.current.addShips(model.ships)
+    gameMap().addShips(model.ships)
 
     const index = model.candidateShips.findIndex(s => s.id === ship.id)
     model.candidateShips[index] = newShip
@@ -772,8 +784,8 @@ export class PlacementUI extends WatersUI {
 
   displayAddInfo (model) {
     if (!model.ships) return
-    this.publishBtn.disabled = model.displacementRatio() < 0.35
-    this.saveBtn.disabled = model.displacementRatio() < 0.15
+    this.publishBtn.disabled = model.hasPlayableShips()
+    this.saveBtn.disabled = model.hasSomeShips()
     this.score.placed.textContent = model.ships.length.toString()
     this.score.weaponsPlaced.textContent = model.loadOut.totalAmmo()
   }
@@ -812,25 +824,26 @@ export class PlacementUI extends WatersUI {
 
 function moveGridCursor (event, shipCellGrid, viewModel) {
   event.preventDefault()
+  const map = gameMap()
   switch (event.key) {
     case 'ArrowUp':
       cursor.x--
-      if (cursor.x < 0) cursor.x = gameMaps.current.rows - 1
+      if (cursor.x < 0) cursor.x = map.rows - 1
       dragNDrop.highlight(viewModel, shipCellGrid, cursor.x, cursor.y)
       break
     case 'ArrowDown':
       cursor.x++
-      if (cursor.x >= gameMaps.current.rows) cursor.x = 0
+      if (cursor.x >= map.rows) cursor.x = 0
       dragNDrop.highlight(viewModel, shipCellGrid, cursor.x, cursor.y)
       break
     case 'ArrowLeft':
       cursor.y--
-      if (cursor.y < 0) cursor.y = gameMaps.current.cols - 1
+      if (cursor.y < 0) cursor.y = map.cols - 1
       dragNDrop.highlight(viewModel, shipCellGrid, cursor.x, cursor.y)
       break
     case 'ArrowRight':
       cursor.y++
-      if (cursor.y >= gameMaps.current.cols) cursor.y = 0
+      if (cursor.y >= map.cols) cursor.y = 0
       dragNDrop.highlight(viewModel, shipCellGrid, cursor.x, cursor.y)
       break
   }

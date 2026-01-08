@@ -78,11 +78,15 @@
 }
 
 /* destroyed (desaturated) board   */
+.board.destroyed .asteroid.light,
+.board.destroyed .space.light,
 .board.destroyed .land.light,
 .board.destroyed .sea.light {
     background: #777;
 }
 
+.board.destroyed .asteroid.dark,
+.board.destroyed .space.dark,
 .board.destroyed .land.dark,
 .board.destroyed .sea.dark {
     background: #555;
@@ -120,6 +124,22 @@
     background: #1761b0;
 }
 
+.cell.asteroid.light {
+    background: #eed8a0;
+
+}
+
+.cell.asteroid.dark {
+    background: #d6c286;
+}
+
+.cell.space.light {
+    background: #e1d4f3;
+}
+
+.cell.space.dark {
+    background: #c2bdd2;
+}
 
 .cell.rightEdge.light {
     border-right: 2px solid #024;

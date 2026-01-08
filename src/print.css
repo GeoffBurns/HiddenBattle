@@ -153,8 +153,26 @@
         color: black !important;
     }
 
+    body.space #buildingTray .cell:not(.empty),
+    div.tally-row.asteroid div.tally-box,
+    .cell.asteroid.light {
+        background: #eed8a0 !important;
+
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color: black !important;
+    }
+
     .cell.land.dark {
         background: #CAE4BA !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color: black !important;
+
+    }
+
+    .cell.asteroid.dark {
+        background: #d6c286 !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
         color: black !important;
@@ -180,6 +198,22 @@
         color: black !important;
     }
 
+    body.space #shipTray .cell:not(.empty),
+    div.tally-row.space div.tally-box,
+    .cell.space.light {
+        background: #e1d4f3 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color: black !important;
+    }
+
+    .cell.space.dark {
+        background: #c2bdd2 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color: black !important;
+    }
+
     .cell.sea.dark {
         background: #D4E6F8 !important;
         -webkit-print-color-adjust: exact;
@@ -195,6 +229,14 @@
         color: black !important;
     }
 
+    body.space #planeTray .cell:not(.empty),
+    div.tally-row.shuttle div.tally-box {
+        background: #CAE4BA !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color: black !important;
+    }
+
     #specialTray .cell:not(.empty),
     div.tally-row.special div.tally-box {
         background: #F5EEFB !important;
@@ -203,9 +245,25 @@
         color: black !important;
     }
 
+    body.space #specialTray .cell:not(.empty),
+    body.space div.tally-row.special div.tally-box {
+        background: #D4E6F8 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color: black !important;
+    }
+
     #weaponTray .cell:not(.empty),
     div.tally-row.weapon div.tally-box {
         background: #F0DAF5 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color: black !important;
+    }
+
+    body.space #weaponTray .cell:not(.empty),
+    body.space div.tally-row.weapon div.tally-box {
+        background: #F5EEFB !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
         color: black !important;

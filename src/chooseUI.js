@@ -1,5 +1,3 @@
-import { gameMaps } from './maps.js'
-
 export class ChooseUI {
   constructor (targetId) {
     this.choose = document.getElementById(targetId)

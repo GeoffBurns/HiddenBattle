@@ -59,16 +59,16 @@ export class CellsToBePlaced {
       return false
     }
     if (this.isWrongZone()) {
-      //console.log('wrong Zone')
+      //  console.log('wrong Zone')
       return false
     }
 
     if (this.isOverlapping(shipCellGrid)) {
-      //   console.log('overlapping')
+      //  console.log('overlapping')
       return false
     }
     if (this.isTouching(shipCellGrid)) {
-      //   console.log('touching')
+      //  console.log('touching')
       return false
     }
     // console.log('good')

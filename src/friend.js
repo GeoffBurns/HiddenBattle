@@ -1,4 +1,4 @@
-import { gameMaps } from './maps.js'
+import { gameMap } from './maps.js'
 import { Waters } from './player.js'
 import { gameStatus } from './playerUI.js'
 
@@ -28,7 +28,7 @@ export class Friend extends Waters {
     }
   }
   seekHit (r, c) {
-    if (!gameMaps.inBounds(r, c)) return false
+    if (!gameMap().inBounds(r, c)) return false
 
     this.flame(r, c, false)
     const key = this.score.createShotKey(r, c)
@@ -43,7 +43,7 @@ export class Friend extends Waters {
   }
 
   seekHit2 (weapon, r, c, power) {
-    if (!gameMaps.inBounds(r, c)) return false
+    if (!gameMap().inBounds(r, c)) return false
 
     if (power > 0) this.flame(r, c, weapon.hasFlash)
     const key =
@@ -59,7 +59,7 @@ export class Friend extends Waters {
   }
 
   walkShot (r, c) {
-    const dir = gameMaps.isLand(r, c) ? 5 : 4
+    const dir = gameMap().isLand(r, c) ? 5 : 4
     const p = Math.floor(Math.random() * dir)
     switch (p) {
       case 0:
@@ -84,12 +84,13 @@ export class Friend extends Waters {
     }
   }
   seekBomb (weapon, effect) {
+    const map = gameMap()
     this.updateUI()
     let hit = false
     for (const position of effect) {
       const [r, c, power] = position
 
-      if (gameMaps.inBounds(r, c)) {
+      if (map.inBounds(r, c)) {
         if (this.seekHit2(weapon, r, c, power)) hit = true
       }
     }
@@ -97,6 +98,7 @@ export class Friend extends Waters {
   }
 
   randomBomb (seeking) {
+    const map = gameMap()
     this.loadOut.destroy = this.seekBomb.bind(this)
 
     for (let impact = 9; impact > 1; impact--)
@@ -105,10 +107,10 @@ export class Friend extends Waters {
           clearInterval(seeking)
           return
         }
-        const r = Math.floor(Math.random() * (gameMaps.current.rows - 2)) + 1
-        const c = Math.floor(Math.random() * (gameMaps.current.cols - 2)) + 1
+        const r = Math.floor(Math.random() * (map.rows - 2)) + 1
+        const c = Math.floor(Math.random() * (map.cols - 2)) + 1
         if (this.score.newShotKey(r, c)) {
-          this.loadOut.aim(gameMaps.current, r, c)
+          this.loadOut.aim(map, r, c)
           return
         }
       }
@@ -125,6 +127,7 @@ export class Friend extends Waters {
   }
 
   randomDestroyOne (seeking) {
+    const map = gameMap()
     this.loadOut.destroyOne = this.destroyOne.bind(this)
 
     if (seeking && (!this.testContinue || this.boardDestroyed)) {
@@ -133,20 +136,21 @@ export class Friend extends Waters {
     }
 
     const r = this.randomLine()
-    this.loadOut.aim(gameMaps.current, r, 0)
-    this.loadOut.aim(gameMaps.current, r, gameMaps.current.cols - 1)
+    this.loadOut.aim(map, r, 0)
+    this.loadOut.aim(map, r, map.cols - 1)
   }
 
   randomSeekOld (seeking) {
     const maxAttempts = 130
+    const map = gameMap()
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       if (seeking && (!this.testContinue || this.boardDestroyed)) {
         clearInterval(seeking)
         return
       }
-      const r = Math.floor(Math.random() * gameMaps.current.rows)
-      const c = Math.floor(Math.random() * gameMaps.current.cols)
+      const r = Math.floor(Math.random() * map.rows)
+      const c = Math.floor(Math.random() * map.cols)
 
       if (this.seekHit(r, c, false)) {
         return
@@ -199,9 +203,10 @@ export class Friend extends Waters {
     this.seek()
   }
   setupUntried () {
+    const map = gameMap()
     this.untried = new Set()
-    for (let r = 0; gameMaps.current.rows > r; r++) {
-      for (let c = 0; gameMaps.current.cols > c; c++) {
+    for (let r = 0; map.rows > r; r++) {
+      for (let c = 0; map.cols > c; c++) {
         const key = `${r},${c}`
 
         this.untried.add(key)
@@ -224,7 +229,7 @@ export class Friend extends Waters {
 
     const idx = Math.floor(Math.random() * locs.length)
 
-    return locs[idx].split(',').map(x => parseInt(x))
+    return locs[idx].split(',').map(x => Number.parseInt(x))
   }
 
   randomLine () {
@@ -232,7 +237,7 @@ export class Friend extends Waters {
     const locs = [...this.untried]
 
     const tally = locs.reduce((acc, el) => {
-      const [r] = el.split(',').map(x => parseInt(x))
+      const [r] = el.split(',').map(x => Number.parseInt(x))
       acc[r] = 1 + (acc[r] || 0)
       return acc
     }, {})
@@ -243,9 +248,9 @@ export class Friend extends Waters {
     const idx = line.findIndex(i => i[1] < line[0][1])
 
     if (idx < 3) {
-      return parseInt(line[0])
+      return Number.parseInt(line[0])
     }
-    return parseInt(line[Math.floor(Math.random() * (idx - 1))])
+    return Number.parseInt(line[Math.floor(Math.random() * (idx - 1))])
   }
 
   seek () {
@@ -270,29 +275,30 @@ export class Friend extends Waters {
   }
   scan (weapon, effect) {
     this.updateUI()
-
+    const map = gameMap()
     for (const position of effect) {
       const [r, c, power] = position
 
-      if (gameMaps.inBounds(r, c)) {
+      if (map.inBounds(r, c)) {
         /// reveal  what is in this position
       }
     }
     /// reveal
   }
   randomScan (seeking) {
+    const map = gameMap()
     this.loadOut.reveal = this.scan.bind(this)
     if (seeking && (!this.testContinue || this.boardDestroyed)) {
       clearInterval(seeking)
       return
     }
-    const r = Math.floor(Math.random() * (gameMaps.current.rows - 2)) + 1
-    const c = Math.floor(Math.random() * (gameMaps.current.cols - 2)) + 1
-    const r1 = Math.floor(Math.random() * (gameMaps.current.rows - 2)) + 1
-    const c1 = Math.floor(Math.random() * (gameMaps.current.cols - 2)) + 1
+    const r = Math.floor(Math.random() * (map.rows - 2)) + 1
+    const c = Math.floor(Math.random() * (map.cols - 2)) + 1
+    const r1 = Math.floor(Math.random() * (map.rows - 2)) + 1
+    const c1 = Math.floor(Math.random() * (map.cols - 2)) + 1
 
-    this.loadOut.aim(gameMaps.current, r, c)
-    this.loadOut.aim(gameMaps.current, r1, c1)
+    this.loadOut.aim(map, r, c)
+    this.loadOut.aim(map, r1, c1)
   }
   selectShot (semis, hits, seeking) {
     if (semis.length > 0) {
@@ -321,7 +327,7 @@ export class Friend extends Waters {
   getHits () {
     const hitss = this.shipsUnsunk().flatMap(s => [...s.hits])
     return hitss.map(h => {
-      const [r, c] = h.split(',').map(n => parseInt(n))
+      const [r, c] = h.split(',').map(n => Number.parseInt(n))
       return [r, c]
     })
   }

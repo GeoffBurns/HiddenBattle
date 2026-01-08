@@ -1,5 +1,5 @@
 import { randomPlaceShape } from './utils.js'
-import { gameMaps } from './maps.js'
+import { gameMap } from './maps.js'
 import { enemyUI } from './enemyUI.js'
 import { Waters } from './player.js'
 import { gameStatus } from './playerUI.js'
@@ -141,7 +141,7 @@ class Enemy extends Waters {
 
     this.loadOut.destroy = this.tryFireAt2.bind(this)
     this.loadOut.destroyOne = this.destroyOne.bind(this)
-    this.loadOut.aim(gameMaps.current, r, c)
+    this.loadOut.aim(gameMap(), r, c)
   }
 
   destroyOne (weapon, effect) {
@@ -202,10 +202,11 @@ class Enemy extends Waters {
   }
 
   dropBomb2 (weapon, effect, hits, sunks, reveals) {
+    const map = gameMap()
     for (const position of effect) {
       const [r, c, power] = position
 
-      if (gameMaps.inBounds(r, c)) {
+      if (map.inBounds(r, c)) {
         const result = this.processShot2(weapon, r, c, power)
         if (result?.hit) hits++
         if (result?.sunkLetter) sunks += result.sunkLetter

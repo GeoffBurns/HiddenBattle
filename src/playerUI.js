@@ -1,4 +1,4 @@
-import { gameMaps, gameHost } from './maps.js'
+import { gameMap, gameMaps, gameHost } from './maps.js'
 import { StatusUI } from './StatusUI.js'
 
 let noticeTimerId = null
@@ -15,14 +15,14 @@ export class WatersUI {
   }
 
   cellSizeScreen (map) {
-    map = map || gameMaps.current
+    map = map || gameMap()
     return this.containerWidth / map.cols
   }
   cellSizeList () {
     return this.containerWidth / 22
   }
   cellSizePrint (map) {
-    map = map || gameMaps.current
+    map = map || gameMap()
     return 600 / (map.cols + 1)
   }
 
@@ -44,7 +44,7 @@ export class WatersUI {
     return this.cellSizePrint() + this.cellUnit()
   }
   gridCellRawAt (r, c) {
-    return this.board.children[r * gameMaps.current.cols + c]
+    return this.board.children[r * gameMap().cols + c]
   }
   gridCellAt (r, c) {
     const result = this.gridCellRawAt(r, c)
@@ -56,9 +56,10 @@ export class WatersUI {
 
   displayAsRevealed (cell, letter) {
     if (cell) {
+      const maps = gameMaps()
       cell.style.background =
-        gameMaps.shipColors[letter] || 'rgba(255, 209, 102, 0.3)'
-      cell.style.color = gameMaps.shipLetterColors[letter] || '#ffd166'
+        maps.shipColors[letter] || 'rgba(255, 209, 102, 0.3)'
+      cell.style.color = maps.shipLetterColors[letter] || '#ffd166'
       cell.textContent = letter
     }
   }
@@ -98,8 +99,7 @@ export class WatersUI {
   }
   displayAsSunk (cell, _letter) {
     this.clearCell(cell)
-    cell.classList.add('frd-sunk')
-    cell.classList.add('frd-hit')
+    cell.classList.add('frd-sunk', 'frd-hit')
   }
   cellSunkAt (r, c, letter) {
     const cell = this.gridCellAt(r, c)
@@ -136,12 +136,13 @@ export class WatersUI {
   }
   surroundMiss (r, c, cellMiss) {
     if (!cellMiss) return
+    const map = gameMap()
     // surrounding water misses
     for (let dr = -1; dr <= 1; dr++)
       for (let dc = -1; dc <= 1; dc++) {
         const rr = r + dr
         const cc = c + dc
-        if (gameMaps.inBounds(rr, cc)) {
+        if (map.inBounds(rr, cc)) {
           cellMiss(rr, cc)
         }
       }
@@ -156,7 +157,7 @@ export class WatersUI {
     }
   }
   resetBoardSize (map, cellSize) {
-    if (!map) map = gameMaps.current
+    if (!map) map = gameMap()
     cellSize = cellSize || this.cellSizeString()
     this.board.style.setProperty('--cols', map.cols)
     this.board.style.setProperty('--rows', map.rows)
@@ -164,7 +165,7 @@ export class WatersUI {
     this.board.innerHTML = ''
   }
   resetBoardSizePrint (map) {
-    if (!map) map = gameMaps.current
+    if (!map) map = gameMap()
     const cellSize = this.cellSizeStringPrint()
     this.board.style.setProperty('--cols', map.cols + 1)
     this.board.style.setProperty('--rows', map.rows + 1)
@@ -184,8 +185,8 @@ export class WatersUI {
     }
   }
   refreshColor (cell) {
-    const r = parseInt(cell.dataset.r)
-    const c = parseInt(cell.dataset.c)
+    const r = Number.parseInt(cell.dataset.r)
+    const c = Number.parseInt(cell.dataset.c)
     this.uncolorCell(cell)
     this.colorizeCell(cell, r, c)
   }
@@ -206,17 +207,17 @@ export class WatersUI {
     this.colorizeCell(cell, r, c)
   }
   colorizeCell (cell, r, c, map) {
-    if (!map) map = gameMaps.current
+    if (!map) map = gameMap()
+
+    map.tagCell(cell.classList, r, c)
 
     const land = map.isLand(r, c)
     const c1 = c + 1
     const r1 = r + 1
-    cell.classList.add(land ? 'land' : 'sea')
-    const checker = (r + c) % 2 === 0
-    cell.classList.add(checker ? 'light' : 'dark')
     if (!land && c1 < map.cols && map.isLand(r, c1)) {
       cell.classList.add('rightEdge')
     }
+
     if (c !== 0 && !land && map.isLand(r, c - 1)) {
       cell.classList.add('leftEdge')
     }
@@ -227,6 +228,7 @@ export class WatersUI {
       cell.classList.add('topEdge')
     }
   }
+
   buildEmptyCell () {
     const cell = document.createElement('div')
     cell.className = 'cell empty'
@@ -244,7 +246,7 @@ export class WatersUI {
     const cell = document.createElement('div')
     cell.className = 'cell col-label'
     cell.dataset.c = c
-    cell.textContent = String.fromCharCode(startCharCode + c)
+    cell.textContent = String.fromCodePoint(startCharCode + c)
     this.board.appendChild(cell)
   }
   buildCell (r, c, onClickCell, map) {
@@ -260,7 +262,7 @@ export class WatersUI {
     this.board.appendChild(cell)
   }
   buildBoardPrint (map) {
-    map = map || gameMaps.current
+    map = map || gameMap()
     this.board.innerHTML = ''
     this.buildEmptyCell()
 
@@ -275,7 +277,7 @@ export class WatersUI {
     }
   }
   buildBoard (onClickCell, thisRef, map) {
-    map = map || gameMaps.current
+    map = map || gameMap()
     this.board.innerHTML = ''
     for (let r = 0; r < map.rows; r++) {
       for (let c = 0; c < map.cols; c++) {

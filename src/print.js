@@ -3,7 +3,8 @@ import { friendUI } from './friendUI.js'
 import { Friend } from './friend.js'
 import { enemyUI } from './enemyUI.js'
 import { enemy } from './enemy.js'
-import { gameMaps } from './maps.js'
+import { gameMap } from './maps.js'
+import { terrain } from './Shape.js'
 
 const friend = new Friend(friendUI)
 
@@ -23,10 +24,12 @@ function refresh () {
     friendUI
   )
   enemyUI.score.buildTally(enemy.ships, enemy.loadOut.weaponSystems, enemyUI)
-  document.title = "Geoff's Hidden Battle - " + gameMaps.current.title
+  document.title = "Geoff's Hidden Battle - " + gameMap().title
   friendUI.hideEmptyUnits(friend.ships)
 
-  for (const weapon of gameMaps.terrain.weapons.weapons) {
+  const weapons = terrain.current.weapons.weapons
+
+  for (const weapon of weapons) {
     if (!friend.loadOut.hasWeapon(weapon.letter)) {
       const el = document.getElementById('weapon-info-' + weapon.tag)
       el.classList.toggle('hidden', el !== null)
@@ -41,7 +44,7 @@ function refresh () {
       if (shipInfo)
         friendUI.buildTrayItemPrint(shipInfo, friendUI.getTrayOfType(type))
     }
-    const notes = [...Object.values(shipsInfo)].flatMap(info => {
+    const notes = Object.values(shipsInfo).flatMap(info => {
       return info.shape.notes || []
     })
     const notesEl = friendUI.getNotesOfType(type)
@@ -64,6 +67,6 @@ fetchNavBar('print', 'Battleship', function () {
   refresh()
 
   if (printMap) {
-    window.print()
+    globalThis.print()
   }
 })

@@ -1,6 +1,6 @@
 import { Waters } from './player.js'
 import { seaAndLand } from './Shape.js'
-import { gameMaps } from './maps.js'
+import { gameMap } from './maps.js'
 import { customUI } from './customUI.js'
 
 export class Custom extends Waters {
@@ -13,9 +13,9 @@ export class Custom extends Waters {
       return {
         subterrain: s,
         total: new Set(),
-        m_zone: s.zones.filter(z => z.isMarginal)[0],
+        m_zone: s.zones.find(z => z.isMarginal),
         margin: new Set(),
-        c_zone: s.zones.filter(z => !z.isMarginal)[0],
+        c_zone: s.zones.find(z => !z.isMarginal),
         core: new Set(),
         footprint: new Set()
       }
@@ -23,7 +23,8 @@ export class Custom extends Waters {
   }
 
   displacedArea () {
-    return (gameMaps.current.rows + 1) * (gameMaps.current.cols + 1) + 1
+    const map = gameMap()
+    return (map.rows + 1) * (map.cols + 1) + 1
   }
 
   noOfShips () {
@@ -38,6 +39,14 @@ export class Custom extends Waters {
       0
     )
   }
+  hasPlayableShips () {
+    return this.displacementRatio() < 0.35
+  }
+
+  hasSomeShips () {
+    return this.displacementRatio() < 0.15
+  }
+
   displacementRatio () {
     return this.shipDisplacement() / this.displacedArea()
   }

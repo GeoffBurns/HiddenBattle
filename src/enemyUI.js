@@ -1,4 +1,4 @@
-import { gameMaps } from './maps.js'
+import { gameMap, gameMaps } from './maps.js'
 import { gameStatus, WatersUI } from './playerUI.js'
 import { ScoreUI } from './ScoreUI.js'
 import { trackLevelEnd } from './navbar.js'
@@ -13,7 +13,7 @@ class EnemyUI extends WatersUI {
   displayFleetSunk () {
     gameStatus.display('Fleet Destroyed', 'All  - Well Done!')
     this.board.classList.add('destroyed')
-    trackLevelEnd(gameMaps.current, true)
+    trackLevelEnd(gameMap(), true)
   }
 
   revealAll (ships) {
@@ -26,10 +26,10 @@ class EnemyUI extends WatersUI {
   }
 
   displayAsSunk (cell, letter) {
+    const maps = gameMaps()
     cell.textContent = letter
-    cell.style.color = gameMaps.shipLetterColors[letter] || '#fff'
-    cell.style.background =
-      gameMaps.shipColors[letter] || 'rgba(255,255,255,0.2)'
+    cell.style.color = maps.shipLetterColors[letter] || '#fff'
+    cell.style.background = maps.shipColors[letter] || 'rgba(255,255,255,0.2)'
     this.clearCell(cell)
   }
   cellSunkAt (r, c, letter) {

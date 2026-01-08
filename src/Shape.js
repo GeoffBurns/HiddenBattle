@@ -5,15 +5,25 @@ import {
   Cyclic4,
   Invariant,
   Variant3,
-  shuffleArray
+  shuffleArray,
+  Diagonal
 } from './variants.js'
 
 export const oldToken = 'geoffs-battleship'
 export const token = 'geoffs-hidden-battle'
+const MIN_CUSTOM_WIDTH = 16
+const MAX_CUSTOM_WIDTH = 22
+const MIN_CUSTOM_HEIGHT = 6
+const MAX_CUSTOM_HEIGHT = 12
 
 export const terrain = {
   current: null,
   terrains: [],
+  minWidth: MIN_CUSTOM_WIDTH,
+  maxWidth: MAX_CUSTOM_WIDTH,
+  minHeight: MIN_CUSTOM_HEIGHT,
+  maxHeight: MAX_CUSTOM_HEIGHT,
+  default: null,
   add: function (newT) {
     if (!this.terrains.includes(newT)) {
       this.terrains.push(newT)
@@ -22,6 +32,22 @@ export const terrain = {
   setCurrent: function (newCurrent) {
     this.add(newCurrent)
     this.current = newCurrent
+    return this.current
+  },
+  setDefault: function (newCurrent) {
+    this.default = this.setCurrent(newCurrent)
+  },
+  allBodyTags () {
+    return this.terrains.map(t => t.bodyTag)
+  },
+  setByTag (tag) {
+    if (tag) {
+      const newTerrain = this.terrains.find(t => t.tag === tag)
+      if (newTerrain) this.setCurrent(newTerrain)
+
+      return newTerrain
+    }
+    return null
   }
 }
 
@@ -63,9 +89,9 @@ export class Shape {
     return this.subterrain === subterrain
   }
   protectionAgainst (weapon) {
-    if (this.immune.find(w => w === weapon)) return 3
-    if (this.hardened.find(w => w === weapon)) return 2
-    if (this.vulnerable.find(w => w === weapon)) return 0
+    if (this.immune.includes(weapon)) return 3
+    if (this.hardened.includes(weapon)) return 2
+    if (this.vulnerable.includes(weapon)) return 0
     return 1
   }
   attachWeapon (ammoBuilder) {
@@ -96,6 +122,8 @@ export class Shape {
         return new Cyclic4(this.cells, this.validator, this.zoneDetail)
       case 'L':
         return new Blinker(this.cells, this.validator, this.zoneDetail)
+      case 'G':
+        return new Diagonal(this.cells, this.validator, this.zoneDetail)
       default:
         throw new Error(
           'Unknown symmetry type for ' + JSON.stringify(this, null, 2)
@@ -125,12 +153,7 @@ export class Shape {
   }
 }
 
-const MIN_CUSTOM_WIDTH = 16
-const MAX_CUSTOM_WIDTH = 22
-const MIN_CUSTOM_HEIGHT = 6
-const MAX_CUSTOM_HEIGHT = 12
-
-class SubTerrain {
+export class SubTerrain {
   constructor (
     title,
     lightColor,
@@ -147,8 +170,9 @@ class SubTerrain {
     this.isDefault = isDefault || false
     this.isTheLand = isTheLand || false
     this.zones = zones
-    this.margin = zones.filter(z => z.isMarginal)[0]
-    this.core = zones.filter(z => !z.isMarginal)[0]
+    this.margin = zones.find(z => z.isMarginal)
+    this.core = zones.find(z => !z.isMarginal)
+    this.tag = title.toLowerCase()
   }
 
   clone () {
@@ -159,12 +183,13 @@ class SubTerrain {
       this.letter,
       this.isDefault,
       this.isTheLand,
-      this.zones
+      this.zones,
+      this.tag
     )
   }
 }
 
-function Zone (title, letter, isMarginal) {
+export function Zone (title, letter, isMarginal) {
   this.title = title
   this.letter = letter
   this.isMarginal = isMarginal
@@ -206,7 +231,7 @@ export class StandardShot extends Weapon {
 
 export const standardShot = new StandardShot()
 
-class WeaponCatelogue {
+export class WeaponCatelogue {
   constructor (weapons) {
     this.weapons = weapons
     this.defaultWeapon = standardShot
@@ -216,7 +241,7 @@ class WeaponCatelogue {
     this.weaponsByLetter = Object.fromEntries(weapons.map(w => [w.letter, w]))
   }
 }
-class ShipCatelogue {
+export class ShipCatelogue {
   constructor (
     baseShapes,
     shipSunkDescriptions,
@@ -235,6 +260,7 @@ class ShipCatelogue {
       baseShapes.map(base => [base.letter, base])
     )
   }
+
   addShapes (shapes) {
     this.baseShapes = shapes
     this.shapesByLetter = Object.fromEntries(
@@ -251,10 +277,18 @@ class ShipCatelogue {
   }
 }
 
-class Terrain {
-  constructor (title, shipCatelogue, subterrains, tag, weaponsCatelogue) {
+export class Terrain {
+  constructor (
+    title,
+    shipCatelogue,
+    subterrains,
+    tag,
+    weaponsCatelogue,
+    mapHeading,
+    fleetHeading
+  ) {
     this.title = title || 'Unknown'
-    this.key = title.toLowerCase().replace(/\s+/g, '-')
+    this.key = title.toLowerCase().replaceAll(/\s+/g, '-')
     this.ships = shipCatelogue
     this.weapons = weaponsCatelogue
     this.minWidth = MIN_CUSTOM_WIDTH
@@ -264,12 +298,21 @@ class Terrain {
     this.subterrains = subterrains
     this.zones = subterrains.flatMap(s => s.zones)
     this.defaultSubterrain =
-      subterrains.filter(s => s.isDefault)[0] || subterrains[0]
-    this.landSubterrain =
-      subterrains.filter(s => s.isTheLand)[0] || subterrains[1]
+      subterrains.find(s => s.isDefault) || subterrains[0]
+    this.landSubterrain = subterrains.find(s => s.isTheLand) || subterrains[1]
     this.tag = tag
+    this.mapHeading = mapHeading || 'Waters'
+    this.fleetHeading = fleetHeading || 'Fleet'
+    this.bodyTag = this.defaultSubterrain.tag
   }
 
+  subterrainTag (isLand) {
+    return isLand ? this.landSubterrain.tag : this.defaultSubterrain.tag
+  }
+
+  allSubterrainTag () {
+    return this.subterrains.map(st => st.tag)
+  }
   getWeapon (letter) {
     return this.weapons.weapons.find(w => w.letter === letter)
   }
@@ -347,6 +390,12 @@ class Terrain {
 
   sunkDescription (letter, middle = ' ') {
     return this.ships.sunkDescription(letter, middle)
+  }
+  addShapes (shapes) {
+    this.ships.addShapes(shapes)
+  }
+  addWeapons (weapons) {
+    this.weapons.addWeapons(weapons)
   }
 }
 const seaAndLandWeapons = new WeaponCatelogue([])
@@ -702,7 +751,7 @@ class SubShape {
     return new SubShape(this.validator, this.zoneDetail, this.subterrain)
   }
 }
-class StandardCells extends SubShape {
+export class StandardCells extends SubShape {
   constructor (validator, zoneDetail, subterrain) {
     super(validator, zoneDetail, subterrain)
     this.cells = []
@@ -713,14 +762,14 @@ class StandardCells extends SubShape {
     )
   }
 }
-class SpecialCells extends SubShape {
+export class SpecialCells extends SubShape {
   constructor (cells, validator, zoneDetail, subterrain) {
     super(validator, zoneDetail, subterrain)
     this.cells = cells
   }
 }
 
-class Hybrid extends Shape {
+export class Hybrid extends Shape {
   constructor (description, letter, symmetry, cells, subGroups, tip, racks) {
     super(
       letter,
@@ -1058,7 +1107,7 @@ seaAndLandShips.addShapes([
   submarine
 ])
 
-terrain.setCurrent(seaAndLand)
+terrain.setDefault(seaAndLand)
 
 export class Megabomb extends Weapon {
   constructor (ammo) {
@@ -1348,12 +1397,10 @@ export class Flack extends Weapon {
     const leftOver = middle.slice(3)
 
     for (let j = -1; j < 2; j++) {
-      leftOver.push([r - 2, c + j, 0])
-      leftOver.push([r + 2, c + j, 0])
+      leftOver.push([r - 2, c + j, 0], [r + 2, c + j, 0])
     }
     for (let i = -1; i < 2; i++) {
-      leftOver.push([r + i, c - 2, 0])
-      leftOver.push([r + i, c + 2, 0])
+      leftOver.push([r + i, c - 2, 0], [r + i, c + 2, 0])
     }
     const result = head.concat(shuffleArray(leftOver))
     for (let i = 0; i < 8; i++) {
@@ -1388,7 +1435,7 @@ function getPieSegmentCells (x1, y1, x2, y2, radius = 4, spreadDeg = 22.5) {
     for (let x = minX; x <= maxX; x++) {
       const dx = x - x1
       const dy = y - y1
-      const dist = Math.sqrt(dx * dx + dy * dy)
+      const dist = Math.hypot(dx, dy)
 
       if (dist > radius) continue // outside circle
 

@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="battlehide.css" />
     <link rel="stylesheet" media="print" href="print.css" />
   </head>
-  <body>
+  <body class="hidden-battle">
     <div class="battleship print-preview" id="battleship-game">
       <div id="navbar"></div>
       <div class="game-container print-preview">
@@ -28,7 +28,9 @@
           <div class="player-body">
             <div class="board-column">
               <div class="title-wrap">
-                <h2 class="centered-title">Friendly Waters</h2>
+                <h2 id="friendly-title" class="centered-title">
+                  Friendly Waters
+                </h2>
               </div>
               <div class="board print-preview" id="friend-board"></div>
             </div>
@@ -41,7 +43,7 @@
             <div class="player-body print-preview">
               <div class="board-column">
                 <div class="title-wrap">
-                  <h2 class="centered-title">Enemy Waters</h2>
+                  <h2 id="enemy-title" class="centered-title">Enemy Waters</h2>
                 </div>
                 <div class="board print-preview" id="enemy-board"></div>
               </div>
@@ -362,7 +364,6 @@
     <script type="module" src="./chooseUI.js"></script>
     <script type="module" src="./utils.js"></script>
     <script type="module" src="./ScoreUI.js"></script>
-
     <script type="module" src="./StatusUI.js"></script>
     <script type="module" src="./playerUI.js"></script>
     <script type="module" src="./Score.js"></script>
@@ -374,6 +375,7 @@
     <script type="module" src="./enemyUI.js"></script>
     <script type="module" src="./enemy.js"></script>
     <script type="module" src="./navbar.js"></script>
+    <script type="module" src="./space.js"></script>
     <script type="module" src="./print.js"></script>
   </body>
 </html>

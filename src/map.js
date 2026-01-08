@@ -34,9 +34,9 @@ export class Map {
       return {
         subterrain: s,
         total: new Set(),
-        m_zone: s.zones.filter(z => z.isMarginal)[0],
+        m_zone: s.zones.find(z => z.isMarginal),
         margin: new Set(),
-        c_zone: s.zones.filter(z => !z.isMarginal)[0],
+        c_zone: s.zones.find(z => !z.isMarginal),
         core: new Set(),
         footprint: new Set()
       }
@@ -91,8 +91,8 @@ export class Map {
 
     tracker.total.forEach((value, key) => {
       const pair = key.split(',')
-      const r = parseInt(pair[0])
-      const c = parseInt(pair[1])
+      const r = Number.parseInt(pair[0])
+      const c = Number.parseInt(pair[1])
       addCellToFootPrint(r, c, tracker.footprint)
     })
   }
@@ -149,6 +149,22 @@ export class Map {
     return this.landArea.some(inRange(r, c))
   }
 
+  tag (r, c) {
+    return this.terrain.subterrainTag(this.isLand(r, c)) || ''
+  }
+  allTags () {
+    return this.terrain.allSubterrainTag() || ''
+  }
+
+  tagCell (cell, r, c) {
+    const allTags = this.allTags()
+    cell.remove(...allTags)
+    const tag = this.tag(r, c)
+
+    const checker = (r + c) % 2 === 0
+    cell.add(tag, checker ? 'light' : 'dark')
+  }
+
   savedMap (newTitle) {
     newTitle = newTitle || makeTitle(this.terrain, this.cols, this.rows)
 
@@ -183,7 +199,9 @@ function getCopyNumKey (terrain, cols, rows) {
   return `${oldToken}.${terrain.key}-index-${cols}x${rows}`
 }
 function getCopyNum (terrain, cols, rows) {
-  return parseInt(localStorage.getItem(getCopyNumKey(terrain, cols, rows)))
+  return Number.parseInt(
+    localStorage.getItem(getCopyNumKey(terrain, cols, rows))
+  )
 }
 function setCopyNum (terrain, cols, rows, index) {
   localStorage.setItem(getCopyNumKey(terrain, cols, rows), index)
@@ -284,7 +302,7 @@ export class CustomBlankMap extends withModifyable(CustomMap) {
     this.rows = rows
     this.cols = cols
     for (const key of this.land) {
-      const [r, c] = key.split(',').map(n => parseInt(n, 10))
+      const [r, c] = key.split(',').map(n => Number.parseInt(n, 10))
       if (!this.inBounds(r, c)) this.land.delete(key)
     }
   }
@@ -296,7 +314,7 @@ export class SavedCustomMap extends CustomMap {
       data.title,
       [data.rows, data.cols],
       data.shipNum,
-      new Set([...data.land]),
+      new Set(data.land),
       null,
       data.example
     )
@@ -306,12 +324,13 @@ export class SavedCustomMap extends CustomMap {
     const weapons = data.weapons.map(w =>
       this.terrain.getNewWeapon(w.letter, w.ammo)
     )
-    this.weapons = [standardShot].concat(weapons.filter(w => w))
+    this.weapons = [standardShot].concat(weapons.filter(Boolean))
   }
 
   static loadObj (title) {
-    const data = localStorage.getItem(`${oldToken}.${title}`)
-    if (!data) throw new Error('No such saved map')
+    const newLocal = `${oldToken}.${title}`
+    const data = localStorage.getItem(newLocal)
+    if (!data) throw new Error('No such saved map for ' + newLocal)
     const obj = JSON.parse(data)
     return obj
   }

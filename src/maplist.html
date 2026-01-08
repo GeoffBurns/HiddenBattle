@@ -3,7 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Geoff's Hidden Battle Custom Maps List</title>
+
+    <title
+      id="page-title"
+      data-template="Geoff's [terrain] [mapType] Maps List"
+    >
+      Geoff's Hidden Battle Custom Maps List
+    </title>
     <meta
       name="description"
       content="Play a challenging version of Battleship with no-touch placement rules and special ships."
@@ -19,7 +25,7 @@
     <link rel="stylesheet" href="battlehide.css" />
     <link rel="stylesheet" media="print" href="print.css" />
   </head>
-  <body>
+  <body class="hidden-battle">
     <div class="battleship" id="battleship-game">
       <div id="navbar"></div>
       <div class="title-wrap">
@@ -36,6 +42,7 @@
 
     <script type="module" src="./maps.js"></script>
     <script type="module" src="./navbar.js"></script>
+    <script type="module" src="./space.js"></script>
     <script type="module" src="./maplist.js"></script>
   </body>
 </html>

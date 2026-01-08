@@ -1,4 +1,4 @@
-import { gameMaps } from './maps.js'
+import { gameMap, gameMaps } from './maps.js'
 import { all, mixed } from './Shape.js'
 import { dragNDrop } from './dragndrop.js'
 
@@ -68,8 +68,7 @@ export class ScoreUI {
     return 'very squeezy'
   }
 
-  createAddZoneEntry (labelTxt, displacedArea, ships, stress, style, extra) {
-    extra = extra || 0
+  createAddZoneEntry (labelTxt, displacedArea, ships, stress, style, extra = 0) {
     const entry = document.createElement('div')
     entry.style = style
     const label = document.createElement(stress)
@@ -90,16 +89,29 @@ export class ScoreUI {
     this.zone.appendChild(entry)
     return tightness
   }
+
   displayZoneInfo () {
+    const map = gameMap()
     for (const entry of this.zoneSync) {
-      gameMaps.current.recalcTracker(entry.tracker.subterrain, entry.tracker)
+      map.recalcTracker(entry.tracker.subterrain, entry.tracker)
       entry.counts[0].textContent = entry.tracker.total.size.toString()
       entry.counts[1].textContent = entry.tracker.margin.size.toString()
       entry.counts[2].textContent = entry.tracker.core.size.toString()
     }
   }
-  refresh
+  hasZoneInfo () {
+    const map = gameMap()
+    const nonDefaultZones = this.zoneSync.slice(1)
+    return (
+      nonDefaultZones.reduce((accumulator, entry) => {
+        map.recalcTracker(entry.tracker.subterrain, entry.tracker)
+        return accumulator + entry.tracker.total.size
+      }, 0) > 0
+    )
+  }
+
   displayAddZoneInfo (model) {
+    const map = gameMap()
     this.zone.innerHTML = ''
     const displacedArea = model.displacedArea()
 
@@ -121,9 +133,9 @@ export class ScoreUI {
         (accumulator, shape) => accumulator + shape.displacement,
         0
       ) / 4
-    for (const tracker of gameMaps.current.subterrainTrackers) {
-      gameMaps.current.recalcTracker(tracker.subterrain, tracker)
-      gameMaps.current.calcFootPrint(tracker)
+    for (const tracker of map.subterrainTrackers) {
+      map.recalcTracker(tracker.subterrain, tracker)
+      map.calcFootPrint(tracker)
       const displacedArea = (tracker.total.size + tracker.footprint.size) / 2
 
       const mixedAmount = mixedShapes.reduce(
@@ -144,36 +156,31 @@ export class ScoreUI {
   }
 
   setupZoneInfo () {
+    const map = gameMap()
     let display = []
     this.zone.innerHTML = ''
-    for (const tracker of gameMaps.current.subterrainTrackers) {
-      gameMaps.current.recalcTracker(tracker.subterrain, tracker)
-
-      let counts = []
-      counts.push(
+    for (const tracker of map.subterrainTrackers) {
+      map.recalcTracker(tracker.subterrain, tracker)
+      let counts = [
         this.createZoneEntry(
           tracker.subterrain.title,
           tracker.total,
           'b',
           'line-height:1.2;'
-        )
-      )
-      counts.push(
+        ),
         this.createZoneEntry(
           tracker.m_zone.title,
           tracker.margin,
           'span',
           'font-size:75%;line-height:1.2'
-        )
-      )
-      counts.push(
+        ),
         this.createZoneEntry(
           tracker.c_zone.title,
           tracker.core,
           'span',
           'font-size:75%;line-height:1.2'
         )
-      )
+      ]
       display.push({ tracker: tracker, counts: counts })
     }
     this.zoneSync = display
@@ -184,6 +191,7 @@ export class ScoreUI {
   buildShipBox (ship) {
     const box = document.createElement('div')
     const letter = ship.letter
+    const maps = gameMaps()
     box.className = 'tally-box'
     if (ship.sunk) {
       box.textContent = 'X'
@@ -191,8 +199,8 @@ export class ScoreUI {
       box.style.color = '#400'
     } else {
       box.textContent = letter
-      box.style.background = gameMaps.shipColors[letter] || '#333'
-      box.style.color = gameMaps.shipLetterColors[letter] || '#fff'
+      box.style.background = maps.shipColors[letter] || '#333'
+      box.style.color = maps.shipLetterColors[letter] || '#fff'
     }
     return box
   }
@@ -227,6 +235,7 @@ export class ScoreUI {
 
   buildBombRow (rowList, viewModel, weaponSystem) {
     if (!weaponSystem.weapon.isLimited) return
+    const maps = gameMaps()
     const ammoTotal = weaponSystem.ammoTotal()
     const ammoUsed = weaponSystem.ammoUsed()
     const row = document.createElement('div')
@@ -239,13 +248,13 @@ export class ScoreUI {
       box.style.fontSize = '105%'
       if (i < ammoUsed) {
         box.textContent = 'X'
-        box.style.background = gameMaps.shipColors[weaponSystem.weapon.letter]
+        box.style.background = maps.shipColors[weaponSystem.weapon.letter]
         box.style.opacity = 0.45
         box.style.color = '#000'
       } else {
         box.textContent = weaponSystem.weapon.letter
-        box.style.background = gameMaps.shipColors[weaponSystem.weapon.letter]
-        box.style.color = gameMaps.shipLetterColors[weaponSystem.weapon.letter]
+        box.style.background = maps.shipColors[weaponSystem.weapon.letter]
+        box.style.color = maps.shipLetterColors[weaponSystem.weapon.letter]
       }
       row.appendChild(box)
     }

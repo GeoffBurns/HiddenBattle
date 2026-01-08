@@ -13,7 +13,7 @@ import {
 } from './dragndrop.js'
 import { placedShipsInstance } from './selection.js'
 import { custom } from './custom.js'
-import { gameMaps } from './maps.js'
+import { gameMap, gameMaps } from './maps.js'
 import {
   setupBuildOptions,
   validateHeight,
@@ -21,9 +21,10 @@ import {
   switchTo,
   switchToEdit,
   fetchNavBar,
-  trackLevelEnd
+  trackLevelEnd,
+  tabs
 } from './navbar.js'
-
+import { terrain } from './Shape.js'
 customUI.resetBoardSize()
 
 placedShipsInstance.registerUndo(customUI.undoBtn, customUI.resetBtn)
@@ -60,23 +61,12 @@ function onClickAccept (editingMap) {
   )
 }
 function onClickDefault () {
-  gameMaps.setToDefaultBlank(validateHeight(), validateWidth())
+  gameMaps().setToDefaultBlank(validateHeight(), validateWidth())
   customUI.refreshAllColor()
 
   customUI.score.displayZoneInfo()
+  customUI.resetClearBtn()
 }
-function onClickClear () {
-  if (customUI.placingShips) {
-    customUI.setTrays()
-    newPlacement()
-    return
-  }
-
-  gameMaps.clearBlank()
-  customUI.refreshAllColor()
-  customUI.score.displayZoneInfo()
-}
-
 function clearShips () {
   customUI.showNotice('ships removed')
   custom.resetShipCells()
@@ -85,20 +75,39 @@ function clearShips () {
   placedShipsInstance.popAll(ship => {
     customUI.subtraction(custom, ship)
   })
+  custom.ships = []
+}
+function onClickClear () {
+  if (customUI.placingShips) {
+    clearShips()
+    customUI.setTrays()
+    newPlacement()
+    customUI.displayShipTrackingInfo(custom)
+    return
+  }
+
+  gameMaps().clearBlank()
+  customUI.refreshAllColor()
+  customUI.score.displayZoneInfo()
+  customUI.resetClearBtn()
+}
+function seekMap () {
+  trackLevelEnd(gameMap(), true)
+  switchTo('battleseek', 'build')
 }
 function playMap () {
-  trackLevelEnd(gameMaps.current, true)
+  trackLevelEnd(gameMap(), true)
   switchTo('index', 'build')
 }
 
 function saveMap () {
-  trackLevelEnd(gameMaps.current, false)
-  switchToEdit(gameMaps.current.title, 'build')
+  trackLevelEnd(gameMap(), false)
+  switchToEdit(gameMap().title, 'build')
 }
 
 function wireupButtons () {
   customUI.newPlacementBtn.addEventListener('click', onClickClear)
-  customUI.acceptBtn.addEventListener('click', onClickAccept)
+  customUI.acceptBtn.addEventListener('click', onClickAccept.bind(null, false))
   customUI.reuseBtn.addEventListener('click', onClickDefault)
   customUI.resetBtn.addEventListener('click', clearShips)
   customUI.publishBtn.addEventListener('click', playMap)
@@ -120,7 +129,7 @@ function setupBuildShortcuts () {
     switch (event.key) {
       case 'a':
       case 'A':
-        onClickAccept()
+        onClickAccept.bind(null, false)
         break
       case 'c':
       case 'C':
@@ -179,7 +188,7 @@ function setupBuildShortcuts () {
 }
 
 function setReuseBtn () {
-  customUI.reuseBtn.disabled = !gameMaps.hasMapSize(
+  customUI.reuseBtn.disabled = !gameMaps().hasMapSize(
     validateHeight(),
     validateWidth()
   )
@@ -190,7 +199,7 @@ function newPlacement () {
   customUI.buildBoard((_r, _c) => {})
   customUI.showBrushTrays()
   customUI.makeBrushable()
-  customUI.buildBrushTray(gameMaps.terrain)
+  customUI.buildBrushTray(terrain.current)
   customUI.brushMode()
   customUI.acceptBtn.disabled = false
   setReuseBtn()
@@ -225,4 +234,7 @@ fetchNavBar('build', 'Create Your Own Game', function () {
     // initial
     newPlacement()
   }
+
+  tabs.hide?.overrideClickListener(playMap)
+  tabs.seek?.overrideClickListener(seekMap)
 })

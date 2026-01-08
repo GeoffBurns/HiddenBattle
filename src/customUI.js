@@ -1,6 +1,13 @@
 import { PlacementUI } from './placementUI.js'
 import { gameStatus } from './playerUI.js'
+import { terrain } from './Shape.js'
 
+function landString () {
+  return terrain.current?.landSubterrain?.title?.toLowerCase() || 'land'
+}
+function seaString () {
+  return terrain.current?.defaultSubterrain?.title?.toLowerCase() || 'sea'
+}
 export class CustomUI extends PlacementUI {
   constructor () {
     super('custom')
@@ -14,13 +21,29 @@ export class CustomUI extends PlacementUI {
     this.saveBtn = document.getElementById('saveBtn')
     this.tips = ['Use shapes create land and sea']
   }
+  resetClearBtn () {
+    if (this.placingShips) {
+      this.newPlacementBtn.disabled = false
 
+      this.newPlacementBtn.innerHTML =
+        '<span class="shortcut">C</span>hange ' + terrain.current.mapHeading
+    } else {
+      this.newPlacementBtn.innerHTML =
+        '<span class="shortcut">C</span>lear ' + terrain.current.mapHeading
+      this.newPlacementBtn.disabled = !this.score.hasZoneInfo()
+    }
+  }
   brushMode () {
     for (const cancellable of this.placelistenCancellables) {
       cancellable()
     }
+
+    const title = document.getElementById('custom-title')
+    title.textContent = 'Customizing ' + terrain.current.mapHeading
+
     this.placelistenCancellables = []
     this.placingShips = false
+    this.resetClearBtn()
     const height = document.getElementById('height-container')
     height.classList.remove('hidden')
     const width = document.getElementById('width-container')
@@ -51,10 +74,12 @@ export class CustomUI extends PlacementUI {
       panel.classList.remove('alt')
     }
     gameStatus.clear()
-    gameStatus.info('drag blocks across map to create or destroy land')
+    gameStatus.info(
+      `drag blocks across map to create or destroy ${landString()}`
+    )
     this.tips = [
-      'drag blocks across map to create or destroy land',
-      'press accept button when the land and sea is to your liking'
+      `drag blocks across map to create or destroy ${landString()}`,
+      `press accept button when the ${seaString()} and ${landString()} is to your liking`
     ]
 
     this.showTips()
@@ -64,8 +89,14 @@ export class CustomUI extends PlacementUI {
     for (const cancellable of this.brushlistenCancellables) {
       cancellable()
     }
+
+    const title = document.getElementById('custom-title')
+
+    title.textContent = 'Customizing ' + terrain.current.fleetHeading
+
     this.brushlistenCancellables = []
     this.placingShips = true
+    this.resetClearBtn()
     this.showShipTrays()
     const height = document.getElementById('height-container')
     height.classList.add('hidden')
@@ -74,7 +105,7 @@ export class CustomUI extends PlacementUI {
     this.reuseBtn.classList.add('hidden')
     this.resetBtn.classList.remove('hidden')
     this.acceptBtn.classList.add('hidden')
-    this.newPlacementBtn.classList.remove('hidden')
+    this.newPlacementBtn.disabled = false
     this.score.placedLabel.classList.remove('hidden')
     this.score.weaponsLabel.classList.remove('hidden')
     this.rotateBtn.classList.remove('hidden')
@@ -88,8 +119,7 @@ export class CustomUI extends PlacementUI {
     this.buildWeaponTray()
     gameStatus.game.classList.remove('hidden')
     gameStatus.mode.classList.remove('hidden')
-    gameStatus.line.classList.remove('hidden')
-    gameStatus.line.classList.remove('small')
+    gameStatus.line.classList.remove('hidden', 'small')
     gameStatus.line.classList.add('medium')
     const panels = document.getElementsByClassName('panel')
     for (const panel of panels) {

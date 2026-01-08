@@ -180,6 +180,38 @@ function rotate (cells, mr, mc) {
     mc
   )
 }
+const areArraysOrderedAndEqual = (arr1, arr2) => {
+  // Check if the arrays are the same length
+  if (arr1.length !== arr2.length) {
+    return false
+  }
+
+  // Check if all items exist and are in the same order
+  return arr1.every((element, index) => element === arr2[index])
+}
+
+const areArraysUnorderedEqual = (arr1, arr2) => {
+  if (arr1.length !== arr2.length) {
+    return false
+  }
+
+  // Create shallow copies and sort them to avoid modifying original arrays
+  const sortedArr1 = [...arr1].sort()
+  const sortedArr2 = [...arr2].sort()
+
+  // Compare the sorted arrays element by element
+  return sortedArr1.every((element, index) =>
+    areArraysOrderedAndEqual(element, sortedArr2[index])
+  )
+}
+
+function flip (cells, mr, mc) {
+  const flipped = flipV(cells, mr, mc)
+  return areArraysUnorderedEqual(flipped, cells)
+    ? flipH(cells, mr, mc)
+    : flipped
+}
+
 function flipV (cells, mr, mc) {
   return normalize(
     cells.map(([r, c]) => [-r, c]),
@@ -187,7 +219,13 @@ function flipV (cells, mr, mc) {
     mc
   )
 }
-
+function flipH (cells, mr, mc) {
+  return normalize(
+    cells.map(([r, c]) => [r, -c]),
+    mr,
+    mc
+  )
+}
 function rotate3 (cells) {
   return normalize3(cells.map(([r, c, z]) => [c, -r, z]))
 }
@@ -273,7 +311,7 @@ export class Klein4 extends FlippableVariant {
   }
 
   static variantsOf (cells) {
-    let flipped = flipV(cells)
+    let flipped = flip(cells)
     return [cells, rotate(cells), flipped, rotate(flipped)]
   }
 
@@ -293,6 +331,34 @@ export class Klein4 extends FlippableVariant {
   static rf = idx => (idx > 1 ? 2 : 0) + (idx % 2 === 0 ? 1 : 0)
 }
 
+export class Diagonal extends FlippableVariant {
+  constructor (cells, validator, zoneDetail, variants) {
+    super(validator, zoneDetail, 'A')
+    this.list = variants || Diagonal.variantsOf(cells)
+  }
+
+  static variantsOf (cells) {
+    return [cells, rotate(cells)]
+  }
+
+  static setBehaviour (rotatable) {
+    rotatable.canFlip = true
+    rotatable.canRotate = true
+    rotatable.r1 = Blinker.r
+    rotatable.f1 = Blinker.r
+    rotatable.rf1 = Blinker.r
+  }
+
+  static cell3 (full, subGroups) {
+    const unrotated = makeCell3(full, subGroups)
+    return [unrotated, rotate3(unrotated)]
+  }
+
+  variant () {
+    return this.list[this.index]
+  }
+}
+
 function variantType (symmetry) {
   switch (symmetry) {
     case 'D':
@@ -305,6 +371,8 @@ function variantType (symmetry) {
       return Cyclic4
     case 'L':
       return Blinker
+    case 'G':
+      return Diagonal
     default:
       throw new Error(
         'Unknown symmetry type for ' + JSON.stringify(this, null, 2)

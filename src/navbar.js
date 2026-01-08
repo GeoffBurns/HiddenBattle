@@ -1,7 +1,8 @@
 import { ChooseFromListUI, ChooseNumberUI } from './chooseUI.js'
-import { gameMaps } from './maps.js'
+import { gameMaps, gameMap, TerrainMaps } from './maps.js'
 import { custom } from './custom.js'
 import { SavedCustomMap } from './map.js'
+import { terrain } from './Shape.js'
 
 export function removeShortcuts () {
   document.removeEventListener('keydown')
@@ -10,29 +11,93 @@ export function removeShortcuts () {
 export function switchToEdit (mapName, huntMode) {
   const params = new URLSearchParams()
   params.append('edit', mapName)
-
-  storeShips(params, huntMode)
+  params.append('terrain', terrain.current.tag)
+  storeShips(params, huntMode, 'battlebuild')
   const location = `./battlebuild.html?${params.toString()}`
-  window.location.href = location
+  globalThis.location.href = location
 }
 
-function storeShips (params, huntMode) {
-  if (huntMode === 'build' && custom.noOfPlacedShips() > 0) {
+function resetCustomMap () {
+  console.log('resetCustomMap')
+  saveCustomMap()
+  const map = gameMap()
+
+  gameMaps().setToBlank(map.rows, map.cols)
+  const map2 = gameMap()
+  console.log(map, map2)
+}
+function saveCustomMap () {
+  trackLevelEnd(gameMap(), false)
+  if (custom.noOfPlacedShips() > 0) {
     custom.store()
-    gameMaps.addCurrentCustomMap(custom.placedShips())
-    params.append('placedShips', '')
+    gameMaps().addCurrentCustomMap(custom.placedShips())
   }
 }
 
+function storeShips (params, huntMode, target) {
+  if (huntMode === 'build') {
+    if (custom.noOfPlacedShips() > 0) {
+      saveCustomMap()
+      params.append('placedShips', '')
+    } else {
+      params.delete('mapName')
+    }
+  }
+  return `./${target}.html?${params.toString()}`
+}
+
 export function switchTo (target, huntMode, mapName) {
-  const params = new URLSearchParams()
-  mapName = mapName || gameMaps.current.title
-  params.append('mapName', mapName)
+  if (target) {
+    const params = new URLSearchParams()
+    const map = gameMap()
+    if (!mapName) {
+      params.append('height', map.rows)
+      params.append('width', map.cols)
+    }
+    mapName = mapName || map.title
+    params.append('mapName', mapName)
+    params.append('terrain', terrain.current.tag)
+    const result = storeShips(params, huntMode, target)
 
-  storeShips(params, huntMode)
+    if (result) {
+      // alert('going to ' + result)
+      globalThis.location.href = result
+    }
+  }
+}
 
-  const location = `./${target}.html?${params.toString()}`
-  window.location.href = location
+class Tab {
+  constructor (name) {
+    this.name = name
+    this.element = document.getElementById(`tab-${this.name}`)
+    this.handers = new Set()
+  }
+  addClickListener (hander) {
+    this.element?.addEventListener('click', hander)
+    this.handers.add(hander)
+  }
+  overrideClickListener (hander) {
+    for (const h of this.handers) {
+      this.element?.removeEventListener('click', h)
+    }
+    this.handers.clear()
+    this.addClickListener(hander)
+  }
+  youAreHere () {
+    this.element?.classList.add('you-are-here')
+  }
+}
+
+export const tabs = {
+  build: null,
+  add: null,
+  hide: null,
+  seek: null,
+  list: null,
+  import: null,
+  about: null,
+  print: null,
+  source: null
 }
 
 export function setupTabs (huntMode) {
@@ -56,101 +121,150 @@ export function setupTabs (huntMode) {
     input.type = 'file'
     input.accept = 'application/json'
 
-    input.onchange = e => {
+    input.onchange = async e => {
       const file = e.target.files[0]
       if (!file) return
 
-      const reader = new FileReader()
-      reader.onload = evt => {
-        try {
-          const map = new SavedCustomMap(JSON.parse(evt.target.result))
-          if (gameMaps.getMap(map.title) || gameMaps.getCustomMap(map.title)) {
-            if (
-              !confirm(
-                'A map with this title already exists. Do you want to overwrite it?'
-              )
-            ) {
-              return
-            }
+      try {
+        const text = await file.text()
+        const map = new SavedCustomMap(JSON.parse(text))
+        const maps = gameMaps()
+        if (maps.getMap(map.title) || maps.getCustomMap(map.title)) {
+          if (
+            !confirm(
+              'A map with this title already exists. Do you want to overwrite it?'
+            )
+          ) {
+            return
           }
-          map.saveToLocalStorage()
-
-          trackClick(map, 'import map')
-          alert('Map imported successfully.')
-        } catch (err) {
-          alert('Invalid JSON: ' + err.message)
         }
+        map.saveToLocalStorage()
+
+        trackClick(map, 'import map')
+        alert('Map imported successfully.')
+      } catch (err) {
+        alert('Invalid JSON: ' + err.message)
       }
-      reader.readAsText(file)
     }
 
     // Trigger the file dialog
     input.click()
   }
-  if (huntMode === 'build') {
-    document.getElementById('tab-build').classList.add('you-are-here')
-    document.getElementById('tab-add').classList.add('you-are-here')
-  } else {
-    document
-      .getElementById('tab-build')
-      ?.addEventListener('click', switchToBuild)
 
-    document.getElementById('tab-add')?.addEventListener('click', function () {
-      window.location.href = './battlebuild.html'
+  tabs.build = new Tab('build')
+  tabs.add = new Tab('add')
+  tabs.hide = new Tab('hide')
+  tabs.seek = new Tab('seek')
+  tabs.list = new Tab('list')
+  tabs.import = new Tab('import')
+  tabs.about = new Tab('about')
+  tabs.source = new Tab('source')
+  tabs.print = new Tab('print')
+  if (huntMode === 'build') {
+    tabs.build.youAreHere()
+    tabs.add.youAreHere()
+  } else {
+    tabs.build?.addClickListener(switchToBuild)
+
+    tabs.add?.addClickListener(function () {
+      globalThis.location.href = './battlebuild.html'
     })
   }
 
   if (huntMode === 'hide') {
-    document.getElementById('tab-hide').classList.add('you-are-here')
+    tabs.hide?.youAreHere()
   } else {
-    document.getElementById('tab-hide')?.addEventListener('click', switchToHide)
+    tabs.hide?.addClickListener(switchToHide)
   }
 
   if (huntMode === 'seek') {
-    document.getElementById('tab-seek').classList.add('you-are-here')
+    tabs.seek?.youAreHere()
   } else {
-    document.getElementById('tab-seek')?.addEventListener('click', switchToSeek)
+    tabs.seek?.addClickListener(switchToSeek)
   }
 
   if (huntMode === 'list') {
-    document.getElementById('tab-build').classList.add('you-are-here')
-    document.getElementById('tab-list').classList.add('you-are-here')
+    tabs.build?.youAreHere()
+    tabs.list?.youAreHere()
   } else {
-    document.getElementById('tab-list')?.addEventListener('click', switchToList)
+    tabs.list?.addClickListener(switchToList)
   }
 
   if (huntMode !== 'import') {
-    document
-      .getElementById('tab-import')
-      ?.addEventListener('click', switchToImport)
+    tabs.import?.addClickListener(switchToImport)
   }
   if (huntMode === 'print') {
-    document.getElementById('tab-build').classList.add('you-are-here')
-    document.getElementById('tab-print').classList.add('you-are-here')
+    tabs.build?.youAreHere()
+    tabs.print?.youAreHere()
   }
-  document.getElementById('tab-print')?.addEventListener('click', function () {
+  tabs.print?.addClickListener(function () {
     trackTab('print')
-    window.print()
+    globalThis.print()
   })
 
-  document.getElementById('tab-about')?.addEventListener('click', function () {
+  tabs.about?.addClickListener(function () {
     trackTab('go to blog')
-    window.location.href =
+    globalThis.location.href =
       'https://geoffburns.blogspot.com/2015/10/pencil-and-paper-battleships.html'
   })
-  document.getElementById('tab-source')?.addEventListener('click', function () {
+  tabs.source?.addClickListener(function () {
     trackTab('go to source code')
-    window.location.href = 'https://github.com/GeoffBurns/battleship'
+    globalThis.location.href = 'https://github.com/GeoffBurns/battleship'
   })
 }
 
+function getParamMap (params) {
+  return params.getAll('mapName')[0]
+}
+function getParamEditMap (params) {
+  return params.getAll('edit')[0]
+}
+
+function isEditMode (params) {
+  const edit = getParamEditMap(params)
+  return !!edit
+}
+function setMapParams (title) {
+  const url = new URL(globalThis.location)
+  const urlParams = url.searchParams
+
+  const mapName = getParamMap(urlParams)
+  if (title && title !== mapName) {
+    urlParams.delete('width')
+    urlParams.delete('height')
+    urlParams.set('mapName', title)
+    urlParams.set('terrain', terrain?.current?.tag)
+
+    updateState(
+      [
+        ['mapName', mapName],
+        ['mode', ''],
+        ['height', ''],
+        ['width', ''],
+        ['x', ''],
+        ['mapType', ''][('terrain', terrain?.current?.bodyTag)]
+      ],
+      url
+    )
+  }
+}
 function setupMapControl (mapName, boardSetup, refresh) {
-  mapName = mapName || gameMaps.getLastMapTitle()
+  const maps = gameMaps()
+
+  if (!mapName) {
+    try {
+      mapName = maps.getLastMapTitle()
+    } catch (error) {
+      console.log(error)
+      mapName = null
+    }
+  }
+
   const mapTitles = (() => {
     try {
-      return gameMaps.mapTitles()
+      return maps.mapTitles()
     } catch (error) {
-      console.error('An error occurred:', error.message, gameMaps.mapTitles)
+      console.error('An error occurred:', error.message, maps.mapTitles)
       return []
     }
   })()
@@ -158,33 +272,50 @@ function setupMapControl (mapName, boardSetup, refresh) {
   const mapUI = new ChooseFromListUI(mapTitles, 'chooseMap')
   mapUI.setup(
     function (_index, title) {
-      gameMaps.setTo(title)
+      maps.setTo(title)
+      setMapParams(title)
       boardSetup()
       refresh()
-      gameMaps.storeLastMap()
+      maps.storeLastMap()
     },
     null,
     mapName
   )
 
-  gameMaps.setTo(mapName)
+  maps.setTo(mapName)
 }
 
 function setupMapSelectionPrint (boardSetup, refresh) {
-  const urlParams = new URLSearchParams(window.location.search)
-  const mapName = urlParams.getAll('mapName')[0]
+  const urlParams = new URLSearchParams(globalThis.location.search)
+  setupTerrain(urlParams)
+  const mapName = getParamMap(urlParams)
 
-  const targetMap = gameMaps.getMap(mapName)
+  const targetMap = gameMaps().getMap(mapName)
   setupMapControl(mapName, boardSetup, refresh)
 
   return targetMap
 }
 function setupMapSelection (boardSetup, refresh) {
-  const urlParams = new URLSearchParams(window.location.search)
-  const mapChoices = urlParams.getAll('mapName')
+  const urlParams = new URLSearchParams(globalThis.location.search)
+
+  setupTerrain(urlParams)
+  let mapName = getParamMap(urlParams)
+  const [height, width] = getParamSize(urlParams)
+  const maps = gameMaps()
+  let targetMap = maps.getMap(mapName)
+  console.log(targetMap)
+  mapName = targetMap?.title
+  if (!mapName && height && width) {
+    const map = maps.getMapOfSize(height, width)
+    mapName = map?.title
+    setMapParams(mapName)
+  }
+
+  const map = gameMap()
+
   const placedShips = urlParams.has('placedShips')
 
-  setupMapControl(mapChoices[0], boardSetup, refresh)
+  setupMapControl(mapName, boardSetup, refresh)
 
   return placedShips
 }
@@ -192,8 +323,12 @@ let widthUI = null
 let heightUI = null
 
 export function validateWidth () {
-  let width = parseInt(widthUI.choose.value, 10)
-  if (isNaN(width) || width < gameMaps.minWidth || width > gameMaps.maxWidth) {
+  let width = Number.parseInt(widthUI.choose.value, 10)
+  if (
+    Number.isNaN(width) ||
+    width < terrain.minWidth ||
+    width > terrain.maxWidth
+  ) {
     width = widthUI.min
     widthUI.choose.value = width
   }
@@ -201,11 +336,11 @@ export function validateWidth () {
 }
 
 export function validateHeight () {
-  let height = parseInt(heightUI.choose.value, 10)
+  let height = Number.parseInt(heightUI.choose.value, 10)
   if (
-    isNaN(height) ||
-    height < gameMaps.minHeight ||
-    height > gameMaps.maxHeight
+    Number.isNaN(height) ||
+    height < terrain.minHeight ||
+    height > terrain.maxHeight
   ) {
     height = heightUI.min
     heightUI.choose.value = height
@@ -213,74 +348,244 @@ export function validateHeight () {
   return height
 }
 
-function setupMapOptions (boardSetup, refresh, huntMode) {
-  const urlParams = new URLSearchParams(window.location.search)
-  huntMode = huntMode || 'build'
+function setSizeParams (height, width) {
+  const url = new URL(globalThis.location)
+  const urlParams = url.searchParams
+  const [h, w] = getParamSize(urlParams)
+
+  const mode = isEditMode(urlParams) ? 'edit' : 'create'
+  let mapName = getParamMap(urlParams)
+
+  if (
+    height &&
+    width &&
+    !Number.isNaN(height) &&
+    !Number.isNaN(width) &&
+    (height !== h || width !== w || mapName)
+  ) {
+    urlParams.delete('mapName')
+    urlParams.set('height', height)
+    urlParams.set('width', width)
+    urlParams.set('terrain', terrain?.current?.tag)
+    updateState(
+      [
+        ['mode', mode],
+        ['mapName', mapName],
+        ['height', height],
+        ['width', width],
+        ['x', 'x'],
+        ['mapType', ''],
+        ['terrain', terrain?.current?.bodyTag]
+      ],
+      url
+    )
+  }
+}
+function toTitleCase (str) {
+  if (!str) {
+    return ''
+  }
+  if (typeof str === 'string') {
+    return str.toLowerCase().replaceAll(/\b\w/g, s => s.toUpperCase())
+  }
+  return str
+}
+
+function replaceToken (template, key, value) {
+  const temp = template.replaceAll('{' + key + '}', value)
+  return temp.replaceAll('[' + key + ']', toTitleCase(value))
+}
+
+function replaceTokens (template, pairs) {
+  for (const [key, value] of pairs) {
+    template = replaceToken(template, key, value)
+  }
+  return template
+}
+
+function updateState (tokens, url) {
+  const pageTitle = document.getElementById('page-title')
+  let template = pageTitle?.dataset?.template
+  if (template) {
+    document.title = replaceTokens(template, tokens)
+  }
+
+  history.pushState({}, '', url)
+}
+function setupTerrain (urlParams) {
+  const terrainTag = urlParams.getAll('terrain')[0]
+  const newTerrainMap = TerrainMaps.setByTag(terrainTag)
+  const newTerrainTag = newTerrainMap?.terrain?.tag
+  const bodyTag = newTerrainMap?.terrain?.bodyTag
+  if ((terrainTag !== newTerrainTag, newTerrainTag)) {
+    const url = new URL(globalThis.location)
+    const urlParams = url.searchParams
+    urlParams.set('terrain', newTerrainTag)
+
+    const mode = isEditMode(urlParams) ? 'edit' : 'create'
+    let mapName = getParamMap(urlParams)
+    let [height, width] = getParamSize(urlParams)
+    const mapType = urlParams.getAll('mapType')[0]
+    let h = ''
+    let w = ''
+    let x = ''
+    if (mapName && (Number.isNaN(height) || Number.isNaN(width))) {
+      const map = gameMap()
+      height = map.rows
+      width = map.cols
+    }
+    if (!Number.isNaN(height) && !!Number.isNaN(width)) {
+      h = height.toString(10)
+      w = width.toString(10)
+      x = 'x'
+    }
+    updateState(
+      [
+        ['mode', mode],
+        ['mapName', mapName || ''],
+        ['height', h],
+        ['width', w],
+        ['x', x],
+        ['terrain', bodyTag],
+        ['mapType', mapType]
+      ],
+      url
+    )
+  }
+
+  const body = document.getElementsByTagName('body')[0]
+  if (body) {
+    body.classList.remove(...terrain.allBodyTags())
+    body.classList.add(terrain.current.bodyTag)
+  }
+}
+
+function getParamSize (urlParams) {
+  const height = Number.parseInt(urlParams.getAll('height')[0], 10)
+  const width = Number.parseInt(urlParams.getAll('width')[0], 10)
+  return [height, width]
+}
+function setupMapOptions (boardSetup, refresh, huntMode = 'build') {
+  const urlParams = new URLSearchParams(globalThis.location.search)
+  const [height, width] = getParamSize(urlParams)
+
+  const refreshSizeParams =
+    huntMode === 'build' ? setSizeParams : Function.prototype
+
+  setupTerrain(urlParams)
 
   widthUI = new ChooseNumberUI(
-    gameMaps.minWidth,
-    gameMaps.maxWidth,
+    terrain.minWidth,
+    terrain.maxWidth,
     1,
     'chooseWidth'
   )
   heightUI = new ChooseNumberUI(
-    gameMaps.minHeight,
-    gameMaps.maxHeight,
+    terrain.minHeight,
+    terrain.maxHeight,
     1,
     'chooseHeight'
   )
-  const targetMap = gameMaps.getEditableMap(urlParams.getAll('edit')[0])
+  const maps = gameMaps()
+  const targetMap = maps.getEditableMap(getParamEditMap(urlParams))
 
   const templateMap =
-    targetMap ||
-    gameMaps.getMap(urlParams.getAll('mapName')[0]) ||
-    gameMaps.getLastMap()
+    targetMap || maps.getMap(getParamMap(urlParams)) || maps.getLastMap()
 
-  let mapWidth = targetMap?.cols || gameMaps.getLastWidth(templateMap?.cols)
-  let mapHeight = targetMap?.rows || gameMaps.getLastHeight(templateMap?.rows)
+  let mapWidth =
+    width || targetMap?.cols || maps.getLastWidth(templateMap?.cols)
+  let mapHeight =
+    height || targetMap?.rows || maps.getLastHeight(templateMap?.rows)
 
   setupTabs(huntMode)
 
   widthUI.setup(function (_index) {
     const width = validateWidth()
     const height = validateHeight()
-    gameMaps.setToBlank(height, width)
-
-    gameMaps.storeLastWidth(width)
+    const maps = gameMaps()
+    maps.setToBlank(height, width)
+    maps.storeLastWidth(width)
 
     boardSetup()
     refresh()
+    refreshSizeParams(height, width)
   }, mapWidth)
 
   heightUI.setup(function (_index) {
     const width = validateWidth()
     const height = validateHeight()
-    gameMaps.setToBlank(height, width)
-    gameMaps.storeLastHeight(height)
+    const maps = gameMaps()
+    maps.setToBlank(height, width)
+    maps.storeLastHeight(height)
     boardSetup()
     refresh()
+    refreshSizeParams(height, width)
   }, mapHeight)
-
   if (targetMap) {
-    gameMaps.current = targetMap
+    gameMap(targetMap)
     boardSetup()
     refresh()
   } else {
-    gameMaps.setToBlank(mapHeight, mapWidth)
+    maps.setToBlank(mapHeight, mapWidth)
   }
 
+  refreshSizeParams(mapHeight, mapWidth)
   return targetMap
 }
+const mapTypes = ['Custom Maps Only', 'All Maps', 'Pre-Defined Maps Only']
 
+function getParamMapType (params) {
+  return params.getAll('mapType')[0]
+}
+function mapTypeIndex (mapType) {
+  return mapTypes.findIndex(m => m.split(' ', 1)[0] === mapType)
+}
+function setMapTypeParams (mapType) {
+  mapType = mapType?.split(' ', 1)[0]
+  const url = new URL(globalThis.location)
+  const urlParams = url.searchParams
+  const m = getParamMapType(urlParams)
+  const terrainTag = urlParams.getAll('terrain')[0]
+  const t = terrain?.current
+  let bodyTag = t?.bodyTag
+
+  if (t?.tag !== terrainTag) {
+    const newTerrainMap = TerrainMaps.setByTag(terrainTag)
+    bodyTag = newTerrainMap?.terrain?.bodyTag
+  }
+
+  if (mapType && m !== mapType) {
+    urlParams.delete('mapName')
+    urlParams.delete('height')
+    urlParams.delete('width')
+    urlParams.set('terrain', t?.tag)
+    urlParams.set('mapType', mapType)
+    updateState(
+      [
+        ['mode', ''],
+        ['mapName', ''],
+        ['height', ''],
+        ['width', ''],
+        ['x', ''],
+        ['mapType', mapType],
+        ['terrain', bodyTag]
+      ],
+      url
+    )
+  }
+}
 export function setupMapListOptions (refresh) {
-  const listUI = new ChooseFromListUI(
-    ['Custom Maps Only', 'All Maps', 'Pre-Defined Maps Only'],
-    'chooseList'
-  )
+  const urlParams = new URLSearchParams(globalThis.location.search)
+  const mapType = getParamMapType(urlParams)
+  const mapTypeIdx = mapTypeIndex(mapType)
+
+  setupTerrain(urlParams)
+  const listUI = new ChooseFromListUI(mapTypes, 'chooseList')
 
   listUI.setup(function (index, text) {
     refresh(index, text)
-  }, 0)
+    setMapTypeParams(text)
+  }, mapTypeIdx)
 }
 
 export function setupGameOptions (boardSetup, refresh) {
@@ -297,6 +602,9 @@ export function setupPrintOptions (boardSetup, refresh) {
 
 export function setupBuildOptions (boardSetup, refresh, huntMode, editHandler) {
   const targetMap = setupMapOptions(boardSetup, refresh, huntMode)
+  const maps = gameMaps()
+  maps.onChange = resetCustomMap
+  console.log('setupBuildOptions', maps)
   if (targetMap && editHandler) {
     editHandler(targetMap)
   } else {
@@ -311,12 +619,12 @@ export function initGA (GA_ID) {
   if (!GA_ID) throw new Error('initGA: missing GA_ID (G-XXXXXX)')
 
   // ensure dataLayer exists
-  window.dataLayer = window.dataLayer || []
+  globalThis.dataLayer = globalThis.dataLayer || []
 
   // define gtag only if not already defined
-  if (!window.gtag) {
-    window.gtag = function gtag () {
-      window.dataLayer.push(arguments)
+  if (!globalThis.gtag) {
+    globalThis.gtag = function gtag () {
+      globalThis.dataLayer.push(arguments)
     }
   }
 
@@ -326,8 +634,8 @@ export function initGA (GA_ID) {
   )
 
   // call basic setup immediately (safe to call before script loads)
-  window.gtag('js', new Date())
-  window.gtag('config', GA_ID, { debug_mode: true })
+  globalThis.gtag('js', new Date())
+  globalThis.gtag('config', GA_ID, { debug_mode: true })
 
   if (!alreadyLoaded) {
     const script = document.createElement('script')
@@ -353,14 +661,14 @@ export function fetchNavBar (tab, title, callback) {
     })
 }
 
-export const gtag = window.gtag
+export const gtag = globalThis.gtag
 
 export function trackLevelEnd (map, success) {
-  if (typeof window.gtag !== 'function') {
+  if (typeof globalThis.gtag !== 'function') {
     console.warn('GA not initialized')
     return
   }
-  map = map || gameMaps.current
+  map = map || gameMap()
 
   const params = {
     level_name: map.title || 'unknown',
@@ -371,15 +679,15 @@ export function trackLevelEnd (map, success) {
     success: !!success
   }
 
-  window.gtag('event', 'level_end', params)
+  globalThis.gtag('event', 'level_end', params)
 }
 
 export function trackClick (map, button) {
-  if (typeof window.gtag !== 'function') {
+  if (typeof globalThis.gtag !== 'function') {
     console.warn('GA not initialized')
     return
   }
-  map = map || gameMaps.current
+  map = map || gameMap()
 
   const params = {
     event_category: 'Engagement',
@@ -391,11 +699,11 @@ export function trackClick (map, button) {
     mode: document.title
   }
 
-  window.gtag('event', 'button_click', params)
+  globalThis.gtag('event', 'button_click', params)
 }
 
 export function trackTab (tab) {
-  if (typeof window.gtag !== 'function') {
+  if (typeof globalThis.gtag !== 'function') {
     console.warn('GA not initialized')
     return
   }
@@ -406,5 +714,5 @@ export function trackTab (tab) {
     mode: document.title
   }
 
-  window.gtag('event', 'tab_click', params)
+  globalThis.gtag('event', 'tab_click', params)
 }

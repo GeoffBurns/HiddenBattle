@@ -3,7 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Geoff's Hidden Battles Seek Game</title>
+    <title id="page-title" data-template="Geoff's [terrain] Seek {mapName}">
+      Geoff's Hidden Battles Seek Game
+    </title>
 
     <meta
       name="description"
@@ -20,13 +22,13 @@
     <link rel="stylesheet" href="battleseek.css" />
     <link rel="stylesheet" media="print" href="print.css" />
   </head>
-  <body>
+  <body class="hidden-battle">
     <div class="battleship" id="battleship-game">
       <div id="navbar"></div>
       <div class="game-container">
         <div class="player-container">
           <div class="title-wrap">
-            <h2 class="centered-title">Enemy Waters</h2>
+            <h2 id="enemy-title" class="centered-title">Enemy Waters</h2>
           </div>
           <div class="player-body">
             <div class="player-main">
@@ -100,6 +102,7 @@
     <script type="module" src="./enemy.js"></script>
     <script type="module" src="./navbar.js"></script>
     <script type="module" src="./enemySetup.js"></script>
+    <script type="module" src="./space.js"></script>
     <script type="module" src="./battleseek.js"></script>
   </body>
 </html>

@@ -1,25 +1,71 @@
 import { placingTarget } from './CellsToBePlaced.js'
 import { Map, SavedCustomMap, CustomBlankMap, EditedCustomMap } from './map.js'
-import { terrain, seaAndLand, oldToken } from './Shape.js'
+import { terrain, seaAndLand, oldToken, token } from './Shape.js'
 export const gameHost = {
   containerWidth: 574
 }
 
-export const terrainMaps = {
+const terrainsMaps = {
   current: null,
   list: [],
+  onChange: Function.prototype,
   add: function (newTM) {
     terrain.add(newTM.terrain)
     if (this.list?.includes(newTM)) return
     this.list.push(newTM)
   },
   setCurrent: function (newCurrent) {
+    console.log('setCurrent')
+    if (newCurrent === this.current) return
+
     this.add(newCurrent)
     terrain.setCurrent(newCurrent.terrain)
     this.current = newCurrent
     placingTarget.boundsChecker = newCurrent.inBounds.bind(newCurrent)
     placingTarget.allBoundsChecker = newCurrent.inAllBounds.bind(newCurrent)
     placingTarget.getZone = newCurrent.zoneInfo.bind(newCurrent)
+
+    console.log('setCurrent2')
+    this.onChange(newCurrent)
+  },
+  setByIndex (idx) {
+    if (idx !== null && idx !== undefined) {
+      const newTerrain = this.list[idx]
+      if (newTerrain) this.setCurrent(newTerrain)
+      return newTerrain
+    }
+    return null
+  },
+  setByTerrain (terrain) {
+    if (terrain) {
+      const newTerrain = this.list.find(t => t.tag === terrain)
+      if (newTerrain) this.setCurrent(newTerrain)
+      return newTerrain
+    }
+    return null
+  },
+  setByTagBase (tag) {
+    if (tag) {
+      tag = tag.toLowerCase()
+      const newTerrain = this.list.find(
+        t =>
+          t?.terrain?.tag?.toLowerCase() === tag ||
+          t?.terrain?.bodyTag?.toLowerCase() === tag
+      )
+      console.log(tag, newTerrain, this.list)
+      if (newTerrain) this.setCurrent(newTerrain)
+      return newTerrain
+    }
+    return null
+  },
+  setToDefault () {
+    const newTerrain = this.default
+    if (newTerrain) this.setCurrent(newTerrain)
+    return newTerrain
+  },
+  setByTag (tag) {
+    console.log('setByTag', tag)
+    return this.setByTagBase(tag) || this.setToDefault() || this.setByIndex(0)
   }
 }
 
@@ -258,7 +304,7 @@ const JaggedXL = new Map(
 )
 
 // gameMapTypes
-class TerrainMaps {
+export class TerrainMaps {
   constructor (terrain, list, currentMap) {
     this.list = list
     this.current = currentMap
@@ -332,7 +378,7 @@ class TerrainMaps {
     }
   }
   prefilledMapIndex (mapName) {
-    this.list.findIndex(m => m.title === mapName)
+    return this.list.findIndex(m => m.title === mapName)
   }
 
   getCustomMap (mapName) {
@@ -346,18 +392,37 @@ class TerrainMaps {
   }
 
   getMap (mapName) {
-    if (!mapName) return
+    if (!mapName) return null
     let map = this.list.find(m => m.title === mapName)
     if (!map) map = this.getCustomMap(mapName)
     return map
   }
 
-  oldLastMapLocalStorageKey = `${oldToken}.map-name`
-  lastMapLocalStorageKey = `${oldToken}.${this.key}-last-map-name`
+  getMapOfSize (height, width) {
+    if (!height || !width) return null
+    let map = this.list.find(m => m.rows === height && m.cols === width)
+    if (!map) map = this.getCustomMapOfSize(height, width)
+    return map
+  }
+  getCustomMapOfSize (height, width) {
+    if (!height || !width) return null
+    const list = this.customMapList()
+    return list.find(m => m.rows === height && m.cols === width)
+  }
+
+  oldoldLastMapLocalStorageKey = `${oldToken}.map-name`
+  oldLastMapLocalStorageKey = `${oldToken}.${this.key}-last-map-name`
+  lastMapLocalStorageKey () {
+    return `${token}.${this.terrain?.tag}.${this.key}-last-map-name`
+  }
 
   getLastMapTitleRaw () {
-    const title = localStorage.getItem(this.lastMapLocalStorageKey)
-    return title || this.getOldLastMapTitle()
+    const title = localStorage.getItem(this.lastMapLocalStorageKey())
+
+    if (this.key !== 'SeaAndLand') {
+      return title
+    }
+    return title || this.getOldLastMapTitle() || this.getOldOldLastMapTitle()
   }
   getLastMapTitle () {
     const title = this.getLastMapTitleRaw()
@@ -368,23 +433,26 @@ class TerrainMaps {
     return this.getMap(title) || this.list[0]
   }
 
+  getOldOldLastMapTitle () {
+    return localStorage.getItem(this.oldoldLastMapLocalStorageKey)
+  }
   getOldLastMapTitle () {
     return localStorage.getItem(this.oldLastMapLocalStorageKey)
   }
-  getOldLastMap () {
-    const title = this.getOldLastMapTitle()
-    return this.getMap(title) || this.list[0]
-  }
   storeLastMap () {
-    localStorage.setItem(this.lastMapLocalStorageKey, this.current.title)
+    localStorage.setItem(this.lastMapLocalStorageKey(), this.current.title)
   }
 
-  lastWidthStorageKey = `${oldToken}.custom-map-width`
-  lastHeightStorageKey = `${oldToken}.custom-map-height`
+  lastWidthStorageKey = `${token}.custom-map-width`
+  lastHeightStorageKey = `${token}.custom-map-height`
+  oldLastWidthStorageKey = `${oldToken}.custom-map-width`
+  oldLastHeightStorageKey = `${oldToken}.custom-map-height`
   getLastWidth (defaultWidth) {
-    const width = parseInt(localStorage.getItem(this.lastWidthStorageKey), 10)
+    const width =
+      Number.parseInt(localStorage.getItem(this.lastWidthStorageKey), 10) ||
+      Number.parseInt(localStorage.getItem(this.oldLastWidthStorageKey), 10)
     if (
-      isNaN(width) ||
+      Number.isNaN(width) ||
       width < this.terrain.minWidth ||
       width > this.terrain.maxWidth
     )
@@ -392,9 +460,11 @@ class TerrainMaps {
     return width
   }
   getLastHeight (defaultHeight) {
-    const height = parseInt(localStorage.getItem(this.lastHeightStorageKey), 10)
+    const height =
+      Number.parseInt(localStorage.getItem(this.lastHeightStorageKey), 10) ||
+      Number.parseInt(localStorage.getItem(this.oldLastHeightStorageKey), 10)
     if (
-      isNaN(height) ||
+      Number.isNaN(height) ||
       height < this.terrain.minHeight ||
       height > this.terrain.maxHeight
     )
@@ -436,7 +506,7 @@ class TerrainMaps {
   }
 
   noOfShipOfShape (shape) {
-    return gameMaps.current.shipNum[shape.letter]
+    return this.current.shipNum[shape.letter]
   }
   inBounds (r, c) {
     return this.current.inBounds(r, c)
@@ -451,6 +521,31 @@ class TerrainMaps {
 
   isLand (r, c) {
     return this.current.isLand(r, c)
+  }
+  static currentTerrainMaps (newCurrent) {
+    console.log('currentTerrainMaps', newCurrent)
+    if (newCurrent && terrainsMaps.current !== newCurrent) {
+      console.log('currentTerrainMaps2')
+      terrainsMaps.setCurrent(newCurrent)
+    }
+    return terrainsMaps.current
+  }
+  static setByTag (tag) {
+    let result = null
+    if (tag) {
+      result = terrainsMaps.setByTag(tag)
+    }
+
+    return result || terrainsMaps.setToDefault() || terrainsMaps.setByIndex(0)
+  }
+  static setByIndex (idx) {
+    if (idx) {
+      return terrainsMaps.setByIndex(idx)
+    }
+    return null
+  }
+  static setToDefault () {
+    return terrainsMaps.setToDefault()
   }
 }
 // gameMapTypes
@@ -481,6 +576,21 @@ class SeaAndLandMaps extends TerrainMaps {
 
 const seaAndLandMaps = new SeaAndLandMaps()
 
-terrainMaps.setCurrent(seaAndLandMaps)
+TerrainMaps.currentTerrainMaps(seaAndLandMaps)
 
-export const gameMaps = seaAndLandMaps
+export function gameMaps (maps) {
+  if (maps) {
+    TerrainMaps.currentTerrainMaps(maps)
+  }
+  if (TerrainMaps.currentTerrainMaps() === null) {
+    TerrainMaps.currentTerrainMaps(seaAndLandMaps)
+  }
+  return TerrainMaps.currentTerrainMaps()
+}
+
+export function gameMap (map) {
+  if (map) {
+    gameMaps().setTo(map.title)
+  }
+  return gameMaps().current
+}

@@ -3,9 +3,13 @@ body {
     background-repeat: repeat;
 }
 
-.logo {
-    width: 90px;
-    height: 90px;
+body.space {
+    background-image: var(--background-image-space);
+    background-repeat: repeat;
+}
+
+body.space img.logo {
+    content: var(--logo-image-space);
 }
 
 .battleship {

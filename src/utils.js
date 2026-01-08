@@ -1,8 +1,9 @@
-import { gameMaps } from './maps.js'
+import { gameMap } from './maps.js'
 
 export function randomPlaceShape (ship, shipCellGrid) {
   const letter = ship.letter
   const shape = ship.shape()
+  const map = gameMap()
   if (!shape) throw new Error('No shape for letter ' + letter)
   let placeables = shape.placeables()
 
@@ -13,8 +14,8 @@ export function randomPlaceShape (ship, shipCellGrid) {
       // compute bounds for random origin so variant fits
       const maxR = placeable.height()
       const maxC = placeable.width()
-      const r0 = Math.floor(Math.random() * (gameMaps.current.rows - maxR))
-      const c0 = Math.floor(Math.random() * (gameMaps.current.cols - maxC))
+      const r0 = Math.floor(Math.random() * (map.rows - maxR))
+      const c0 = Math.floor(Math.random() * (map.cols - maxC))
       if (placeable.canPlace(r0, c0, shipCellGrid)) {
         ship.placePlaceable(placeable, r0, c0)
         ship.addToGrid(shipCellGrid)
@@ -31,21 +32,20 @@ export function throttle (func, delay) {
   let lastTime
 
   return function () {
-    const context = this
     const args = arguments
 
-    if (!inThrottle) {
-      func.apply(context, args)
-      lastTime = Date.now()
-      inThrottle = true
-    } else {
+    if (inThrottle) {
       clearTimeout(lastFn)
-      lastFn = setTimeout(function () {
+      lastFn = setTimeout(() => {
         if (Date.now() - lastTime >= delay) {
-          func.apply(context, args)
+          func.apply(this, args)
           lastTime = Date.now()
         }
       }, Math.max(delay - (Date.now() - lastTime), 0))
+    } else {
+      func.apply(this, args)
+      lastTime = Date.now()
+      inThrottle = true
     }
   }
 }

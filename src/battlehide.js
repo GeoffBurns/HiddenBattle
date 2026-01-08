@@ -229,7 +229,7 @@ fetchNavBar('hide', "Geoff's Hidden Battle (Hide & Seek)", function () {
   newPlacement()
 
   if (placedShips) {
-    friend.load()
+    friend.load(null)
     friend.updateUI(friend.ships)
     friendUI.readyMode()
   }

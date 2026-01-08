@@ -38,19 +38,22 @@
     border: 2px solid orange;
 }
 
-
+.cell.space.bad,
 .cell.sea.bad {
     border: 2px solid #ff0080;
 }
 
+.cell.space.notgood,
 .cell.sea.notgood {
     border: 2px solid #ff8080;
 }
 
+.cell.asteroid.bad,
 .cell.land.bad {
     border: 2px solid #ff7219;
 }
 
+.cell.asteroid.notgood,
 .cell.land.notgood {
     border: 2px solid #ffa219;
 }
@@ -59,60 +62,73 @@
     border: 2px solid green;
 }
 
+.cell.space.good,
 .cell.sea.good {
     border: 2px solid #1ABB99;
 }
 
+.cell.asteroid.good,
 .cell.land.good {
     border: 2px solid #29BB34
 }
 
 
-
+.cell.asteroid.light.bad,
 .cell.land.light.bad {
     background: #B48239
 }
 
+.cell.asteroid.dark.bad,
 .cell.land.dark.bad {
     background: #A96334
 }
 
+.cell.asteroid.light.cell.notgood,
 .cell.land.light.notgood {
     background: #B4b239
 }
 
+.cell.asteroid.dark.notgood,
 .cell.land.dark.notgood {
     background: #A99334
 }
 
+.cell.space.light.bad,
 .cell.sea.light.bad {
     background: #BA78D6
 }
 
+.cell.space.dark.bad,
 .cell.sea.dark.bad {
     background: #9761B0
 }
 
+.cell.space.light.notgood,
 .cell.sea.light.notgood {
     background: #BAa8D6
 }
 
+.cell.space.dark.notgood,
 .cell.sea.dark.notgood {
     background: #97a1B0
 }
 
+.cell.cell.asteroid.light.bad,
 .cell.land.light.good {
     background: #34F239
 }
 
+.cell.asteroid.dark.good,
 .cell.land.dark.good {
     background: #29C334
 }
 
+.cell.space.light.good,
 .cell.sea.light.good {
     background: #1AE8D6
 }
 
+.cell.space.dark.bad,
 .cell.sea.dark.good {
     background: #17C1B0
 }

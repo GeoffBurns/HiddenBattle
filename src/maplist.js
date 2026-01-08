@@ -228,13 +228,13 @@ class MapList {
 
     switch (listIncludes) {
       case '0':
-        maps = gameMaps.customMapList()
+        maps = gameMaps().customMapList()
         break
       case '1':
-        maps = gameMaps.maps()
+        maps = gameMaps().maps()
         break
       case '2':
-        maps = gameMaps.preGenMapList()
+        maps = gameMaps().preGenMapList()
         break
       default:
         throw new Error('unknown list display option')
@@ -281,7 +281,7 @@ async function saveToFile (map, suggestedName) {
   suggestedName = suggestedName || (name ? name + '.json' : 'map.json')
 
   // feature-detect
-  if ('showSaveFilePicker' in window) {
+  if ('showSaveFilePicker' in globalThis) {
     try {
       const opts = {
         suggestedName,
@@ -292,7 +292,7 @@ async function saveToFile (map, suggestedName) {
           }
         ]
       }
-      const handle = await window.showSaveFilePicker(opts)
+      const handle = await globalThis.showSaveFilePicker(opts)
       const writable = await handle.createWritable()
       await writable.write(json)
       await writable.close()

@@ -1,6 +1,6 @@
 import { DraggedShip, Brush } from './selection.js'
 import { cursor } from './cursor.js'
-import { gameMaps } from './maps.js'
+import { gameMap } from './maps.js'
 import { CustomMap } from './map.js'
 
 let selection = null
@@ -154,9 +154,9 @@ function createSelection (viewModel, ships, shipCellGrid, shipId) {
       : viewModel.getTrayItem(shipId)
 
   if (shipElement === null) return
-  const id = shipId === null ? parseInt(shipElement.dataset.id) : shipId
+  const id = shipId === null ? Number.parseInt(shipElement.dataset.id) : shipId
   const ship = ships.find(s => s.id === id)
-  const variantIndex = parseInt(shipElement.dataset.variant) || 0
+  const variantIndex = Number.parseInt(shipElement.dataset.variant) || 0
 
   selection = new DraggedShip(
     ship,
@@ -209,7 +209,7 @@ class DraggedWeapon {
     // nothing to remove
   }
   addToMap (map) {
-    map = map || gameMaps.current
+    map = map || gameMap()
     const weapons = map.weapons
 
     const idx = weapons.findIndex(w => w.letter === this.weapon.letter)
@@ -238,8 +238,8 @@ class DragNDrop {
     if (!selection) return
 
     if (selection instanceof DraggedShip) {
-      const r = parseInt(cell.dataset.r)
-      const c = parseInt(cell.dataset.c)
+      const r = Number.parseInt(cell.dataset.r)
+      const c = Number.parseInt(cell.dataset.c)
 
       const placed = selection.place(r, c, model.shipCellGrid)
       if (placed) {
@@ -289,8 +289,8 @@ class DragNDrop {
   handleAddShipDropEvent (cell, model, viewModel) {
     if (!selection) return
     if (selection instanceof DraggedShip) {
-      const r = parseInt(cell.dataset.r)
-      const c = parseInt(cell.dataset.c)
+      const r = Number.parseInt(cell.dataset.r)
+      const c = Number.parseInt(cell.dataset.c)
 
       const placed = selection.place(r, c, model.shipCellGrid)
       if (placed) {
@@ -342,20 +342,20 @@ class DragNDrop {
   }
 
   highlight (viewModel, shipCellGrid, r, c) {
+    const map = gameMap()
     if (!selection?.ghost) return
     if (r === null) r = lastEntered[0]
     if (c === null) c = lastEntered[1]
     const [r0, c0] = selection.offsetCell(r, c)
-    if (!gameMaps.inBounds(r0, c0)) return
+    if (!map.inBounds(r0, c0)) return
 
     viewModel.removeHighlight()
 
     const placing = selection.placeable().placeAt(r0, c0)
-
     const canPlace = placing.canPlace(shipCellGrid)
     const cells = placing.cells
     for (const [rr, cc, dm] of cells) {
-      if (gameMaps.inBounds(rr, cc)) {
+      if (map.inBounds(rr, cc)) {
         const cell = viewModel.gridCellAt(rr, cc)
         let cellClass = 'bad'
         if (canPlace) {
@@ -368,18 +368,19 @@ class DragNDrop {
     }
   }
   dragEnter (cell, model, viewModel) {
+    const context = this
     cell.addEventListener('dragenter', e => {
       e.preventDefault()
       const isShip = e.dataTransfer.types.includes('ship')
       if (!isShip) return
 
       const el = e.target
-      const r = parseInt(el.dataset.r)
-      const c = parseInt(el.dataset.c)
+      const r = Number.parseInt(el.dataset.r)
+      const c = Number.parseInt(el.dataset.c)
       if (lastEntered[0] === r && lastEntered[1] === c) return
 
       lastEntered = [r, c]
-      this.highlight(viewModel, model.shipCellGrid, r, c)
+      context.highlight(viewModel, model.shipCellGrid, r, c)
     })
   }
 
@@ -387,17 +388,17 @@ class DragNDrop {
     function setLandCells (r, c, min, max, map, subterrain) {
       for (let i = min; i < max; i++) {
         for (let j = min; j < max; j++) {
-          if (gameMaps.inBounds(r + i, c + j)) {
+          if (map.inBounds(r + i, c + j)) {
             map.setLand(r + i, c + j, subterrain)
           }
         }
       }
     }
 
-    function recolorCells (viewModel, r, c, min, max) {
+    function recolorCells (viewModel, r, c, min, max, map) {
       for (let i = min - 1; i < max + 1; i++) {
         for (let j = min - 1; j < max + 1; j++) {
-          if (gameMaps.inBounds(r + i, c + j)) {
+          if (map.inBounds(r + i, c + j)) {
             viewModel.recolor(r + i, c + j)
           }
         }
@@ -409,15 +410,15 @@ class DragNDrop {
       const isBrush = e.dataTransfer.types.includes('brush')
       if (!isBrush) return
       const el = e.target
-      const r = parseInt(el.dataset.r)
-      const c = parseInt(el.dataset.c)
+      const r = Number.parseInt(el.dataset.r)
+      const c = Number.parseInt(el.dataset.c)
       if (lastEntered[0] === r && lastEntered[1] === c) return
 
       lastEntered = [r, c]
 
       const size = selection?.size
       const subterrain = selection?.subterrain
-      const map = gameMaps.current
+      const map = gameMap()
 
       if (!(selection?.size && subterrain && map instanceof CustomMap)) return
 
@@ -425,8 +426,9 @@ class DragNDrop {
       let max = size < 2 ? 1 : 2
 
       setLandCells(r, c, min, max, map, subterrain)
-      recolorCells.call(this, viewModel, r, c, min, max)
+      recolorCells.call(this, viewModel, r, c, min, max, map)
       viewModel.score.displayZoneInfo()
+      viewModel.resetClearBtn()
     }
     cell.addEventListener('dragenter', handler)
   }
@@ -443,12 +445,12 @@ class DragNDrop {
       }
 
       cursor.isDragging = false
-      if (e.dataTransfer.dropEffect !== 'none') {
-        // The item was successfully dropped on a valid drop target
-        viewModel.disableRotateFlip()
-      } else {
+      if (e.dataTransfer.dropEffect === 'none') {
         // The drag operation was canceled or dropped on an invalid target
         viewModel.assignClicked(selection.ship, shipElement)
+      } else {
+        // The item was successfully dropped on a valid drop target
+        viewModel.disableRotateFlip()
       }
 
       removeSelection()
@@ -499,7 +501,7 @@ class DragNDrop {
   dragStartWeapon (viewModel, dragShip, weapon, substract) {
     dragShip.addEventListener('dragstart', e => {
       const shipElement = e.currentTarget
-      const shipId = parseInt(shipElement.dataset.id)
+      const shipId = Number.parseInt(shipElement.dataset.id)
       if (e.target !== shipElement && !shipId) {
         return
       }
@@ -518,7 +520,7 @@ class DragNDrop {
   dragStart (viewModel, dragShip, ships) {
     dragShip.addEventListener('dragstart', e => {
       const shipElement = e.currentTarget
-      const shipId = parseInt(shipElement.dataset.id)
+      const shipId = Number.parseInt(shipElement.dataset.id)
       if (e.target !== shipElement && !shipId) {
         return
       }

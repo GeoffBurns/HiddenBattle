@@ -1,4 +1,4 @@
-import { gameMaps } from './maps.js'
+import { gameMap, gameMaps } from './maps.js'
 import { terrain } from './Shape.js'
 
 export class Ship {
@@ -34,7 +34,7 @@ export class Ship {
   }
   isRightZone (r, c) {
     const shipType = this.type()
-    const isLand = gameMaps.isLand(r, c)
+    const isLand = gameMap().isLand(r, c)
     // area rules
     if (shipType === 'G' && !isLand) return false
     if (shipType === 'S' && isLand) return false
@@ -42,9 +42,10 @@ export class Ship {
     return true
   }
   noTouchCheck (r, c, shipCellGrid) {
+    const map = gameMap()
     for (let nr = r - 1; nr <= r + 1; nr++)
       for (let nc = c - 1; nc <= c + 1; nc++) {
-        if (gameMaps.inBounds(nr, nc) && shipCellGrid[nr][nc]) return false
+        if (map.inBounds(nr, nc) && shipCellGrid[nr][nc]) return false
       }
     return true
   }
@@ -55,9 +56,10 @@ export class Ship {
   }
   canPlace (variant, r0, c0, shipCellGrid) {
     const placing = this.placeCells(variant, r0, c0)
+    const map = gameMap()
     if (
       placing.some(([r, c]) => {
-        return !gameMaps.inBounds(r, c)
+        return !map.inBounds(r, c)
       })
     ) {
       // console.log('out of bounds')
@@ -70,7 +72,7 @@ export class Ship {
 
     if (
       placing.some(([r, c]) => {
-        return (gameMaps.inBounds(r, c) && shipCellGrid[r][c]) === true
+        return (map.inBounds(r, c) && shipCellGrid[r][c]) === true
       })
     ) {
       //   console.log('overlapping')
@@ -95,7 +97,7 @@ export class Ship {
     }
   }
   shape () {
-    return gameMaps.shapesByLetter[this.letter]
+    return gameMaps().shapesByLetter[this.letter]
   }
   sunkDescription (middle = ' ') {
     return terrain.current.sunkDescription(this.letter, middle)

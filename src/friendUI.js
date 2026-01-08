@@ -2,7 +2,7 @@ import { gameStatus } from './playerUI.js'
 import { PlacementUI } from './placementUI.js'
 import { setupDragHandlers } from './dragndrop.js'
 import { trackLevelEnd } from './navbar.js'
-import { gameMaps } from './maps.js'
+import { gameMap } from './maps.js'
 
 export class FriendUI extends PlacementUI {
   constructor () {
@@ -23,7 +23,7 @@ export class FriendUI extends PlacementUI {
   displayFleetSunk () {
     gameStatus.display('Your Fleet is Destroyed', '')
     this.board.classList.add('destroyed')
-    trackLevelEnd(gameMaps.current, false)
+    trackLevelEnd(gameMap(), false)
   }
 
   cellHit (r, c) {
@@ -53,8 +53,7 @@ export class FriendUI extends PlacementUI {
     this.showShipTrays()
     gameStatus.game.classList.remove('hidden')
     gameStatus.mode.classList.remove('hidden')
-    gameStatus.line.classList.remove('hidden')
-    gameStatus.line.classList.remove('small')
+    gameStatus.line.classList.remove('hidden', 'small')
     gameStatus.line.classList.add('medium')
     const panels = document.getElementsByClassName('panel')
     for (const panel of panels) {
@@ -82,8 +81,7 @@ export class FriendUI extends PlacementUI {
 
     gameStatus.game.classList.remove('hidden')
     gameStatus.mode.classList.remove('hidden')
-    gameStatus.line.classList.remove('hidden')
-    gameStatus.line.classList.remove('small')
+    gameStatus.line.classList.remove('hidden', 'small')
     gameStatus.line.classList.add('medium')
     const panels = document.getElementsByClassName('panel')
     for (const panel of panels) {
@@ -138,8 +136,7 @@ export class FriendUI extends PlacementUI {
     this.hideTips()
     gameStatus.game.classList.remove('hidden')
     gameStatus.mode.classList.remove('hidden')
-    gameStatus.line.classList.remove('medium')
-    gameStatus.line.classList.add('hidden')
+    gameStatus.line.classList.remove('medium', 'hidden')
     gameStatus.line2.classList.remove('medium')
     gameStatus.line2.classList.add('small')
   }
