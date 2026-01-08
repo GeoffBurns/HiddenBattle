@@ -16,7 +16,7 @@ export class WatersUI {
 
   cellSizeScreen (map) {
     map = map || gameMap()
-    return this.containerWidth / map.cols
+    return this.containerWidth / (map?.cols || 18)
   }
   cellSizeList () {
     return this.containerWidth / 22
@@ -159,8 +159,8 @@ export class WatersUI {
   resetBoardSize (map, cellSize) {
     if (!map) map = gameMap()
     cellSize = cellSize || this.cellSizeString()
-    this.board.style.setProperty('--cols', map.cols)
-    this.board.style.setProperty('--rows', map.rows)
+    this.board.style.setProperty('--cols', map?.cols || 18)
+    this.board.style.setProperty('--rows', map?.rows || 8)
     this.board.style.setProperty('--boxSize', cellSize)
     this.board.innerHTML = ''
   }

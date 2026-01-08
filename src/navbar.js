@@ -18,13 +18,10 @@ export function switchToEdit (mapName, huntMode) {
 }
 
 function resetCustomMap () {
-  console.log('resetCustomMap')
   saveCustomMap()
   const map = gameMap()
 
   gameMaps().setToBlank(map.rows, map.cols)
-  const map2 = gameMap()
-  console.log(map, map2)
 }
 function saveCustomMap () {
   trackLevelEnd(gameMap(), false)
@@ -237,12 +234,13 @@ function setMapParams (title) {
 
     updateState(
       [
-        ['mapName', mapName],
+        ['mapName', mapName || ''],
         ['mode', ''],
         ['height', ''],
         ['width', ''],
         ['x', ''],
-        ['mapType', ''][('terrain', terrain?.current?.bodyTag)]
+        ['mapType', ''],
+        ['terrain', terrain?.current?.bodyTag || '']
       ],
       url
     )
@@ -302,16 +300,20 @@ function setupMapSelection (boardSetup, refresh) {
   let mapName = getParamMap(urlParams)
   const [height, width] = getParamSize(urlParams)
   const maps = gameMaps()
-  let targetMap = maps.getMap(mapName)
-  console.log(targetMap)
-  mapName = targetMap?.title
+  let targetMap = null
+  try {
+    targetMap = maps.getMap(mapName)
+    console.log(targetMap)
+    mapName = targetMap?.title
+  } catch (error) {
+    console.log(error)
+  }
+
   if (!mapName && height && width) {
     const map = maps.getMapOfSize(height, width)
     mapName = map?.title
     setMapParams(mapName)
   }
-
-  const map = gameMap()
 
   const placedShips = urlParams.has('placedShips')
 
@@ -431,10 +433,10 @@ function setupTerrain (urlParams) {
     let x = ''
     if (mapName && (Number.isNaN(height) || Number.isNaN(width))) {
       const map = gameMap()
-      height = map.rows
-      width = map.cols
+      height = map?.rows
+      width = map?.cols
     }
-    if (!Number.isNaN(height) && !!Number.isNaN(width)) {
+    if (height && width && !Number.isNaN(height) && !Number.isNaN(width)) {
       h = height.toString(10)
       w = width.toString(10)
       x = 'x'
@@ -447,7 +449,7 @@ function setupTerrain (urlParams) {
         ['width', w],
         ['x', x],
         ['terrain', bodyTag],
-        ['mapType', mapType]
+        ['mapType', mapType || '']
       ],
       url
     )
@@ -604,7 +606,6 @@ export function setupBuildOptions (boardSetup, refresh, huntMode, editHandler) {
   const targetMap = setupMapOptions(boardSetup, refresh, huntMode)
   const maps = gameMaps()
   maps.onChange = resetCustomMap
-  console.log('setupBuildOptions', maps)
   if (targetMap && editHandler) {
     editHandler(targetMap)
   } else {
@@ -645,22 +646,38 @@ export function initGA (GA_ID) {
   }
 }
 
-export function fetchNavBar (tab, title, callback) {
+export async function fetchNavBar (tab, title, callback) {
   initGA(GA_ID)
-  fetch('./navbars.html')
-    .then(res => res.text())
-    .then(html => {
-      document.getElementById('navbar').innerHTML = html
-      document.getElementById('print-title').textContent = title
-      setupTabs(tab)
-      if (typeof callback === 'function') callback()
-    })
-    .catch(err => {
-      console.error('Failed to load navbars:', err)
-      if (typeof callback === 'function') callback(err)
-    })
-}
 
+  try {
+    // The await keyword pauses the execution until the fetch() promise settles (resolves or rejects)
+    const res = await fetch('./navbars.html')
+
+    // Check if the request was successful
+    if (!res.ok) {
+      // Create a specific error for non-successful HTTP status codes
+      throw new Error(`HTTP error! status: ${res.status}`)
+    }
+
+    // Await the promise returned by the .text() method (or .json() if applicable)
+    const html = await res.text()
+    // Do something with the html
+    document.getElementById('navbar').innerHTML = html
+    document.getElementById('print-title').textContent = title
+    setupTabs(tab)
+    if (typeof callback === 'function') {
+      try {
+        callback()
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  } catch (err) {
+    // The catch block handles any errors from the fetch call itself or from the processing (e.g., .text())
+    console.error('Failed to load navbars:', err)
+    if (typeof callback === 'function') callback(err)
+  }
+}
 export const gtag = globalThis.gtag
 
 export function trackLevelEnd (map, success) {

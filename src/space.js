@@ -11,9 +11,11 @@ import {
   Sweep,
   Hybrid,
   StandardCells,
-  SpecialCells
+  SpecialCells,
+  standardShot
 } from './Shape.js'
 import { TerrainMaps } from './maps.js'
+import { Map } from './map.js'
 
 const spaceWeapons = new WeaponCatelogue([])
 
@@ -33,26 +35,27 @@ const spaceShips = new ShipCatelogue(
     C: '#66ccff',
     D: '#55cc59',
     E: '#99ff33', // Bright Lime
-    F: '#33cc99',
-    G: '#3399cc', // Teal Blue
+    F: '#3399cc', // Teal Blue'
+    G: '#33cc99',
     H: '#ffcc66', // Amber Orange
-    I: '#ffcc66', // Amber Orange
+    I: '#ffdd77', // Amber Orange
     J: '#ff6699',
     K: '#ff884d',
     L: '#cc99ff',
-    M: '#ff99cc',
+    M: '#33ffcc', //Turquoise Mint
     N: '#6699ff',
     O: '#ffff66',
     P: '#ff9933',
-    Q: '#33ffcc', //Turquoise Mint
+    Q: '#ff99cc',
     R: '#cc33cc', // Deep Magenta
     S: '#7799ee',
     T: '#3366ff',
     U: '#2288dd',
-    V: '#9933ff',
+    V: '#bb66ff',
     Y: '#3366ff',
     W: '#fff',
     '+': '#000',
+    X: '#000',
     Z: '#000',
     '^': '#000',
     '@': '#000',
@@ -122,26 +125,29 @@ const spaceShips = new ShipCatelogue(
     D: 'rgba(102,255,102,0.3)',
     E: 'rgba(153, 255, 51,0.3)',
     F: 'rgba(51, 153, 204,0.3)',
-    G: 'rgba(255,153,204,0.3)',
-    H: 'rgba(255,255,102,0.3)',
-    I: 'rgba(255,255,102,0.3)',
-    J: 'rgba(51,204,153,0.3)',
+    G: 'rgba(51,204,153,0.3)',
+    H: 'rgba(244,244,102,0.3)',
+    I: 'rgba(255,255,162,0.3)',
+    J: 'rgba(255,153,204,0.3)',
     K: 'rgba(255,204,102,0.3)',
     L: 'rgba(255,102,153,0.3)',
-    M: 'rgba(255,136,77,0.3)',
+    M: 'rgba(51, 255, 204,0.3)',
     N: 'rgba(102,153,255,0.3)',
     O: 'rgba(255, 153, 51,0.3)',
-    P: 'rgba(51, 255, 204,0.3)',
+    P: 'rgba(233,122,88,0.3)',
     Q: 'rgba(204, 51, 204,0.3)',
-    R: 'rgba(80, 200, 244,0.3)',
-    S: 'rgba(180, 120, 244,0.3)',
-    T: 'rgba(120, 80, 244,0.3)',
+    R: 'rgba(244, 100, 40,0.3)',
+    S: 'rgba(210, 100, 204,0.3)',
+    T: 'rgba(160, 80, 244,0.3)',
     U: 'rgba(40, 100, 244,0.3)',
-    V: 'rgba(120, 180, 244,0.3)',
+    V: 'rgba(190, 70, 130,0.3)',
     W: 'rgba(40, 200, 120,0.3)',
     Y: 'rgba(51, 51, 204,0.3)',
+    1: 'rgba(80, 200, 244,0.3)',
+    2: 'rgba(120, 180, 244,0.3)',
     '+': '#ffd866',
-    '^': '#cc3333',
+    X: '#cc3333',
+    '^': '#cc3388',
     '*': '#3333cc',
     '@': '#66ffcc', // Seafoam Green
     '%': '#9966ff',
@@ -656,7 +662,9 @@ export class Missile extends Megabomb {
   constructor (ammo) {
     super(ammo)
     this.name = 'Missile'
+    this.plural = 'Missiles'
     this.symbol = '+'
+    this.letter = '+'
     this.cursors = ['bomb']
     this.hints = ['Click On Square To Aim Missile']
     this.buttonHtml = '<span class="shortcut">M</span>issile'
@@ -688,6 +696,8 @@ export class RailBolt extends Kinetic {
   constructor (ammo) {
     super(ammo)
     this.name = 'Rail Bolt'
+    this.plural = 'Rail Bolts'
+    this.letter = 'X'
     this.symbol = 'X'
     this.cursors = ['satelite', 'strike']
     this.hints = [
@@ -781,14 +791,125 @@ export class Scan extends Sweep {
   }
 }
 
+const smugglerSS = new Map(
+  "Smuggler's Run SS",
+  [7, 18],
+  { H: 2, R: 1, S: 1, F: 1, T: 1, M: 3, L: 1, '+': 6, X: 4 },
+  [
+    [0, 7, 9],
+    [1, 0, 1],
+    [2, 0, 2],
+    [3, 0, 3],
+    [3, 15, 17],
+    [4, 13, 17],
+    [5, 12, 17],
+    [6, 11, 17],
+    [4, 0, 3],
+    [5, 0, 3],
+    [6, 0, 3]
+  ],
+  'SmugglerSS',
+  spaceAndAsteroids
+)
+smugglerSS.weapons = [standardShot, new Missile(6), new RailBolt(4)]
+
+const smugglerMS = new Map(
+  "Smuggler's Run MS",
+  [8, 18],
+  { H: 2, R: 1, S: 1, F: 1, T: 1, M: 3, L: 1, '+': 6, X: 4 },
+  [
+    [0, 7, 9],
+    [2, 0, 1],
+    [3, 0, 2],
+    [4, 0, 3],
+    [4, 15, 17],
+    [5, 13, 17],
+    [6, 12, 17],
+    [7, 11, 17],
+    [5, 0, 3],
+    [6, 0, 3],
+    [7, 0, 3]
+  ],
+  'SmugglerMS',
+  spaceAndAsteroids
+)
+smugglerMS.weapons = [standardShot, new Missile(6), new RailBolt(4)]
+const smugglerM = new Map(
+  "Smuggler's Run M",
+  [9, 17],
+  { H: 2, R: 1, S: 1, F: 1, T: 1, V: 1, M: 2, L: 1, '+': 4, X: 4 },
+  [
+    [0, 7, 9],
+    [3, 0, 1],
+    [4, 0, 2],
+    [5, 0, 3],
+    [5, 15, 16],
+    [6, 13, 16],
+    [7, 12, 16],
+    [8, 11, 16],
+    [6, 0, 3],
+    [7, 0, 3],
+    [8, 0, 3]
+  ],
+  'SmugglerM',
+  spaceAndAsteroids
+)
+smugglerM.weapons = [standardShot, new Missile(5), new RailBolt(4)]
+const smugglerML = new Map(
+  "Smuggler's Run ML",
+  [9, 18],
+  { H: 2, R: 1, S: 1, F: 1, T: 2, V: 1, M: 2, L: 1, '+': 6, X: 4 },
+  [
+    [2, 7, 9],
+    [3, 6, 9],
+    [4, 5, 9],
+    [5, 7, 9],
+    [4, 0, 1],
+    [5, 0, 2],
+    [6, 0, 3],
+    [5, 15, 17],
+    [6, 13, 17],
+    [7, 12, 17],
+    [8, 11, 17],
+    [7, 0, 3],
+    [8, 0, 3]
+  ],
+  'SmugglerML',
+  spaceAndAsteroids
+)
+smugglerML.weapons = [standardShot, new Missile(4), new RailBolt(4)]
+const smugglerL = new Map(
+  "Smuggler's Run L",
+  [9, 18],
+  { H: 2, R: 1, S: 1, F: 1, T: 2, V: 1, M: 2, L: 2, '+': 6, X: 4 },
+  [
+    [3, 7, 9],
+    [4, 6, 9],
+    [5, 5, 9],
+    [6, 7, 9],
+    [5, 0, 1],
+    [6, 0, 2],
+    [7, 0, 3],
+    [6, 15, 17],
+    [7, 13, 17],
+    [8, 12, 17],
+    [9, 11, 17],
+    [8, 0, 3],
+    [9, 0, 3]
+  ],
+  'SmugglerL',
+  spaceAndAsteroids
+)
+smugglerL.weapons = [standardShot, new Missile(4), new RailBolt(4)]
 spaceAndAsteroids.addWeapons([new Missile(1), new RailBolt(1)])
 
 class SpaceAndAsteroidsMaps extends TerrainMaps {
   constructor () {
-    super(spaceAndAsteroids, [], null)
-    this.maxBombs = 3
-    this.clearBlankWith(7, 18)
-    this.list.push(this.current)
+    super(
+      spaceAndAsteroids,
+      [smugglerSS, smugglerMS, smugglerM, smugglerML, smugglerL],
+      smugglerSS
+    )
   }
 }
 

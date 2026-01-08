@@ -15,7 +15,6 @@ const terrainsMaps = {
     this.list.push(newTM)
   },
   setCurrent: function (newCurrent) {
-    console.log('setCurrent')
     if (newCurrent === this.current) return
 
     this.add(newCurrent)
@@ -25,7 +24,6 @@ const terrainsMaps = {
     placingTarget.allBoundsChecker = newCurrent.inAllBounds.bind(newCurrent)
     placingTarget.getZone = newCurrent.zoneInfo.bind(newCurrent)
 
-    console.log('setCurrent2')
     this.onChange(newCurrent)
   },
   setByIndex (idx) {
@@ -52,7 +50,6 @@ const terrainsMaps = {
           t?.terrain?.tag?.toLowerCase() === tag ||
           t?.terrain?.bodyTag?.toLowerCase() === tag
       )
-      console.log(tag, newTerrain, this.list)
       if (newTerrain) this.setCurrent(newTerrain)
       return newTerrain
     }
@@ -64,7 +61,6 @@ const terrainsMaps = {
     return newTerrain
   },
   setByTag (tag) {
-    console.log('setByTag', tag)
     return this.setByTagBase(tag) || this.setToDefault() || this.setByIndex(0)
   }
 }
@@ -426,7 +422,7 @@ export class TerrainMaps {
   }
   getLastMapTitle () {
     const title = this.getLastMapTitleRaw()
-    return title || this.list[0].title
+    return title || this.list[0]?.title || ''
   }
   getLastMap () {
     const title = this.getLastMapTitleRaw()
@@ -523,9 +519,7 @@ export class TerrainMaps {
     return this.current.isLand(r, c)
   }
   static currentTerrainMaps (newCurrent) {
-    console.log('currentTerrainMaps', newCurrent)
     if (newCurrent && terrainsMaps.current !== newCurrent) {
-      console.log('currentTerrainMaps2')
       terrainsMaps.setCurrent(newCurrent)
     }
     return terrainsMaps.current
@@ -570,7 +564,6 @@ class SeaAndLandMaps extends TerrainMaps {
       ],
       defaultMap
     )
-    this.maxBombs = 3
   }
 }
 
