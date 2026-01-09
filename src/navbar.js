@@ -439,7 +439,7 @@ function setupTerrain (urlParams) {
   const terrainTag = urlParams.getAll('terrain')[0]
   const newTerrainMap = TerrainMaps.setByTag(terrainTag)
   const newTerrainTag = newTerrainMap?.terrain?.tag
-  if ((terrainTag !== newTerrainTag, newTerrainTag)) {
+  if (newTerrainTag && terrainTag !== newTerrainTag) {
     setTerrainParams(newTerrainTag, newTerrainMap)
   }
 }
