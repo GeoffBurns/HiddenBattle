@@ -317,7 +317,7 @@ fetchNavBar('list', 'List of Hidden Battle Maps', function () {
   document.getElementById('second-tab-bar').classList.remove('hidden')
   document.getElementById('choose-include').classList.remove('hidden')
 
-  setupMapListOptions(mapList.makeList.bind(mapList))
+  const includes = setupMapListOptions(mapList.makeList.bind(mapList))
 
-  mapList.makeList('0')
+  mapList.makeList(includes)
 })

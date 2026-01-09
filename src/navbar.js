@@ -296,7 +296,7 @@ function terrainSelect (boardSetup, refresh) {
   terrainUI.setup(
     function (_index, title) {
       TerrainMaps.setByTitle(title)
-      setTerrainParams(terrain.current)
+      setTerrainParams(gameMaps())
       boardSetup()
       refresh()
     },
@@ -603,6 +603,9 @@ function setMapTypeParams (mapType) {
     )
   }
 }
+
+let mapTypeIncludes = '0'
+
 export function setupMapListOptions (refresh) {
   const urlParams = new URLSearchParams(globalThis.location.search)
   const mapType = getParamMapType(urlParams)
@@ -612,11 +615,17 @@ export function setupMapListOptions (refresh) {
   const listUI = new ChooseFromListUI(mapTypes, 'chooseList')
 
   listUI.setup(function (index, text) {
+    mapTypeIncludes = index
     refresh(index, text)
     setMapTypeParams(text)
   }, mapTypeIdx)
 
-  terrainSelect(Function.prototype, refresh)
+  mapTypeIncludes = mapTypeIdx.toString()
+  terrainSelect(Function.prototype, () => {
+    refresh(mapTypeIncludes)
+  })
+
+  return mapTypeIncludes
 }
 
 export function setupGameOptions (boardSetup, refresh) {
