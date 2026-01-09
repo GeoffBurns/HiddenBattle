@@ -809,7 +809,7 @@ const smugglerSS = new Map(
     [5, 0, 3],
     [6, 0, 3]
   ],
-  'SmugglerSS',
+  'Smugglers Run Battle SS',
   spaceAndAsteroids
 )
 smugglerSS.weapons = [standardShot, new Missile(6), new RailBolt(4)]
@@ -831,7 +831,7 @@ const smugglerMS = new Map(
     [6, 0, 3],
     [7, 0, 3]
   ],
-  'SmugglerMS',
+  'Smugglers Run Battle MS',
   spaceAndAsteroids
 )
 smugglerMS.weapons = [standardShot, new Missile(6), new RailBolt(4)]
@@ -852,7 +852,7 @@ const smugglerM = new Map(
     [7, 0, 3],
     [8, 0, 3]
   ],
-  'SmugglerM',
+  'Smugglers Run Battle M',
   spaceAndAsteroids
 )
 smugglerM.weapons = [standardShot, new Missile(5), new RailBolt(4)]
@@ -898,7 +898,7 @@ const smugglerL = new Map(
     [8, 0, 3],
     [9, 0, 3]
   ],
-  'SmugglerL',
+  'Smugglers Run Battle L',
   spaceAndAsteroids
 )
 smugglerL.weapons = [standardShot, new Missile(4), new RailBolt(4)]
