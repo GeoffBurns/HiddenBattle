@@ -1,5 +1,10 @@
 export class ChooseUI {
   constructor (targetId) {
+    if (new.target === ChooseUI) {
+      throw new Error(
+        'base class cannot be instantiated directly. Please extend it.'
+      )
+    }
     this.choose = document.getElementById(targetId)
   }
 
@@ -12,7 +17,27 @@ export class ChooseUI {
       option.selected = 'selected'
     }
   }
+  empty () {
+    this.choose.length = 0
+  }
+  numOptions () {
+    return this.choose?.options?.length || 0
+  }
+  setup (callback, selectedId, selectedText) {
+    const numOptions = this.numOptions()
+    if (numOptions > 0) {
+      this.resetOptions(selectedId, selectedText)
+      return
+    }
+    this.setOptions(selectedId, selectedText)
+    this.onChange(callback)
+  }
 
+  resetOptions (selectedId, selectedText) {
+    this.empty()
+    this.setOptions(selectedId, selectedText)
+  }
+  setOptions (_selectedId, _selectedText) {}
   onChange (callback) {
     this.choose.addEventListener('change', function () {
       const index = this.value
@@ -28,13 +53,12 @@ export class ChooseFromListUI extends ChooseUI {
     this.list = list
   }
 
-  setup (callback, selectedId, selectedText) {
+  setOptions (selectedId, selectedText) {
     let id = 0
     this.list.forEach(choice => {
       this.addOption(id, choice, selectedId, selectedText)
       id++
     })
-    this.onChange(callback)
   }
 }
 
@@ -46,11 +70,10 @@ export class ChooseNumberUI extends ChooseUI {
     this.step = step
   }
 
-  setup (callback, defaultIndex) {
+  setOptions (defaultIndex, _text) {
     if (defaultIndex === undefined) defaultIndex = this.min
     for (let i = this.min; i <= this.max; i += this.step) {
       this.addOption(i, i, defaultIndex, defaultIndex)
     }
-    this.onChange(callback)
   }
 }

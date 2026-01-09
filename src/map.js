@@ -330,19 +330,17 @@ export class SavedCustomMap extends CustomMap {
   static loadObj (title) {
     const newLocal = `${oldToken}.${title}`
     const data = localStorage.getItem(newLocal)
-    if (!data) throw new Error('No such saved map for ' + newLocal)
+    if (!data) return null
     const obj = JSON.parse(data)
     return obj
   }
 
   static load (title) {
-    try {
-      const obj = SavedCustomMap.loadObj(title)
-      return new SavedCustomMap(obj)
-    } catch (error) {
-      console.error("Can't Load Map : ", error)
-      return null
-    }
+    const obj = SavedCustomMap.loadObj(title)
+    if (obj) return new SavedCustomMap(obj)
+
+    console.log("Can't Load Map : ", title)
+    return null
   }
 
   localStorageKey () {

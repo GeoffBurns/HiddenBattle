@@ -246,18 +246,26 @@ function setMapParams (title) {
     )
   }
 }
-function setupMapControl (mapName, boardSetup, refresh) {
+function setupMapControl (
+  urlParams,
+  boardSetup = Function.prototype,
+  refresh = Function.prototype
+) {
+  var { mapName, targetMap } = setMapFromParams(urlParams)
+
+  setMapSelector(boardSetup, refresh, mapName)
+
+  terrainSelect(boardSetup, refresh)
+  gameMaps().setTo(mapName)
+  return targetMap
+}
+
+function setMapSelector (
+  boardSetup = Function.prototype,
+  refresh = Function.prototype,
+  mapName
+) {
   const maps = gameMaps()
-
-  if (!mapName) {
-    try {
-      mapName = maps.getLastMapTitle()
-    } catch (error) {
-      console.log(error)
-      mapName = null
-    }
-  }
-
   const mapTitles = (() => {
     try {
       return maps.mapTitles()
@@ -279,46 +287,9 @@ function setupMapControl (mapName, boardSetup, refresh) {
     null,
     mapName
   )
-  terrainSelect(boardSetup, refresh)
-  maps.setTo(mapName)
 }
 
-function terrainSelect (boardSetup, refresh) {
-  const terrainTitles = (() => {
-    try {
-      return TerrainMaps.titleList()
-    } catch (error) {
-      console.error('An error occurred:', error.message, terrain)
-      return []
-    }
-  })()
-  const terrainUI = new ChooseFromListUI(terrainTitles, 'chooseTerrain')
-  terrainUI.setup(
-    function (_index, title) {
-      TerrainMaps.setByTitle(title)
-      setTerrainParams(gameMaps())
-      boardSetup()
-      refresh()
-    },
-    null,
-    terrain?.current?.title
-  )
-}
-
-function setupMapSelectionPrint (boardSetup, refresh) {
-  const urlParams = new URLSearchParams(globalThis.location.search)
-  setupTerrain(urlParams)
-  const mapName = getParamMap(urlParams)
-
-  const targetMap = gameMaps().getMap(mapName)
-  setupMapControl(mapName, boardSetup, refresh)
-
-  return targetMap
-}
-function setupMapSelection (boardSetup, refresh) {
-  const urlParams = new URLSearchParams(globalThis.location.search)
-
-  setupTerrain(urlParams)
+function setMapFromParams (urlParams) {
   let mapName = getParamMap(urlParams)
   const [height, width] = getParamSize(urlParams)
   const maps = gameMaps()
@@ -335,10 +306,68 @@ function setupMapSelection (boardSetup, refresh) {
     mapName = map?.title
     setMapParams(mapName)
   }
+  if (!mapName) {
+    try {
+      mapName = maps.getLastMapTitle()
+    } catch (error) {
+      console.log(error)
+      mapName = null
+    }
+  }
+  return { mapName, targetMap }
+}
+
+function terrainSelect (
+  boardSetup = Function.prototype,
+  refresh = Function.prototype
+) {
+  const terrainTitles = (() => {
+    try {
+      return TerrainMaps.titleList()
+    } catch (error) {
+      console.error('An error occurred:', error.message, terrain)
+      return []
+    }
+  })()
+  const terrainUI = new ChooseFromListUI(terrainTitles, 'chooseTerrain')
+  terrainUI.setup(
+    function (_index, title) {
+      const old = gameMap()
+      const height = old?.rows
+      const width = old?.cols
+      TerrainMaps.setByTitle(title)
+      if (height && width) {
+        setSizeParams(height, width)
+      }
+      setTerrainParams(gameMaps())
+
+      var { mapName } = setMapFromParams(
+        new URLSearchParams(globalThis.location.search)
+      )
+      setMapSelector(boardSetup, refresh, mapName)
+      gameMaps().setTo(mapName)
+      boardSetup()
+      refresh()
+    },
+    null,
+    terrain?.current?.title
+  )
+}
+
+function setupMapSelectionPrint (boardSetup, refresh) {
+  const urlParams = new URLSearchParams(globalThis.location.search)
+  setupTerrain(urlParams)
+
+  return setupMapControl(urlParams, boardSetup, refresh)
+}
+function setupMapSelection (boardSetup, refresh) {
+  const urlParams = new URLSearchParams(globalThis.location.search)
+
+  setupTerrain(urlParams)
 
   const placedShips = urlParams.has('placedShips')
 
-  setupMapControl(mapName, boardSetup, refresh)
+  setupMapControl(urlParams, boardSetup, refresh)
 
   return placedShips
 }

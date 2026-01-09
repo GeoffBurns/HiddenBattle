@@ -189,14 +189,21 @@ export class SubTerrain {
   }
 }
 
-export function Zone (title, letter, isMarginal) {
-  this.title = title
-  this.letter = letter
-  this.isMarginal = isMarginal
+export class Zone {
+  constructor (title, letter, isMarginal) {
+    this.title = title
+    this.letter = letter
+    this.isMarginal = isMarginal
+  }
 }
 
 export class Weapon {
   constructor (name, letter, isLimited, destroys, points) {
+    if (new.target === Weapon) {
+      throw new Error(
+        'base class cannot be instantiated directly. Please extend it.'
+      )
+    }
     this.name = name
     this.plural = name + 's'
     this.letter = letter
