@@ -9,7 +9,6 @@
       name="description"
       content="Play a challenging Battleship style game with no-touch placement rules and special ships."
     />
-
     <link rel="icon" type="image/png" href="../favicon.png" />
     <link rel="stylesheet" href="animation.css" />
     <link rel="stylesheet" href="tab.css" />
@@ -99,32 +98,39 @@
         <h3>Unit Categories:</h3>
 
         <div class="rules-container sea" id="sea-container">
-          <span class="heading">Sea Units</span>
-          <p>These are added to the blue areas (sea) of the map</p>
+          <span id="sea-unit-header" class="heading">Sea Units</span>
+          <p id="sea-unit-info">
+            These are added to the blue areas (sea) of the map
+          </p>
 
           <div class="tray" id="shipTray"></div>
           <div class="notes hidden" id="shipNotes"></div>
         </div>
         <br />
         <div class="rules-container land" id="land-container">
-          <span class="heading">Land Units</span>
-          <p>These are added to the greens areas (land) of the map</p>
-
+          <span id="land-unit-header" class="heading">Land Units</span>
+          <p id="land-unit-info">
+            These are added to the greens areas (land) of the map
+          </p>
           <div class="tray" id="buildingTray"></div>
           <div class="notes hidden" id="buildingNotes"></div>
         </div>
         <br />
         <div class="rules-container air" id="air-container">
-          <span class="heading">Air Units</span>
-          <p>These are added to the any area (sea or land) of the map</p>
+          <span id="air-unit-header" class="heading">Air Units</span>
+          <p id="air-unit-info">
+            These are added to the any area (sea or land) of the map
+          </p>
 
           <div class="tray" id="planeTray"></div>
           <div class="notes hidden" id="planeNotes"></div>
         </div>
         <br />
         <div class="rules-container special" id="special-container">
-          <span class="heading"> Special Units</span>
-          <p>These have special rules about where they are placed on the map</p>
+          <span id="special-unit-header" class="heading"> Special Units</span>
+          <p id="special-unit-info">
+            These have special rules about where they are placed on the map
+          </p>
 
           <div class="tray" id="specialTray"></div>
           <div class="notes hidden" id="specialNotes"></div>

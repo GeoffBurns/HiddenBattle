@@ -4,7 +4,7 @@ import { Friend } from './friend.js'
 import { enemyUI } from './enemyUI.js'
 import { enemy } from './enemy.js'
 import { gameMap } from './maps.js'
-import { terrain } from './Shape.js'
+import { terrain, Terrain } from './Shape.js'
 
 const friend = new Friend(friendUI)
 
@@ -23,6 +23,7 @@ function refresh () {
     friend.loadOut.weaponSystems,
     friendUI
   )
+
   enemyUI.score.buildTally(enemy.ships, enemy.loadOut.weaponSystems, enemyUI)
   document.title = "Geoff's Hidden Battle - " + gameMap().title
   friendUI.hideEmptyUnits(friend.ships)
@@ -35,6 +36,13 @@ function refresh () {
       el.classList.toggle('hidden', el !== null)
     }
   }
+  Terrain.customizeUnitDescriptions('-unit-header', (letter, _description) => {
+    return terrain.current.ships.unitDescriptions[letter] + ' Units'
+  })
+
+  Terrain.customizeUnitDescriptions('-unit-info', (letter, _description) => {
+    return terrain.current.ships.unitInfo[letter]
+  })
 
   const groups = friendUI.splitUnits(friend.ships)
   for (let type in groups) {

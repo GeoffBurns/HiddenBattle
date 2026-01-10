@@ -248,20 +248,31 @@ export class WeaponCatelogue {
     this.weaponsByLetter = Object.fromEntries(weapons.map(w => [w.letter, w]))
   }
 }
+
+export class ShipGroups {
+  constructor (shipSunkDescriptions, shipUnitDescriptions, shipUnitInfo) {
+    this.shipSunkDescriptions = shipSunkDescriptions
+    this.unitDescriptions = shipUnitDescriptions
+    this.unitInfo = shipUnitInfo
+  }
+}
+
 export class ShipCatelogue {
   constructor (
     baseShapes,
-    shipSunkDescriptions,
+    shipGroups,
     shipLetterColors,
     shipDescription,
-    shipTypes,
+    shiptypes,
     shipColors
   ) {
     this.baseShapes = baseShapes
-    this.shipSunkDescriptions = shipSunkDescriptions
+    this.shipSunkDescriptions = shipGroups.shipSunkDescriptions
+    this.unitDescriptions = shipGroups.unitDescriptions
+    this.unitInfo = shipGroups.unitInfo
     this.letterColors = shipLetterColors
     this.descriptions = shipDescription
-    this.types = shipTypes
+    this.types = shiptypes
     this.colors = shipColors
     this.shapesByLetter = Object.fromEntries(
       baseShapes.map(base => [base.letter, base])
@@ -311,6 +322,61 @@ export class Terrain {
     this.mapHeading = mapHeading || 'Waters'
     this.fleetHeading = fleetHeading || 'Fleet'
     this.bodyTag = this.defaultSubterrain.tag
+  }
+
+  static typeDescriptions = {
+    A: 'Air',
+    G: 'Land',
+    M: 'Hybrid',
+    T: 'Transformer',
+    X: 'Special',
+    S: 'Sea',
+    W: 'Weapon'
+  }
+
+  static unitDescriptions = {
+    A: 'Air',
+    G: 'Land',
+    X: 'Special',
+    S: 'Sea',
+    W: 'Weapon'
+  }
+
+  static customizeUnits (elementTag, customize = Function.prototype) {
+    const desscriptions = Object.entries(Terrain.unitDescriptions)
+    for (const [letter, description] of desscriptions) {
+      const key = description.toLowerCase() + elementTag
+      const el = document.getElementById(key)
+      if (el && customize !== Function.prototype) {
+        customize(letter, description, el, key)
+      }
+    }
+  }
+  static customizeUnitDescriptions (
+    elementTag,
+    textContent = Function.prototype,
+    innerHTML = Function.prototype
+  ) {
+    Terrain.customizeUnits(elementTag, (letter, description, el, key) => {
+      if (textContent !== Function.prototype)
+        el.textContent = textContent(letter, description, el, key)
+      if (innerHTML !== Function.prototype)
+        el.innerHTML = innerHTML(letter, description, el, key)
+    })
+  }
+  static showsUnits (
+    elementTag,
+    hasClass = Function.prototype,
+    className = 'hidden'
+  ) {
+    Terrain.customizeUnits(elementTag, (letter, description, el, key) => {
+      if (hasClass !== Function.prototype)
+        if (hasClass(letter, description, el, key, className)) {
+          el.classList.remove(className)
+        } else {
+          el.classList.add(className)
+        }
+    })
   }
 
   subterrainTag (isLand) {
@@ -407,8 +473,7 @@ export class Terrain {
 }
 const seaAndLandWeapons = new WeaponCatelogue([])
 
-const seaAndLandShips = new ShipCatelogue(
-  [],
+const seaAndLandGroups = new ShipGroups(
   {
     A: 'Shot Down',
     G: 'Destroyed',
@@ -417,6 +482,29 @@ const seaAndLandShips = new ShipCatelogue(
     X: 'Destroyed',
     S: 'Sunk'
   },
+  {
+    A: 'Air',
+    G: 'Land',
+    M: 'Hybrid',
+    T: 'Transformer',
+    X: 'Special',
+    S: 'Sea',
+    W: 'Weapon'
+  },
+  {
+    A: 'These are added to the any area (sea or land) of the map',
+    G: 'These are added to the greens areas (land) of the map',
+    M: 'These have special rules about where they are placed on the map',
+    T: 'These have special rules about where they are placed on the map',
+    X: 'These have special rules about where they are placed on the map',
+    S: 'These are added to the blue areas (sea) of the map',
+    W: 'These have special rules about where they are placed on the map'
+  }
+)
+
+const seaAndLandShips = new ShipCatelogue(
+  [],
+  seaAndLandGroups,
   {
     A: '#ff6666', //  coral red
     T: '#ffccff',

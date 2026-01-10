@@ -5,7 +5,7 @@ import { ClickedShip } from './selection.js'
 import { cursor } from './cursor.js'
 import { Ship } from './Ship.js'
 import { dragNDrop } from './dragndrop.js'
-import { terrain } from './Shape.js'
+import { terrain, Terrain } from './Shape.js'
 
 export class PlacementUI extends WatersUI {
   constructor (terroritory) {
@@ -357,6 +357,7 @@ export class PlacementUI extends WatersUI {
     const ship = ships.find(s => s.id === shipId)
     if (ship && shipElement) this.assignClicked(ship, shipElement)
   }
+
   disableRotateFlip () {
     this.rotateBtn.disabled = true
     this.rotateLeftBtn.disabled = true
@@ -640,22 +641,6 @@ export class PlacementUI extends WatersUI {
     }
   }
 
-  getContainerOfType (type) {
-    switch (type) {
-      case 'A':
-        return document.getElementById('air-container')
-      case 'S':
-        return document.getElementById('sea-container')
-      case 'M':
-      case 'T':
-      case 'X':
-        return document.getElementById('special-container')
-      case 'G':
-        return document.getElementById('land-container')
-      default:
-        throw new Error('Unknown type for ' + type)
-    }
-  }
   getNotesOfType (type) {
     switch (type) {
       case 'A':
@@ -692,21 +677,14 @@ export class PlacementUI extends WatersUI {
 
   hideEmptyUnits (ships) {
     const counts = ships.reduce((acc, ship) => {
-      const key = this.getUnitType(ship)
-      acc[key] = (acc[key] || 0) + 1
+      const letter = this.getUnitType(ship)
+      acc[letter] = (acc[letter] || 0) + 1
       return acc
     }, {})
 
-    for (let key in counts) {
-      if (counts[key] === 0) {
-        const emptyGroup = this.getContainerOfType(key)
-        if (emptyGroup) {
-          emptyGroup.classList.add('hidden')
-        } else {
-          emptyGroup.classList.remove('hidden')
-        }
-      }
-    }
+    Terrain.showsUnits('-container', letter => {
+      return counts[letter]
+    })
   }
 
   addShipToTrays (ships, ship) {
