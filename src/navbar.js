@@ -596,8 +596,10 @@ function getParamMapType (params) {
   return params.getAll('mapType')[0]
 }
 function mapTypeIndex (mapType) {
-  return mapTypes.findIndex(m => m.split(' ', 1)[0] === mapType)
+  const mapTypeIdx = mapTypes.findIndex(m => m.split(' ', 1)[0] === mapType)
+  return mapTypeIdx >= 0 ? mapTypeIdx : 0
 }
+
 function setMapTypeParams (mapType) {
   mapType = mapType?.split(' ', 1)[0]
   const url = new URL(globalThis.location)
