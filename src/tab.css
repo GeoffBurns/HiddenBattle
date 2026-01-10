@@ -61,7 +61,24 @@
     }
 
     div#choose-terrain-container {
+      display: flex;
+      align-items: center;
+      flex-shrink: 100;
       flex: 0 0 auto;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    @media (max-width: 830px) {
+      div#choose-terrain-container {
+        display: flex;
+        flex-flow: column;
+        align-items: flex-start;
+        flex-shrink: 100;
+        flex: 0 0 auto;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
     }
 
     .tab-bar-container .logo {
