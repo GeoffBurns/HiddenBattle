@@ -31,11 +31,13 @@ function refresh () {
   friendUI.hideEmptyUnits(friend.ships)
 
   const weapons = terrain.current.weapons.weapons
-
+  let i = 2
   for (const weapon of weapons) {
-    if (!friend.loadOut.hasWeapon(weapon.letter)) {
+    if (friend.loadOut.hasWeapon(weapon.letter)) {
       const el = document.getElementById('weapon-info-' + weapon.tag)
+      el.dataset.listText = i + '.'
       el.classList.toggle('hidden', el !== null)
+      i++
     }
   }
   Terrain.customizeUnitDescriptions('-unit-header', (letter, _description) => {

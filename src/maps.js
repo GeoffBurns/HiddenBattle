@@ -345,7 +345,9 @@ export class TerrainMaps {
   setTo (mapName) {
     this.current = this.getMap(mapName) || this.list[0]
   }
-
+  setToMap (map) {
+    this.current = map || this.list[0]
+  }
   addCurrentCustomMap (example) {
     if (
       !(
@@ -602,7 +604,7 @@ export function gameMaps (maps) {
 
 export function gameMap (map) {
   if (map) {
-    gameMaps().setTo(map.title)
+    gameMaps().setToMap(map)
   }
   return gameMaps().current
 }

@@ -260,6 +260,10 @@ export class CustomMap extends Map {
 
 const withModifyable = Base =>
   class extends Base {
+    constructor (...args) {
+      super(...args) // REQUIRED
+    }
+
     addLand (r, c) {
       if (this.inBounds(r, c)) this.land.add(`${r},${c}`)
     }
@@ -377,7 +381,12 @@ export class SavedCustomMap extends CustomMap {
     }
   }
 }
+
 export class EditedCustomMap extends withModifyable(SavedCustomMap) {
+  constructor (...args) {
+    super(...args) // REQUIRED
+  }
+
   static load (title) {
     const obj = SavedCustomMap.loadObj(title)
     if (obj) {

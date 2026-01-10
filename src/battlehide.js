@@ -15,7 +15,6 @@ import { enemy } from './enemy.js'
 import { setupEnemy, newGame } from './enemySetup.js'
 import { gameStatus } from './playerUI.js'
 import { randomPlaceShape } from './utils.js'
-import { terrain } from './Shape.js'
 
 const friend = new Friend(friendUI)
 placedShipsInstance.registerUndo(friendUI.undoBtn)
