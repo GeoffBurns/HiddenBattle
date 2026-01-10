@@ -356,6 +356,7 @@ function terrainSelect (
 
 function setupMapSelectionPrint (boardSetup, refresh) {
   const urlParams = new URLSearchParams(globalThis.location.search)
+
   setupTerrain(urlParams)
 
   return setupMapControl(urlParams, boardSetup, refresh)
@@ -668,6 +669,7 @@ export function setupGameOptions (boardSetup, refresh) {
 export function setupPrintOptions (boardSetup, refresh) {
   const targetMap = setupMapSelectionPrint(boardSetup, refresh)
   boardSetup()
+  setTerrainParams(gameMaps())
   return targetMap
 }
 
