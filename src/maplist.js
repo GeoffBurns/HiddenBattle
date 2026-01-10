@@ -132,7 +132,7 @@ class MapList {
       controls.push(
         this.addEntryButton('edit', idx, map, buttons, function (map) {
           trackClick(map, 'edit custom map')
-          switchToEdit(map.title)
+          switchToEdit(map)
         })
       )
     }
@@ -231,15 +231,15 @@ class MapList {
 
     switch (listIncludes) {
       case '0':
-        titleEl.textContent = 'Custom ' +  listOF
+        titleEl.textContent = 'Custom ' + listOF
         maps = gameMaps().customMapList()
         break
       case '1':
-        titleEl.textContent =  listOF
+        titleEl.textContent = listOF
         maps = gameMaps().maps()
         break
       case '2':
-        titleEl.textContent = 'Standard ' +  listOF
+        titleEl.textContent = 'Standard ' + listOF
         maps = gameMaps().preGenMapList()
         break
       default:

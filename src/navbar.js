@@ -8,33 +8,35 @@ export function removeShortcuts () {
   document.removeEventListener('keydown')
 }
 
-export function switchToEdit (mapName, huntMode) {
+export function switchToEdit (map, huntMode) {
+  const mapName = map?.title
   const params = new URLSearchParams()
   params.append('edit', mapName)
   params.append('terrain', terrain.current.tag)
-  storeShips(params, huntMode, 'battlebuild')
+  storeShips(params, huntMode, 'battlebuild', map)
   const location = `./battlebuild.html?${params.toString()}`
   globalThis.location.href = location
 }
 
 function resetCustomMap () {
-  saveCustomMap()
   const map = gameMap()
+  saveCustomMap(map)
 
   gameMaps().setToBlank(map.rows, map.cols)
 }
-function saveCustomMap () {
-  trackLevelEnd(gameMap(), false)
+function saveCustomMap (map) {
+  trackLevelEnd(map, false)
   if (custom.noOfPlacedShips() > 0) {
+    map.weapons = map.weapons.filter(w => w.ammo > 0 || w.unlimited)
     custom.store()
     gameMaps().addCurrentCustomMap(custom.placedShips())
   }
 }
 
-function storeShips (params, huntMode, target) {
+function storeShips (params, huntMode, target, map) {
   if (huntMode === 'build') {
     if (custom.noOfPlacedShips() > 0) {
-      saveCustomMap()
+      saveCustomMap(map)
       params.append('placedShips', '')
     } else {
       params.delete('mapName')
@@ -54,7 +56,7 @@ export function switchTo (target, huntMode, mapName) {
     mapName = mapName || map.title
     params.append('mapName', mapName)
     params.append('terrain', terrain.current.tag)
-    const result = storeShips(params, huntMode, target)
+    const result = storeShips(params, huntMode, target, map)
 
     if (result) {
       // alert('going to ' + result)
@@ -163,9 +165,7 @@ export function setupTabs (huntMode) {
   } else {
     tabs.build?.addClickListener(switchToBuild)
 
-    tabs.add?.addClickListener(function () {
-      globalThis.location.href = './battlebuild.html'
-    })
+    tabs.add?.addClickListener(switchToBuild)
   }
 
   if (huntMode === 'hide') {
@@ -531,6 +531,7 @@ function setupMapOptions (boardSetup, refresh, huntMode = 'build') {
     huntMode === 'build' ? setSizeParams : Function.prototype
 
   setupTerrain(urlParams)
+
   terrainSelect(boardSetup, refresh)
 
   widthUI = new ChooseNumberUI(
@@ -557,7 +558,6 @@ function setupMapOptions (boardSetup, refresh, huntMode = 'build') {
     height || targetMap?.rows || maps.getLastHeight(templateMap?.rows)
 
   setupTabs(huntMode)
-
   widthUI.setup(function (_index) {
     const width = validateWidth()
     const height = validateHeight()
@@ -580,6 +580,7 @@ function setupMapOptions (boardSetup, refresh, huntMode = 'build') {
     refresh()
     refreshSizeParams(height, width)
   }, mapHeight)
+
   if (targetMap) {
     gameMap(targetMap)
     boardSetup()

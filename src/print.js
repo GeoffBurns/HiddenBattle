@@ -35,9 +35,11 @@ function refresh () {
   for (const weapon of weapons) {
     if (friend.loadOut.hasWeapon(weapon.letter)) {
       const el = document.getElementById('weapon-info-' + weapon.tag)
-      el.dataset.listText = i + '.'
-      el.classList.toggle('hidden', el !== null)
-      i++
+      if (el) {
+        el.dataset.listText = i + '.'
+        el.classList.remove('hidden')
+        i++
+      }
     }
   }
   Terrain.customizeUnitDescriptions('-unit-header', (letter, _description) => {

@@ -101,8 +101,9 @@ function playMap () {
 }
 
 function saveMap () {
-  trackLevelEnd(gameMap(), false)
-  switchToEdit(gameMap().title, 'build')
+  const saveMap = gameMap()
+  trackLevelEnd(saveMap, false)
+  switchToEdit(saveMap, 'build')
 }
 
 function wireupButtons () {

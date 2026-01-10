@@ -695,7 +695,7 @@ export class Missile extends Megabomb {
     this.tip =
       'drag a missile on to the map to increase the number of times you can fire missiles'
     this.hasFlash = true
-    this.tag = 'mega'
+    this.tag = 'missile'
     this.dragShape = [
       [0, 0, 0],
       [0, 1, 0],
@@ -733,7 +733,7 @@ export class RailBolt extends Kinetic {
       'drag a rail bolt on to the map to increase the number of times you can strike'
     this.isOneAndDone = true
     this.hasFlash = false
-    this.tag = 'kinetic'
+    this.tag = 'rail'
     this.dragShape = [
       [0, 0, 1],
       [0, 1, 0],
@@ -766,7 +766,7 @@ export class GuassRound extends Torpedo {
       'drag a guass round on to the map to increase the number of times you can strike'
     this.isOneAndDone = true
     this.hasFlash = false
-    this.tag = 'torpedo'
+    this.tag = 'guass'
     this.dragShape = [
       [1, 0, 1],
       [1, 1, 0],
@@ -795,7 +795,7 @@ export class Scan extends Sweep {
     this.tip = ''
     this.isOneAndDone = false
     this.hasFlash = false
-    this.tag = 'sweep'
+    this.tag = 'scan'
     this.dragShape = [
       [2, 0, 1],
       [1, 1, 0],

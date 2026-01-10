@@ -734,7 +734,9 @@ export class PlacementUI extends WatersUI {
     model.nextId++
     model.ships.push(ship)
 
-    gameMap().addShips(model.ships)
+    const map = gameMap() // Ensure map is an instance of the correct class
+
+    map.addShips(model.ships)
 
     const index = model.candidateShips.findIndex(s => s.id === ship.id)
     model.candidateShips[index] = newShip
