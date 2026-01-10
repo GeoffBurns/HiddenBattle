@@ -222,8 +222,8 @@ class MapList {
   }
 
   makeList (listIncludes) {
-    const title = document.getElementById('list-title')
-    title.textContent = 'Custom ' + terrain.current.mapHeading + ' List'
+    const titleEl = document.getElementById('list-title')
+    const listOF = terrain.current.mapHeading + ' List'
     listIncludes = listIncludes || this.listIncludes
     this.listIncludes = listIncludes
 
@@ -231,12 +231,15 @@ class MapList {
 
     switch (listIncludes) {
       case '0':
+        titleEl.textContent = 'Custom ' +  listOF
         maps = gameMaps().customMapList()
         break
       case '1':
+        titleEl.textContent =  listOF
         maps = gameMaps().maps()
         break
       case '2':
+        titleEl.textContent = 'Standard ' +  listOF
         maps = gameMaps().preGenMapList()
         break
       default:
