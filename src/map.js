@@ -380,6 +380,10 @@ export class SavedCustomMap extends CustomMap {
 export class EditedCustomMap extends withModifyable(SavedCustomMap) {
   static load (title) {
     const obj = SavedCustomMap.loadObj(title)
-    return new EditedCustomMap(obj)
+    if (obj) {
+      return new EditedCustomMap(obj)
+    } else {
+      return null
+    }
   }
 }
