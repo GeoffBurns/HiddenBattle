@@ -1,12 +1,10 @@
 import { gameMap, gameMaps } from './maps.js'
 import { gameStatus, WatersUI } from './playerUI.js'
-import { ScoreUI } from './ScoreUI.js'
+
 import { trackLevelEnd } from './navbar.js'
 class EnemyUI extends WatersUI {
   constructor () {
-    super()
-    this.board = document.getElementById('enemy-board')
-    this.score = new ScoreUI('enemy')
+    super('enemy', 'Enemy')
     this.weaponBtn = document.getElementById('weaponBtn')
     this.revealBtn = document.getElementById('revealBtn')
   }

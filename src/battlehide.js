@@ -212,8 +212,7 @@ function newPlacement () {
   friendUI.flipBtn.disabled = true
   friendUI.rotateLeftBtn.disabled = true
   friendUI.undoBtn.disabled = true
-  const title = document.getElementById('friendly-title')
-  title.textContent = 'Friendly ' + terrain.current.mapHeading
+  friendUI.showMapTitle()
 }
 // wire buttons
 wireupButtons()

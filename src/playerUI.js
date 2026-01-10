@@ -1,5 +1,7 @@
 import { gameMap, gameMaps, gameHost } from './maps.js'
 import { StatusUI } from './StatusUI.js'
+import { ScoreUI } from './ScoreUI.js'
+import { terrain } from './Shape.js'
 
 let noticeTimerId = null
 let tipsTimerId = null
@@ -7,11 +9,25 @@ let tipsTimerId = null
 export const gameStatus = new StatusUI()
 const startCharCode = 65
 export class WatersUI {
-  constructor () {
-    this.board = {}
+  constructor (terroritory, title) {
+    this.board = document.getElementById(terroritory + '-board')
+    this.score = new ScoreUI(terroritory)
+    this.terroritory = terroritory
+    this.terroritoryTitle = title
     this.placingShips = false
     this.containerWidth = gameHost.containerWidth
     this.isPrinting = false
+  }
+
+  showTitle (name) {
+    const titleEl = document.getElementById(this.terroritory + '-title')
+    titleEl.textContent = this.terroritoryTitle + ' ' + name
+  }
+  showMapTitle () {
+    this.showTitle(terrain.current.mapHeading)
+  }
+  showFleetTitle () {
+    this.showTitle(terrain.current.fleetHeading)
   }
 
   cellSizeScreen (map) {

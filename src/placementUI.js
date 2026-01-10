@@ -1,6 +1,5 @@
 import { gameMap, gameMaps } from './maps.js'
 import { WatersUI } from './playerUI.js'
-import { ScoreUI } from './ScoreUI.js'
 import { ClickedShip } from './selection.js'
 import { cursor } from './cursor.js'
 import { Ship } from './Ship.js'
@@ -8,11 +7,10 @@ import { dragNDrop } from './dragndrop.js'
 import { terrain, Terrain } from './Shape.js'
 
 export class PlacementUI extends WatersUI {
-  constructor (terroritory) {
-    super()
+  constructor (terroritory, title) {
+    super(terroritory, title)
     this.placingShips = true
-    this.board = document.getElementById(terroritory + '-board')
-    this.score = new ScoreUI(terroritory)
+
     this.newPlacementBtn = document.getElementById('newPlacement')
     this.rotateBtn = document.getElementById('rotateBtn')
     this.rotateLeftBtn = document.getElementById('rotateLeftBtn')

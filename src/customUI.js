@@ -10,7 +10,7 @@ function seaString () {
 }
 export class CustomUI extends PlacementUI {
   constructor () {
-    super('custom')
+    super('custom', 'Customizing')
     this.reuseBtn = document.getElementById('reuseBtn')
     this.resetBtn = document.getElementById('resetBtn')
     this.acceptBtn = document.getElementById('acceptBtn')
@@ -38,8 +38,7 @@ export class CustomUI extends PlacementUI {
       cancellable()
     }
 
-    const title = document.getElementById('custom-title')
-    title.textContent = 'Customizing ' + terrain.current.mapHeading
+    this.showMapTitle()
 
     this.placelistenCancellables = []
     this.placingShips = false
@@ -90,9 +89,7 @@ export class CustomUI extends PlacementUI {
       cancellable()
     }
 
-    const title = document.getElementById('custom-title')
-
-    title.textContent = 'Customizing ' + terrain.current.fleetHeading
+    this.showFleetTitle()
 
     this.brushlistenCancellables = []
     this.placingShips = true

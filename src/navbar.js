@@ -275,8 +275,8 @@ function setMapSelector (
     }
   })()
 
-  const mapUI = new ChooseFromListUI(mapTitles, 'chooseMap')
-  mapUI.setup(
+  const mapSelectUI = new ChooseFromListUI(mapTitles, 'chooseMap')
+  mapSelectUI.setup(
     function (_index, title) {
       maps.setTo(title)
       setMapParams(title)

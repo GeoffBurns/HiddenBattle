@@ -6,7 +6,7 @@ import { gameMap } from './maps.js'
 
 export class FriendUI extends PlacementUI {
   constructor () {
-    super('friend')
+    super('friend', 'Friendly')
     this.tips = [
       'Drag ships from the trays onto the board.',
       'Click a ship in the tray to select it, then click on the buttons to rotate and flip',

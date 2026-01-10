@@ -18,6 +18,8 @@ function refresh () {
   enemy.setMap()
   friendUI.buildBoardPrint()
   enemyUI.buildBoardPrint()
+  friendUI.showMapTitle()
+  enemyUI.showMapTitle()
   friendUI.score.buildTally(
     friend.ships,
     friend.loadOut.weaponSystems,
