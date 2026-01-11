@@ -79,7 +79,7 @@ const spaceShips = new ShipCatelogue(
     Y: '#3366ff',
     W: '#fff',
     '+': '#000',
-    X: '#000',
+    '|': '#000',
     Z: '#000',
     '^': '#000',
     '@': '#000',
@@ -139,7 +139,7 @@ const spaceShips = new ShipCatelogue(
     Y: 'G',
     '+': 'W',
     '^': 'W',
-    X: 'W',
+    '|': 'W',
     Z: 'W'
   },
   {
@@ -170,7 +170,7 @@ const spaceShips = new ShipCatelogue(
     1: 'rgba(80, 200, 244,0.3)',
     2: 'rgba(120, 180, 244,0.3)',
     '+': '#ffd866',
-    X: '#cc3333',
+    '|': '#cc3333',
     '^': '#cc3388',
     '*': '#3333cc',
     '@': '#66ffcc', // Seafoam Green
@@ -730,8 +730,8 @@ export class RailBolt extends Kinetic {
     super(ammo)
     this.name = 'Rail Bolt'
     this.plural = 'Rail Bolts'
-    this.letter = 'X'
-    this.symbol = 'X'
+    this.letter = '|'
+    this.symbol = '|'
     this.cursors = ['satelite', 'strike']
     this.hints = [
       'Click on square to start rail bolt',
@@ -827,7 +827,7 @@ export class Scan extends Sweep {
 const smugglerSS = new Map(
   "Smuggler's Run SS",
   [7, 18],
-  { H: 2, R: 1, S: 1, F: 1, T: 1, M: 3, L: 1, '+': 6, X: 4 },
+  { H: 2, R: 1, S: 1, F: 1, T: 1, M: 3, L: 1, '+': 6, '|': 4 },
   [
     [0, 7, 9],
     [1, 0, 1],
@@ -849,7 +849,7 @@ smugglerSS.weapons = [standardShot, new Missile(6), new RailBolt(4)]
 const smugglerMS = new Map(
   "Smuggler's Run MS",
   [8, 18],
-  { H: 2, R: 1, S: 1, F: 1, T: 1, M: 3, L: 1, '+': 6, X: 4 },
+  { H: 2, R: 1, S: 1, F: 1, T: 1, M: 3, L: 1, '+': 6, '|': 4 },
   [
     [0, 7, 9],
     [2, 0, 1],
@@ -870,7 +870,7 @@ smugglerMS.weapons = [standardShot, new Missile(6), new RailBolt(4)]
 const smugglerM = new Map(
   "Smuggler's Run M",
   [9, 17],
-  { H: 2, R: 1, S: 1, F: 1, T: 1, V: 1, M: 2, L: 1, '+': 4, X: 4 },
+  { H: 2, R: 1, S: 1, F: 1, T: 1, V: 1, M: 2, L: 1, '+': 4, '|': 4 },
   [
     [0, 7, 9],
     [3, 0, 1],
@@ -891,7 +891,7 @@ smugglerM.weapons = [standardShot, new Missile(5), new RailBolt(4)]
 const smugglerML = new Map(
   "Smuggler's Run ML",
   [9, 18],
-  { H: 2, R: 1, S: 1, F: 1, T: 2, V: 1, M: 2, L: 1, '+': 6, X: 4 },
+  { H: 2, R: 1, S: 1, F: 1, T: 2, V: 1, M: 2, L: 1, '+': 6, '|': 4 },
   [
     [2, 7, 9],
     [3, 6, 9],
@@ -914,7 +914,7 @@ smugglerML.weapons = [standardShot, new Missile(4), new RailBolt(4)]
 const smugglerL = new Map(
   "Smuggler's Run L",
   [9, 18],
-  { H: 2, R: 1, S: 1, F: 1, T: 2, V: 1, M: 2, L: 2, '+': 6, X: 4 },
+  { H: 2, R: 1, S: 1, F: 1, T: 2, V: 1, M: 2, L: 2, '+': 6, '|': 4 },
   [
     [3, 7, 9],
     [4, 6, 9],
