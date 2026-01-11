@@ -214,6 +214,7 @@ export class Weapon {
     this.hasFlash = false
     this.tip = `drag on to the map to increase the tally of ${this.name}`
     this.isOneAndDone = false
+    this.splashPower = -1
   }
 
   info () {
@@ -656,6 +657,7 @@ class Building extends Shape {
     this.validator = Building.validator
     this.zoneDetail = Building.zoneDetail
     this.canBeOn = HillFort.canBe
+    this.immune = ['Z', '+']
   }
   static canBe (subterrain) {
     return subterrain === land
@@ -732,7 +734,8 @@ class Plane extends Shape {
     this.terrain = seaAndLand
     this.subterrain = all
     this.canBeOn = Plane.canBe
-    this.immune = ['Z']
+    this.immune = ['Z', '+']
+    this.vulnerable = ['F']
   }
 
   static canBe = Function.prototype
@@ -1158,8 +1161,6 @@ const jetFighterCraft = new Plane('Jet Fighter', 'J', 'H', [
   [2, 2]
 ])
 
-jetFighterCraft.vulnerable = ['F']
-jetFighterCraft.immune = ['+']
 const helicopter = new Plane('Helicopter', 'H', 'S', [
   [0, 1],
   [1, 0],
@@ -1168,7 +1169,6 @@ const helicopter = new Plane('Helicopter', 'H', 'S', [
   [2, 1]
 ])
 helicopter.vulnerable = ['W', 'F']
-helicopter.immune = ['+']
 const airplane = new Plane('Airplane', 'P', 'H', [
   [0, 1],
   [1, 0],
@@ -1176,7 +1176,6 @@ const airplane = new Plane('Airplane', 'P', 'H', [
   [1, 2]
 ])
 airplane.vulnerable = ['W', 'F']
-airplane.immune = ['+']
 const stealthBomber = new Plane('Stealth Bomber', 'Q', 'H', [
   [0, 0],
   [1, 0],
@@ -1444,6 +1443,7 @@ export class Kinetic extends Weapon {
       [0, 3, 0],
       [0, 4, 1]
     ]
+    this.splashPower = 0
   }
   clone (ammo) {
     ammo = ammo || this.ammo
@@ -1496,6 +1496,7 @@ export class Torpedo extends Weapon {
       [0, 3, 0],
       [2, 3, 0]
     ]
+    this.splashPower = 1
   }
   clone (ammo) {
     ammo = ammo || this.ammo
@@ -1523,6 +1524,7 @@ export class Torpedo extends Weapon {
   addSplash (map, r, c, power, newEffect) {
     if (map.inBounds(r, c) && !map.isLand(r, c)) newEffect.push([r, c, power])
   }
+
   splash (map, coords) {
     const [r, c] = coords
     const newEffect = [coords]
