@@ -493,7 +493,16 @@ export class PlacementUI extends WatersUI {
 
   buildTrayItemPrint (shipInfo, tray) {
     const shape = shipInfo.shape
+    if (shape.canTransform && shape.forms && shape.forms.length > 1) {
+      for (const [index, form] of shape.forms.entries()) {
+        this.addtrayitem(form, index === 0 ? shipInfo.count : 1, tray)
+      }
+    } else {
+      this.addtrayitem(shape, shipInfo.count, tray)
+    }
+  }
 
+  addtrayitem (shape, count, tray) {
     const dragShipContainer = document.createElement('div')
 
     dragShipContainer.className = 'drag-ship-container'
@@ -510,8 +519,7 @@ export class PlacementUI extends WatersUI {
 
     const label = document.createElement('div')
     label.textContent =
-      shape.descriptionText +
-      (shipInfo.count === 1 ? '' : ` x ${shipInfo.count}`)
+      shape.descriptionText + (count === 1 ? '' : ` x ${count}`)
 
     dragShipContainer.appendChild(label)
     tray.appendChild(dragShipContainer)
