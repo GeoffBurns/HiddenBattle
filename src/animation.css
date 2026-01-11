@@ -5,6 +5,8 @@
     --flame2-duration: 0.7s;
     --content-width: 600px;
     --bomb-cursor-image: url('./bomb32.png');
+    --rail-cursor-image: url('./rail32.png');
+    --bolt-cursor-image: url('./bolt32.png');
     --strike-cursor-image: url('./strike32.png');
     --satelite-cursor-image: url('./sat32.png');
     --cluster-cursor-image: url('./cluster32.png');
