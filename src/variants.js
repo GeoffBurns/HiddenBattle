@@ -21,12 +21,13 @@ class Variants {
     this.index = 0
     this.canFlip = false
     this.canRotate = false
-    this.canTransform = false
     this.validator = validator
     this.onChange = Function.prototype
     this.zoneDetail = zoneDetail
     this.symmetry = symmetry
   }
+  numVariants () {
+    return this.list.length
   variant (index) {
     return this.list[index || this.index]
   }
@@ -133,6 +134,140 @@ class RotatableVariant extends Variants {
   }
 }
 
+export class TransformableVariants extends Variants {
+  constructor (forms) {
+    super(forms[0].validator, forms[0].zoneDetail, forms[0].symmetry)
+
+    this.canRotate = forms[0].canRotate
+    this.canFlip = forms[0].canFlip
+    this.forms = forms
+    this.formsIdx = 0
+    this.index = 0
+    this.canTransform = true
+    this.totalVariants = forms.reduce((acc, f) => acc + f.numVariants(), 0)
+    this.currentForm = forms[this.index]
+  }
+  numVariants () {
+    return this.totalVariants
+  }
+
+  positionInForms (index) {
+    const idx = (index || this.index) % this.totalVariants
+    let count = 0
+    for (let i = 0; i < this.forms.length; i++) {
+      const formVariants = this.forms[i].numVariants()
+      if (idx < count + formVariants) {
+        return { formIndex: i, variantIndex: idx - count }
+      }
+      count += formVariants
+    }
+    throw new Error('Index out of bounds')
+  }
+
+  indexFromForms () {
+    const form = this.currentForm
+    const formIndex = this.forms.indexOf(form)
+    let idx = 0
+    for (let i = 0; i < formIndex; i++) {
+      idx += this.forms[i].numVariants()
+    }
+    idx += form.index
+    return idx
+  }
+
+  variant (index) {
+    const { formIndex, variantIndex } = this.positionInForms(index)
+    return this.forms[formIndex].variant(variantIndex)
+  }
+
+  special (index, groupIndex = 1) {
+    const idx = index || this.index
+    const { formIndex, variantIndex } = this.positionInForms(idx)
+    return this.forms[formIndex].special(variantIndex, groupIndex)
+  }
+
+  placeable (index) {
+    const { formIndex, variantIndex } = this.positionInForms(index)
+    return this.forms[formIndex].placeable(variantIndex)
+  }
+
+  allVariationsAndForms () {
+    return this.forms.flatMap(f => f.list.map(v => [f, v]))
+  }
+  variationsAndForms () {
+    let variants0 = this.allVariationsAndForms()
+    return shuffleArray(variants0)
+  }
+  variations () {
+    return this.allVariationsAndForms().map(vf => vf[1])
+  }
+  placeables () {
+    let variants0 = this.variationsAndForms()
+
+    return variants0.map(
+      vf => new Placeable(vf[1], vf[0].validator, vf[0].zoneDetail)
+    )
+  }
+  normalize (mr, mc) {
+    return this.allVariationsAndForms().map(v => normalize(v[1], mr, mc))
+  }
+
+  height () {
+    return Math.max(...this.forms.map(f => f.height()))
+  }
+  width () {
+    return Math.max(...this.forms.map(f => f.width()))
+  }
+
+  setByIndex (index) {
+    const { formIndex, variantIndex } = this.positionInForms(
+      index || this.index
+    )
+    this.currentForm = this.forms[formIndex]
+    this.currentForm.setByIndex(variantIndex)
+    this.index = index || this.index
+    this.onChange()
+  }
+
+  placingAt (r, c) {
+    return new CellsToBePlaced(this.variant(), r, c, this.currentForm.validator)
+  }
+
+  nextForm () {
+    const old = this.index
+    this.formsIdx = (this.formsIdx + 1) % this.forms.length
+    this.currentForm = this.forms[this.formsIdx]
+
+    if (this.currentForm.numVariants() > 1) {
+      this.currentForm.setByIndex(0)
+    }
+    this.index = this.indexFromForms()
+    if (old !== this.index) this.onChange()
+  }
+
+  rotate () {
+    if (!this.canRotate) return
+    const old = this.index
+    this.currentForm.rotate()
+    this.index = this.indexFromForms()
+    if (old !== this.index) this.onChange()
+  }
+  flip () {
+    if (!this.canFlip) return
+    const old = this.index
+    this.currentForm.flip()
+    this.index = this.indexFromForms()
+    if (old !== this.index) this.onChange()
+  }
+  leftRotate () {
+    if (!this.canRotate) return
+    const old = this.index
+    this.currentForm.leftRotate()
+    this.index = this.indexFromForms()
+    if (old !== this.index) this.onChange()
+  }
+}
+
 class FlippableVariant extends RotatableVariant {
   constructor (validator, zoneDetail, symmetry) {
     super(validator, zoneDetail, symmetry)
@@ -146,7 +281,6 @@ class FlippableVariant extends RotatableVariant {
   static setBehaviour (subType, flippable) {
     flippable.canFlip = true
     flippable.canRotate = true
-    flippable.canTransform = false
     flippable.r1 = subType.r
     flippable.f1 = subType.f
     flippable.rf1 = subType.rf
