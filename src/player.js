@@ -311,7 +311,7 @@ export class Waters {
       return { hit: false, sunk: '', reveal: false }
     }
 
-    const shape = gameMap().shapesByLetter[shipCell.letter]
+    const shape = gameMaps().shapesByLetter[shipCell.letter]
     const protection = shape.protectionAgainst(weapon.letter)
     if (power === 1 && protection === 2 && hitShip) {
       this.score.shotReveal(key)

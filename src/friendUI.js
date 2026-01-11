@@ -3,6 +3,7 @@ import { PlacementUI } from './placementUI.js'
 import { setupDragHandlers } from './dragndrop.js'
 import { trackLevelEnd } from './navbar.js'
 import { gameMap } from './maps.js'
+import { terrain } from './Shape.js'
 
 export class FriendUI extends PlacementUI {
   constructor () {
@@ -46,6 +47,11 @@ export class FriendUI extends PlacementUI {
     this.score.placedLabel.classList.remove('hidden')
     this.rotateBtn.classList.remove('hidden')
     this.rotateLeftBtn.classList.remove('hidden')
+    if (terrain.current.ships.hasTransforms) {
+      this.transformBtn.classList.remove('hidden')
+    } else {
+      this.transformBtn.classList.add('hidden')
+    }
     this.flipBtn.classList.remove('hidden')
     this.undoBtn.classList.remove('hidden')
     this.autoBtn.classList.remove('hidden')
@@ -102,6 +108,7 @@ export class FriendUI extends PlacementUI {
     this.score.placedLabel.classList.add('hidden')
     this.rotateBtn.classList.add('hidden')
     this.rotateLeftBtn.classList.add('hidden')
+    this.transformBtn.classList.add('hidden')
     this.flipBtn.classList.add('hidden')
     this.undoBtn.classList.add('hidden')
     this.autoBtn.classList.add('hidden')
@@ -125,6 +132,7 @@ export class FriendUI extends PlacementUI {
     this.score.placedLabel.classList.add('hidden')
     this.rotateBtn.classList.add('hidden')
     this.rotateLeftBtn.classList.add('hidden')
+    this.transformBtn.classList.add('hidden')
     this.flipBtn.classList.add('hidden')
     this.undoBtn.classList.add('hidden')
     this.autoBtn.classList.add('hidden')

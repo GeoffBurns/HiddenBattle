@@ -5,6 +5,7 @@ import {
   onClickRotate,
   onClickFlip,
   onClickRotateLeft,
+  onClickTransform,
   tabCursor,
   enterCursor,
   setupDragHandlers,
@@ -116,6 +117,7 @@ function wireupButtons () {
   customUI.rotateBtn.addEventListener('click', onClickRotate)
   customUI.rotateLeftBtn.addEventListener('click', onClickRotateLeft)
   customUI.flipBtn.addEventListener('click', onClickFlip)
+  customUI.transformBtn.addEventListener('click', onClickTransform)
   customUI.undoBtn.addEventListener('click', onClickUndo)
 
   dragNDrop.takeDrop(customUI, custom)
@@ -155,6 +157,10 @@ function setupBuildShortcuts () {
       case 'f':
       case 'F':
         onClickFlip()
+        break
+      case 'x':
+      case 'X':
+        onClickTransform()
         break
       case 'u':
       case 'U':

@@ -23,6 +23,11 @@ export function onClickFlip () {
     clickedShip.flip()
   }
 }
+export function onClickTransform () {
+  if (clickedShip?.canTransform()) {
+    clickedShip.nextForm()
+  }
+}
 
 let lastmodifier = ''
 let dragCounter = 0

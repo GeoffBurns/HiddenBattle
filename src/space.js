@@ -13,6 +13,7 @@ import {
   Hybrid,
   StandardCells,
   SpecialCells,
+  Transformer,
   standardShot
 } from './Shape.js'
 import { TerrainMaps } from './maps.js'
@@ -214,7 +215,7 @@ export const spaceAndAsteroids = new Terrain(
   spaceWeapons,
   'Sector'
 )
-
+spaceAndAsteroids.hasTransforms = true
 class Installation extends Shape {
   constructor (description, letter, symmetry, cells, tip, racks) {
     super(
@@ -516,14 +517,22 @@ const transport = new SpaceVessel('Transport', 'T', 'L', [
   [0, 4]
 ])
 
-const railgun = new SpaceVessel('Railgun', 'R', 'S', [
+const railgunSpace = new SpaceVessel('Railgun', 'R', 'S', [
   [0, 1],
   [1, 0],
   [1, 1],
   [1, 2],
   [2, 1]
 ])
+const railgunAsteroid = new Installation('Railgun', 'R', 'S', [
+  [0, 0],
+  [2, 0],
+  [1, 1],
+  [0, 2],
+  [2, 2]
+])
 
+const railgun = new Transformer([railgunSpace, railgunAsteroid])
 const corvette = new Shuttle('Corvette', 'V', 'H', [
   [0, 0],
   [2, 0],

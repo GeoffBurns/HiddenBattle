@@ -63,7 +63,9 @@ class SelectedShip {
   canRotate () {
     return this.variants.canRotate
   }
-
+  canTransform () {
+    return this.variants.canTransform
+  }
   placeable () {
     return this.variants.placeable()
   }
@@ -83,6 +85,9 @@ class SelectedShip {
   }
   flip () {
     return this.variants.flip()
+  }
+  nextForm () {
+    return this.variants.nextForm()
   }
 }
 

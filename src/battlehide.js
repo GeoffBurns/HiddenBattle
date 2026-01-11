@@ -6,6 +6,7 @@ import {
   onClickRotate,
   onClickFlip,
   onClickRotateLeft,
+  onClickTransform,
   tabCursor,
   enterCursor
 } from './dragndrop.js'
@@ -134,6 +135,7 @@ function wireupButtons () {
   friendUI.newPlacementBtn.addEventListener('click', newPlacement)
   friendUI.rotateBtn.addEventListener('click', onClickRotate)
   friendUI.rotateLeftBtn.addEventListener('click', onClickRotateLeft)
+  friendUI.transformBtn.addEventListener('click', onClickTransform)
   friendUI.flipBtn.addEventListener('click', onClickFlip)
   friendUI.undoBtn.addEventListener('click', onClickUndo)
   friendUI.autoBtn.addEventListener('click', onClickAuto)
@@ -164,6 +166,10 @@ function setupHideShortcuts () {
       case 'f':
       case 'F':
         onClickFlip()
+        break
+      case 'x':
+      case 'X':
+        onClickTransform()
         break
       case 't':
       case 'T':

@@ -54,6 +54,7 @@ export class CustomUI extends PlacementUI {
     this.acceptBtn.classList.remove('hidden')
     this.rotateBtn.classList.add('hidden')
     this.rotateLeftBtn.classList.add('hidden')
+    this.transformBtn.classList.add('hidden')
     this.flipBtn.classList.add('hidden')
     this.undoBtn.classList.add('hidden')
     this.autoBtn.classList.add('hidden')
@@ -107,6 +108,12 @@ export class CustomUI extends PlacementUI {
     this.score.weaponsLabel.classList.remove('hidden')
     this.rotateBtn.classList.remove('hidden')
     this.rotateLeftBtn.classList.remove('hidden')
+    if (terrain.current.ships.hasTransforms) {
+      this.transformBtn.classList.remove('hidden')
+    } else {
+      this.transformBtn.classList.add('hidden')
+    }
+    this.transformBtn.classList.remove('hidden')
     this.flipBtn.classList.remove('hidden')
     this.undoBtn.classList.remove('hidden')
     this.autoBtn.classList.add('hidden')

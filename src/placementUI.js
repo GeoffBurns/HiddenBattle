@@ -15,6 +15,7 @@ export class PlacementUI extends WatersUI {
     this.rotateBtn = document.getElementById('rotateBtn')
     this.rotateLeftBtn = document.getElementById('rotateLeftBtn')
     this.flipBtn = document.getElementById('flipBtn')
+    this.transformBtn = document.getElementById('transformBtn')
     this.testBtn = document.getElementById('testBtn')
     this.seekBtn = document.getElementById('seekBtn')
     this.stopBtn = document.getElementById('stopBtn')
@@ -377,6 +378,7 @@ export class PlacementUI extends WatersUI {
     this.rotateBtn.disabled = !clickedShip.canRotate()
     this.flipBtn.disabled = !clickedShip.canFlip()
     this.rotateLeftBtn.disabled = !clickedShip.canRotate()
+    this.transformBtn.disabled = !clickedShip.canTransform()
   }
   assignClickedWeapon (weapon, clicked) {
     this.removeClicked()
