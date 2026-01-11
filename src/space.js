@@ -698,7 +698,7 @@ export class Missile extends Megabomb {
     this.plural = 'Missiles'
     this.symbol = '+'
     this.letter = '+'
-    this.cursors = ['bomb']
+    this.cursors = ['missile']
     this.hints = ['Click On Square To Aim Missile']
     this.buttonHtml = '<span class="shortcut">M</span>issile'
     this.tip =
