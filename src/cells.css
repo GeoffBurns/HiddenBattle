@@ -47,6 +47,14 @@
     cursor: var(--bomb-cursor-image) 26 26, pointer;
 }
 
+.board.rail {
+    cursor: var(--rail-cursor-image) 26 26, pointer;
+}
+
+.board.bolt {
+    cursor: var(--bolt-cursor-image) 26 26, pointer;
+}
+
 .board.strike {
     cursor: var(--strike-cursor-image) 6 26, pointer;
 }
