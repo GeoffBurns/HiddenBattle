@@ -28,6 +28,7 @@ class Variants {
   }
   numVariants () {
     return this.list.length
+  }
   variant (index) {
     return this.list[index || this.index]
   }
