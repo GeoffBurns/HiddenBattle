@@ -732,7 +732,7 @@ export class RailBolt extends Kinetic {
     this.plural = 'Rail Bolts'
     this.letter = '|'
     this.symbol = '|'
-    this.cursors = ['satelite', 'strike']
+    this.cursors = ['rail', 'bolt']
     this.hints = [
       'Click on square to start rail bolt',
       'Click on square end rail bolt'
