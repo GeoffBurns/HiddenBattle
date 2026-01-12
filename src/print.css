@@ -123,6 +123,34 @@
         border: 0 none;
     }
 
+    .cell.destroy-vunerable {
+        background: #b6e673
+    }
+
+    .cell.destroy-normal {
+        background: #f5b44c
+    }
+
+    .cell.destroy-hardened {
+        background: #f50177
+    }
+
+    .cell.reveal-vunerable {
+        background: #73bce6
+    }
+
+    .cell.reveal-normal {
+        background: #4f4cf5
+    }
+
+    .cell.reveal-hardened {
+        background: #5d018e
+    }
+
+    .cell.weapon-path {
+        background: #fd3d02
+    }
+
     .cell.special::after {
         background: black;
         transition: none;

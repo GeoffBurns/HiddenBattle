@@ -405,6 +405,26 @@ export class PlacementUI extends WatersUI {
       }
     }
   }
+  setSplashContents (dragShip, cells) {
+    const maxR = Math.max(...cells.map(s => s[0])) + 1
+    const maxC = Math.max(...cells.map(s => s[1])) + 1
+    const minR = Math.min(...cells.map(s => s[0]))
+    const minC = Math.min(...cells.map(s => s[1]))
+
+    dragShip.setAttribute(
+      'style',
+      `display:grid;place-items: center;--boxSize:${this.cellSizeString()};grid-template-rows:repeat(${
+        maxR - minR
+      }, var(--boxSize));grid-template-columns:repeat(${
+        maxC - minC
+      }, var(--boxSize));gap:0px;`
+    )
+    for (let r = minR; r < maxR; r++) {
+      for (let c = minC; c < maxC; c++) {
+        this.createSplashCell(dragShip, cells, r, c)
+      }
+    }
+  }
 
   setBrushContents (brush, size, subterrain) {
     brush.setAttribute(
@@ -419,7 +439,6 @@ export class PlacementUI extends WatersUI {
       }
     }
   }
-
   createDragShipCell (dragShip, cells, letter, r, c, special) {
     const maps = gameMaps()
     if (cells.some(shipcell => shipcell[0] === r && shipcell[1] === c)) {
@@ -432,6 +451,15 @@ export class PlacementUI extends WatersUI {
         letter,
         special
       )
+    } else {
+      this.appendEmptyCell(dragShip, r, c)
+    }
+  }
+
+  createSplashCell (dragShip, cells, r, c) {
+    const cell = cells.find(cell => cell[0] === r && cell[1] === c)
+    if (cell) {
+      this.appendSplashCell(dragShip, cell[2])
     } else {
       this.appendEmptyCell(dragShip, r, c)
     }
@@ -476,6 +504,22 @@ export class PlacementUI extends WatersUI {
     }
     dragItem.appendChild(cell)
   }
+  static get spashTags () {
+    return {
+      0: 'destroy-vunerable',
+      1: 'destroy-normal',
+      2: 'destroy-hardened',
+      10: 'reveal-vunerable',
+      11: 'reveal-normal',
+      12: 'reveal-hardened',
+      20: 'weapon-path'
+    }
+  }
+  appendSplashCell (dragItem, power) {
+    const cell = this.makeCell()
+    cell.classList.add(PlacementUI.spashTags[power])
+    dragItem.appendChild(cell)
+  }
 
   displayAsPlaced (cell, letter) {
     cell.textContent = letter
@@ -502,6 +546,40 @@ export class PlacementUI extends WatersUI {
     }
   }
 
+  buildSplashLegend (cells, weapon, legend) {
+    const tray = document.getElementById('splash-legend-' + weapon.tag)
+    if (!tray) return
+    tray.classList.remove('hidden')
+    let powerList = {}
+
+    for (const cell of cells) {
+      powerList[cell[2]] = [0, 0, cell[2]]
+    }
+
+    const splashCol = document.createElement('div')
+    splashCol.className = 'splash-col'
+    for (const [key] of Object.entries(powerList)) {
+      const dragShipContainer = document.createElement('div')
+
+      dragShipContainer.className = 'splash-container'
+      const dragShip = document.createElement('div')
+      dragShip.className = 'splash-cells'
+      dragShip.setAttribute(
+        'style',
+        `display:grid;place-items: center;--boxSize:${this.cellSizeString()};grid-template-rows:repeat(1, var(--boxSize));grid-template-columns:repeat(1, var(--boxSize));gap:0px;`
+      )
+      this.appendSplashCell(dragShip, key)
+      dragShipContainer.appendChild(dragShip)
+      const label = document.createElement('div')
+      label.textContent = legend[key]
+
+      dragShipContainer.appendChild(label)
+      splashCol.appendChild(dragShipContainer)
+    }
+
+    tray.appendChild(splashCol)
+  }
+
   addtrayitem (shape, count, tray) {
     const dragShipContainer = document.createElement('div')
 
@@ -522,6 +600,21 @@ export class PlacementUI extends WatersUI {
       shape.descriptionText + (count === 1 ? '' : ` x ${count}`)
 
     dragShipContainer.appendChild(label)
+    tray.appendChild(dragShipContainer)
+  }
+
+  buildWeaponsSplashPrint (cells, weapon) {
+    const tray = document.getElementById('splash-map-' + weapon.tag)
+    if (!tray) return
+    tray.classList.remove('hidden')
+    const dragShipContainer = document.createElement('div')
+
+    dragShipContainer.className = 'drag-ship-container'
+
+    const dragShip = document.createElement('div')
+    dragShip.className = 'drag-ship'
+    this.setSplashContents(dragShip, cells)
+    dragShipContainer.appendChild(dragShip)
     tray.appendChild(dragShipContainer)
   }
 

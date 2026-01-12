@@ -220,6 +220,32 @@ export class Weapon {
   info () {
     return `${this.name} (${this.letter})`
   }
+
+  addSplash () {
+    throw Error('override in derided class')
+  }
+
+  addNeighbours (map, r, c, p1, p2, newEffect) {
+    this.addOrthogonal(map, r, c, p1, newEffect)
+    this.addDiagonal(map, r, c, p2, newEffect)
+    return newEffect
+  }
+
+  addDiagonal (map, r, c, power, newEffect) {
+    this.addSplash(map, r + 1, c + 1, power, newEffect)
+    this.addSplash(map, r - 1, c + 1, power, newEffect)
+    this.addSplash(map, r + 1, c - 1, power, newEffect)
+    this.addSplash(map, r - 1, c - 1, power, newEffect)
+    return newEffect
+  }
+
+  addOrthogonal (map, r, c, power, newEffect) {
+    this.addSplash(map, r + 1, c, power, newEffect)
+    this.addSplash(map, r - 1, c, power, newEffect)
+    this.addSplash(map, r, c + 1, power, newEffect)
+    this.addSplash(map, r, c - 1, power, newEffect)
+    return newEffect
+  }
 }
 
 export class StandardShot extends Weapon {
@@ -1306,6 +1332,7 @@ export class Megabomb extends Weapon {
       'drag a megabomb on to the map to increase the number of times you can drop bombs'
     this.hasFlash = true
     this.tag = 'mega'
+    this.splashCoords = this.aoe(null, [[2, 2]])
     this.dragShape = [
       [0, 0, 0],
       [0, 1, 0],
@@ -1436,6 +1463,14 @@ export class Kinetic extends Weapon {
     this.isOneAndDone = true
     this.hasFlash = false
     this.tag = 'kinetic'
+    this.splashCoords = this.addOrthogonal(null, 2, 2, 0, [
+      [2, 2, 2],
+      [0, 0, 20],
+      [1, 1, 20],
+      [3, 3, 20],
+      [4, 4, 20]
+    ])
+
     this.dragShape = [
       [0, 0, 1],
       [0, 1, 0],
@@ -1465,12 +1500,13 @@ export class Kinetic extends Weapon {
   splash (map, coords) {
     const [r, c] = coords
     const newEffect = [coords]
-    if (map.inBounds(r + 1, c)) newEffect.push([r + 1, c, 0])
-    if (map.inBounds(r - 1, c)) newEffect.push([r - 1, c, 0])
-
-    if (map.inBounds(r, c + 1)) newEffect.push([r, c + 1, 0])
-    if (map.inBounds(r, c - 1)) newEffect.push([r, c - 1, 0])
+    this.addOrthogonal(map, r, c, 0, newEffect)
     return newEffect
+  }
+
+  addSplash (map, r, c, power, newEffect) {
+    const noCheck = map === null || map === undefined
+    if (noCheck || map.inBounds(r, c)) newEffect.push([r, c, power])
   }
 }
 
@@ -1489,6 +1525,17 @@ export class Torpedo extends Weapon {
     this.isOneAndDone = true
     this.hasFlash = false
     this.tag = 'torpedo'
+    this.splashCoords = this.addOrthogonal(null, 3, 3, 1, [
+      [3, 3, 2],
+      [4, 2, 0],
+      [2, 4, 0],
+      [0, 0, 20],
+      [1, 1, 20],
+      [2, 2, 30],
+      [4, 4, 30],
+      [5, 5, 20],
+      [6, 6, 20]
+    ])
     this.dragShape = [
       [1, 0, 1],
       [1, 1, 0],
@@ -1521,22 +1568,18 @@ export class Torpedo extends Weapon {
     }
     return line
   }
+
   addSplash (map, r, c, power, newEffect) {
-    if (map.inBounds(r, c) && !map.isLand(r, c)) newEffect.push([r, c, power])
+    const noCheck = map === null || map === undefined
+    if (noCheck || (map.inBounds(r, c) && !map.isLand(r, c)))
+      newEffect.push([r, c, power])
   }
 
   splash (map, coords) {
     const [r, c] = coords
     const newEffect = [coords]
 
-    this.addSplash(map, r + 1, c, 1, newEffect)
-    this.addSplash(map, r - 1, c, 1, newEffect)
-    this.addSplash(map, r + 1, c + 1, 0, newEffect)
-    this.addSplash(map, r - 1, c + 1, 0, newEffect)
-    this.addSplash(map, r + 1, c - 1, 0, newEffect)
-    this.addSplash(map, r - 1, c - 1, 0, newEffect)
-    this.addSplash(map, r, c + 1, 1, newEffect)
-    this.addSplash(map, r, c - 1, 1, newEffect)
+    this.addNeighbours(map, r, c, 1, 0, newEffect)
     return newEffect
   }
 }
@@ -1552,6 +1595,18 @@ export class Flack extends Weapon {
     this.isOneAndDone = false
     this.hasFlash = false
     this.tag = 'flack'
+    this.splashCoords = [
+      [0, 0, 1],
+      [1, 1, 2],
+      [0, 2, 1],
+      [2, 0, 1],
+      [2, 2, 1],
+      [1, 3, 2],
+      [0, 4, 1],
+      [2, 4, 1],
+      [0, 1, 0],
+      [2, 3, 0]
+    ]
     this.dragShape = [
       [0, 0, 0],
       [1, 1, 1],

@@ -181,6 +181,34 @@
     background: transparent
 }
 
+.cell.destroy-vunerable {
+    background: #c9e673
+}
+
+.cell.destroy-normal {
+    background: #f5b44c
+}
+
+.cell.destroy-hardened {
+    background: #6c0135
+}
+
+.cell.reveal-vunerable {
+    background: #73bce6
+}
+
+.cell.reveal-normal {
+    background: #4f4cf5
+}
+
+.cell.reveal-hardened {
+    background: #540181
+}
+
+.cell.weapon-path {
+    background: #a6f9e1
+}
+
 .cell.empty,
 .cell.row-label,
 .cell.col-label {

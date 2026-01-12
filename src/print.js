@@ -12,6 +12,84 @@ function resetBoardSize () {
   friendUI.resetBoardSizePrint()
   enemyUI.resetBoardSizePrint()
 }
+function customSplash (hasPower) {
+  let legend = {}
+  let translate = {}
+
+  translate[20] = 20
+  legend[20] = 'Weapon Path'
+  if (hasPower[2]) {
+    translate[2] = 2
+    translate[32] = 2
+    legend[2] = 'Hardened Destroyed'
+    translate[12] = 12
+    legend[12] = 'Hardened Revealed'
+    translate[1] = 1
+    translate[31] = 1
+    if (hasPower[1]) {
+      legend[1] = 'Normal Destroyed, Hardened Revealed'
+      translate[11] = 11
+      legend[11] = 'Normal Revealed'
+
+      if (hasPower[0]) {
+        translate[0] = 0
+        translate[30] = 0
+        legend[0] = 'Vunerable Destroyed'
+        translate[10] = 10
+        legend[10] = 'Vunerable Revealed'
+      } else {
+        translate[0] = -1
+        translate[30] = 20
+        translate[10] = -1
+      }
+    } else {
+      if (hasPower[0]) {
+        translate[1] = 0
+        translate[31] = 0
+        legend[1] = 'Vunerable Destroyed, Hardened Revealed'
+      } else {
+        translate[1] = 12
+        translate[31] = 12
+
+        legend[12] = 'Hardened Revealed'
+      }
+    }
+  } else {
+    // not hasPower[2]
+    if (hasPower[1]) {
+      translate[2] = 1
+      translate[32] = 1
+      translate[12] = 11
+      translate[1] = 1
+      translate[31] = 1
+      legend[1] = 'Normal Destroyed'
+      translate[11] = 11
+      legend[11] = 'Normal Revealed'
+
+      if (hasPower[0]) {
+        translate[0] = 0
+        translate[30] = 0
+        legend[0] = 'Vunerable Destroyed'
+        translate[10] = 10
+        legend[10] = 'Vunerable Revealed'
+      } else {
+        translate[0] = -1
+        translate[30] = 20
+        translate[10] = -1
+      }
+    } else {
+      if (hasPower[0]) {
+        translate[1] = 0
+        translate[31] = 0
+        legend[1] = 'Vunerable Destroyed, Hardened Revealed'
+      } else {
+        translate[1] = -1
+        translate[31] = -1
+      }
+    }
+  }
+  return [translate, legend]
+}
 
 function refresh () {
   friend.setMap()
@@ -40,6 +118,20 @@ function refresh () {
         el.classList.remove('hidden')
         i++
         const { vulnerable, normal, hardened, immune } = getPowerGroups(weapon)
+        const hasPower = [
+          vulnerable.length > 0,
+          normal.length > 0,
+          hardened.length > 0
+        ]
+
+        const [translate, legend] = customSplash(hasPower)
+        const cells = weapon.splashCoords.map(m => {
+          const t = translate[m[2]] || m[2]
+
+          return [m[0], m[1], t]
+        })
+        friendUI.buildWeaponsSplashPrint(cells, weapon)
+        friendUI.buildSplashLegend(cells, weapon, legend)
         showSplashInfo(weapon, vulnerable, normal, hardened, immune)
         showPowerGroups(hardened, vulnerable, immune, weapon, normal)
       }
