@@ -166,22 +166,29 @@ fetchNavBar('print', 'Battleship', function () {
   }
 })
 function getPowerGroups (weapon) {
-  const immune = enemy.ships.flatMap(s =>
-    (s.shape.immune || []).includes(weapon.letter) ? s.shape.name : []
-  )
-  const vulnerable = enemy.ships.flatMap(s =>
-    (s.shape.vulnerable || []).includes(weapon.letter) ? s.shape.name : []
-  )
-  const hardened = enemy.ships.flatMap(s =>
-    (s.shape.hardened || []).includes(weapon.letter) ? s.shape.name : []
-  )
+  const immune = enemy.ships.flatMap(s => {
+    const shape = s.shape()
+    return (shape.immune || []).includes(weapon.letter) ? shape.name : []
+  })
+
+  const vulnerable = enemy.ships.flatMap(s => {
+    const shape = s.shape()
+    return (shape.vulnerable || []).includes(weapon.letter) ? shape.name : []
+  })
+
+  const hardened = enemy.ships.flatMap(s => {
+    const shape = s.shape()
+    return (shape.hardened || []).includes(weapon.letter) ? shape.name : []
+  })
+
   const normal = enemy.ships.flatMap(s => {
+    const shape = s.shape()
     if (
-      !(s.shape.immune || []).includes(weapon.letter) &&
-      !(s.shape.vulnerable || []).includes(weapon.letter) &&
-      !(s.shape.hardened || []).includes(weapon.letter)
+      !(shape.immune || []).includes(weapon.letter) &&
+      !(shape.vulnerable || []).includes(weapon.letter) &&
+      !(shape.hardened || []).includes(weapon.letter)
     ) {
-      return s.shape.name
+      return shape.name
     } else {
       return []
     }
