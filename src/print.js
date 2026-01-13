@@ -167,28 +167,31 @@ fetchNavBar('print', 'Battleship', function () {
   }
 })
 function getPowerGroups (weapon) {
-  const immune = enemy.ships.flatMap(s => {
+  const ships = [
+    ...new Map(enemy.ships.map(ship => [ship.letter, ship])).values()
+  ]
+  const immune = ships.flatMap(s => {
     const shape = s.shape()
     return (shape.immune || []).includes(weapon.letter)
       ? shape.descriptionText
       : []
   })
 
-  const vulnerable = enemy.ships.flatMap(s => {
+  const vulnerable = ships.flatMap(s => {
     const shape = s.shape()
     return (shape.vulnerable || []).includes(weapon.letter)
       ? shape.descriptionText
       : []
   })
 
-  const hardened = enemy.ships.flatMap(s => {
+  const hardened = ships.flatMap(s => {
     const shape = s.shape()
     return (shape.hardened || []).includes(weapon.letter)
       ? shape.descriptionText
       : []
   })
 
-  const normal = enemy.ships.flatMap(s => {
+  const normal = ships.flatMap(s => {
     const shape = s.shape()
     if (
       !(shape.immune || []).includes(weapon.letter) &&

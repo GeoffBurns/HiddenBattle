@@ -397,7 +397,16 @@
                   <b>plus all eight adjacent squares </b>(the surrounding 3x3
                   area).
                 </p>
+                <div class="splash-group">
+                  <div id="splash-map-missile" class="hidden"></div>
+                  <div id="splash-legend-missile" class="hidden"></div>
+                </div>
               </li>
+              <li
+                id="power-info-missile"
+                class="hidden"
+                data-list-text="◦"
+              ></li>
               <li data-list-text="◦">
                 <p>Your opponent announces:</p>
                 <ul>
@@ -429,10 +438,18 @@
               </li>
               <li data-list-text="◦">
                 <p>
-                  The strike hits one of the squares along the line. The strike
-                  can also do splash damage against vulnerable units.
+                  The strike hits one of the squares along the line.
+                  <span class="hidden" id="splash-info-rail"
+                    >The strike can also do splash damage</span
+                  ><span class="hidden" id="splashed-rail"></span
+                  ><span class="hidden" id="unsplashed-rail"></span>.
                 </p>
+                <div class="splash-group">
+                  <div id="splash-map-rail" class="hidden"></div>
+                  <div id="splash-legend-rail" class="hidden"></div>
+                </div>
               </li>
+              <li id="power-info-rail" class="hidden" data-list-text="◦"></li>
               <li data-list-text="◦">
                 <p>Your opponent chooses:</p>
                 <ul>

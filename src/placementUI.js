@@ -458,7 +458,7 @@ export class PlacementUI extends WatersUI {
 
   createSplashCell (dragShip, cells, r, c) {
     const cell = cells.find(cell => cell[0] === r && cell[1] === c)
-    if (cell) {
+    if (cell && cell[2] >= 0) {
       this.appendSplashCell(dragShip, cell[2])
     } else {
       this.appendEmptyCell(dragShip, r, c)
@@ -553,7 +553,8 @@ export class PlacementUI extends WatersUI {
     let powerList = {}
 
     for (const cell of cells) {
-      powerList[cell[2]] = [0, 0, cell[2]]
+      const power = cell[2]
+      if (power >= 0) powerList[power] = [0, 0, power]
     }
 
     const splashCol = document.createElement('div')
