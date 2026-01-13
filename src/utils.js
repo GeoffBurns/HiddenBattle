@@ -1,5 +1,15 @@
 import { gameMap } from './maps.js'
 
+export function toTitleCase (str) {
+  if (!str) {
+    return ''
+  }
+  if (typeof str === 'string') {
+    return str.toLowerCase().replaceAll(/\b\w/g, s => s.toUpperCase())
+  }
+  return str
+}
+
 export function randomPlaceShape (ship, shipCellGrid) {
   const letter = ship.letter
   const shape = ship.shape()

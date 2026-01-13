@@ -124,31 +124,45 @@
     }
 
     .cell.destroy-vunerable {
-        background: #b6e673
+        background: #c6f683 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     .cell.destroy-normal {
-        background: #f5b44c
+        background: #f5c46c !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     .cell.destroy-hardened {
-        background: #f50177
+        background: #f54197 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     .cell.reveal-vunerable {
-        background: #73bce6
+        background: #93ccf6 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     .cell.reveal-normal {
-        background: #4f4cf5
+        background: #8f8cf5 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     .cell.reveal-hardened {
-        background: #5d018e
+        background: #8d61de !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     .cell.weapon-path {
-        background: #fd3d02
+        background: #fd6d40 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     .cell.special::after {
@@ -158,7 +172,6 @@
 
 
     .cell {
-
         border: 1px solid black;
     }
 

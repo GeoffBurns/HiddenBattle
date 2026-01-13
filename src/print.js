@@ -5,6 +5,7 @@ import { enemyUI } from './enemyUI.js'
 import { enemy } from './enemy.js'
 import { gameMap } from './maps.js'
 import { terrain, Terrain } from './Shape.js'
+import { toTitleCase } from './utils.js'
 
 const friend = new Friend(friendUI)
 
@@ -168,17 +169,23 @@ fetchNavBar('print', 'Battleship', function () {
 function getPowerGroups (weapon) {
   const immune = enemy.ships.flatMap(s => {
     const shape = s.shape()
-    return (shape.immune || []).includes(weapon.letter) ? shape.name : []
+    return (shape.immune || []).includes(weapon.letter)
+      ? shape.descriptionText
+      : []
   })
 
   const vulnerable = enemy.ships.flatMap(s => {
     const shape = s.shape()
-    return (shape.vulnerable || []).includes(weapon.letter) ? shape.name : []
+    return (shape.vulnerable || []).includes(weapon.letter)
+      ? shape.descriptionText
+      : []
   })
 
   const hardened = enemy.ships.flatMap(s => {
     const shape = s.shape()
-    return (shape.hardened || []).includes(weapon.letter) ? shape.name : []
+    return (shape.hardened || []).includes(weapon.letter)
+      ? shape.descriptionText
+      : []
   })
 
   const normal = enemy.ships.flatMap(s => {
@@ -188,7 +195,7 @@ function getPowerGroups (weapon) {
       !(shape.vulnerable || []).includes(weapon.letter) &&
       !(shape.hardened || []).includes(weapon.letter)
     ) {
-      return shape.name
+      return shape.descriptionText
     } else {
       return []
     }
@@ -257,15 +264,14 @@ function showSplashedUnit (weapon, powerGroup, splashedList) {
     splashedEl &&
     (!unsplashedEl || splashedList.length < unsplashedList.length)
   ) {
-    const names = powerGroupName
-      .slice(0, weapon.splashPower + 1)
-      .join(', ')
-      .toTitleCase()
+    const names = toTitleCase(
+      powerGroupName.slice(0, weapon.splashPower + 1).join(', ')
+    )
+
     splashedEl.classList.remove('hidden')
-    splashedEl.textContent =
-      ` ${names} units are effected such as ${splashedList.join(', ')}`.join(
-        ', '
-      )
+    splashedEl.textContent = ` ${names} units are effected such as ${splashedList.join(
+      ', '
+    )}`
   } else if (
     unsplashedEl &&
     (!splashedEl || unsplashedList.length < splashedList.length)

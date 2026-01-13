@@ -3,6 +3,7 @@ import { gameMaps, gameMap, TerrainMaps } from './maps.js'
 import { custom } from './custom.js'
 import { SavedCustomMap } from './map.js'
 import { terrain } from './Shape.js'
+import { toTitleCase } from './utils.js'
 
 export function removeShortcuts () {
   document.removeEventListener('keydown')
@@ -433,15 +434,6 @@ function setSizeParams (height, width) {
       url
     )
   }
-}
-function toTitleCase (str) {
-  if (!str) {
-    return ''
-  }
-  if (typeof str === 'string') {
-    return str.toLowerCase().replaceAll(/\b\w/g, s => s.toUpperCase())
-  }
-  return str
 }
 
 function replaceToken (template, key, value) {
