@@ -15,7 +15,8 @@ export class StatusUI {
     }
   }
   displayAmmoStatus (wps, idx = 0) {
-    const { ammo, weapon } = wps
+    const weapon = wps.weapon
+    const ammo = wps.ammoLeft()
     return this.display(weapon.ammoStatus(ammo), weapon.hints[idx])
   }
   info (game) {

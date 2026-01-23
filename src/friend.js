@@ -1,7 +1,8 @@
-import { gameMap } from './maps.js'
-import { Waters } from './player.js'
-import { gameStatus } from './playerUI.js'
-
+import { gameMap } from './gameMaps.js'
+import { Waters } from './Waters.js'
+import { gameStatus } from './WatersUI.js'
+import { makeKey } from './utilities.js'
+import { setupDragHandlers } from './dragndrop.js'
 export class Friend extends Waters {
   constructor (friendUI) {
     super(friendUI)
@@ -94,7 +95,7 @@ export class Friend extends Waters {
         if (this.seekHit2(weapon, r, c, power)) hit = true
       }
     }
-    if (hit) this.flash()
+    if (hit) this.flash('long')
   }
 
   randomBomb (seeking) {
@@ -110,14 +111,15 @@ export class Friend extends Waters {
         const r = Math.floor(Math.random() * (map.rows - 2)) + 1
         const c = Math.floor(Math.random() * (map.cols - 2)) + 1
         if (this.score.newShotKey(r, c)) {
-          this.loadOut.aim(map, r, c)
+          this.launchRandomWeapon(r, c)
+          this.loadOut.aim(gameMap(), r, c, this.loadOut.selectedWeapon)
           return
         }
       }
   }
 
   destroyOne (weapon, effect) {
-    const candidates = this.getHitCandidates(effect)
+    const candidates = this.getHitCandidates(effect, weapon)
     if (candidates.length < 1) {
       this.seekBomb(weapon, effect)
       return
@@ -136,8 +138,10 @@ export class Friend extends Waters {
     }
 
     const r = this.randomLine()
-    this.loadOut.aim(map, r, 0)
-    this.loadOut.aim(map, r, map.cols - 1)
+    this.launchRandomWeapon(r, 0)
+    this.loadOut.aim(map, r, map.cols - 1, this.loadOut.selectedWeapon)
+    // this.loadOut.aim(map, r, 0)
+    /// this.loadOut.aim(map, r, map.cols - 1)
   }
 
   randomSeekOld (seeking) {
@@ -179,18 +183,26 @@ export class Friend extends Waters {
       }
     }
   }
+
   restartBoard () {
-    this.boardDestroyed = false
-    this.UI.board.classList.remove('destroyed')
-    this.armWeapons()
-    this.score.reset()
+    this.resetBase()
     this.UI.clearVisuals()
     for (const ship of this.ships) {
-      ship.sunk = false
-      ship.hits = new Set()
+      ship.reset()
       this.UI.revealShip(ship)
     }
+    this.armWeapons()
   }
+  restartFriendBoard () {
+    this.resetBase()
+    this.UI.clearFriendVisuals()
+    for (const ship of this.ships) {
+      ship.reset()
+      this.UI.revealShip(ship)
+    }
+    this.armWeapons()
+  }
+
   test () {
     gameStatus.display('', '')
     this.UI.testMode()
@@ -207,7 +219,7 @@ export class Friend extends Waters {
     this.untried = new Set()
     for (let r = 0; map.rows > r; r++) {
       for (let c = 0; map.cols > c; c++) {
-        const key = `${r},${c}`
+        const key = makeKey(r, c)
 
         this.untried.add(key)
       }
@@ -277,7 +289,7 @@ export class Friend extends Waters {
     this.updateUI()
     const map = gameMap()
     for (const position of effect) {
-      const [r, c, power] = position
+      const [r, c] = position
 
       if (map.inBounds(r, c)) {
         /// reveal  what is in this position
@@ -300,6 +312,23 @@ export class Friend extends Waters {
     this.loadOut.aim(map, r, c)
     this.loadOut.aim(map, r1, c1)
   }
+  randomEffect (effect, seeking) {
+    switch (effect) {
+      case 'DestroyOne':
+        this.randomDestroyOne(seeking)
+        break
+      case 'Bomb':
+        this.randomBomb(seeking)
+        break
+      case 'Scan':
+        this.randomScan(seeking)
+        break
+      case 'Seek':
+        this.randomSeek(seeking)
+        break
+    }
+  }
+
   selectShot (semis, hits, seeking) {
     if (semis.length > 0) {
       this.loadOut.switchToSShot()
@@ -308,19 +337,14 @@ export class Friend extends Waters {
     } else if (hits.length > 0) {
       this.loadOut.switchToSShot()
       this.chase(hits, seeking)
-    } else if (this.loadOut.switchTo('K')) {
-      this.randomDestroyOne(seeking)
-    } else if (this.loadOut.switchTo('F')) {
-      this.randomBomb(seeking)
-    } else if (this.loadOut.switchTo('M')) {
-      this.randomBomb(seeking)
-    } else if (this.loadOut.switchTo('+')) {
-      this.randomDestroyOne(seeking)
-    } else if (this.loadOut.switchTo('W')) {
-      this.randomScan(seeking)
     } else {
-      this.loadOut.switchToSShot()
-      this.randomSeek(seeking)
+      const op = this.loadOut.switchToPrefered()
+      if (op) {
+        this.randomEffect(op)
+      } else {
+        this.loadOut.switchToSShot()
+        this.randomSeek(seeking)
+      }
     }
   }
 
@@ -336,7 +360,12 @@ export class Friend extends Waters {
 
     this.selectShot([...this.score.semi], hits, seeking)
   }
-
+  updateMode () {
+    if (this.isRevealed || this.boardDestroyed) {
+      return
+    }
+    this.updateWeapon()
+  }
   resetModel () {
     this.score.reset()
     this.resetMap()
@@ -345,12 +374,13 @@ export class Friend extends Waters {
     this.UI.buildBoard()
     this.resetShipCells()
     this.UI.makeDroppable(this)
+    setupDragHandlers(this.UI)
   }
 
   resetUI (ships) {
+    this.resetBase()
     ships = ships || this.ships
     this.UI.reset(ships)
-    this.UI.board.classList.remove('destroyed')
     this.buildBoard()
     this.UI.buildTrays(ships, this.shipCellGrid)
     this.updateUI(ships)

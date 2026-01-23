@@ -3,7 +3,7 @@ import { friendUI } from './friendUI.js'
 import { Friend } from './friend.js'
 import { enemyUI } from './enemyUI.js'
 import { enemy } from './enemy.js'
-import { gameMap } from './maps.js'
+import { gameMap } from './gameMaps.js'
 import { terrain, Terrain } from './Shape.js'
 import { toTitleCase } from './utils.js'
 

@@ -1,19 +1,12 @@
-import {
-  seaAndLand,
-  terrain,
-  addCellToFootPrint,
-  standardShot,
-  Megabomb,
-  oldToken
-} from './Shape.js'
+import { Megabomb } from './SeaWeapons.js'
+import { addCellToFootPrint, makeKey, parsePair } from './utilities.js'
+import { terrain, oldToken } from './terrain.js'
+import { standardShot } from './Weapon.js'
+import { seaAndLand } from './seaAndLand.js'
 
 // geometry helper
 export const inRange = (r, c) => element =>
   element[0] == r && element[1] <= c && element[2] >= c
-
-export function locationKey (r, c) {
-  return `${r},${c}`
-}
 
 export class Map {
   constructor (title, size, shipNum, landArea, name, mapTerrain, land) {
@@ -64,7 +57,7 @@ export class Map {
   setTracker (r, c, subterrain, tracker) {
     const isLand = subterrain.isTheLand
     if (isLand !== this.isLand(r, c)) return
-    const key = `${r},${c}`
+    const key = makeKey(r, c)
     tracker.total.add(key)
     for (let i = -1; i <= 1; i++) {
       for (let j = -1; j <= 1; j++) {
@@ -90,12 +83,11 @@ export class Map {
     tracker.footprint.clear()
 
     tracker.total.forEach((value, key) => {
-      const pair = key.split(',')
-      const r = Number.parseInt(pair[0])
-      const c = Number.parseInt(pair[1])
+      const [r, c] = parsePair(key)
       addCellToFootPrint(r, c, tracker.footprint)
     })
   }
+
   inBounds (r, c) {
     return r >= 0 && r < this.rows && c >= 0 && c < this.cols
   }
@@ -109,7 +101,7 @@ export class Map {
 
   subterrain (r, c) {
     for (const tracker of this.subterrainTrackers) {
-      if (tracker.total.has(locationKey(r, c))) return tracker.subterrain
+      if (tracker.total.has(makeKey(r, c))) return tracker.subterrain
     }
 
     return this.terrain.defaultSubterrain
@@ -117,10 +109,10 @@ export class Map {
 
   zoneDetail (r, c) {
     for (const tracker of this.subterrainTrackers) {
-      if (tracker.total.has(locationKey(r, c))) {
-        if (tracker.margin.has(locationKey(r, c)))
+      if (tracker.total.has(makeKey(r, c))) {
+        if (tracker.margin.has(makeKey(r, c)))
           return [tracker.subterrain, tracker.m_zone]
-        else if (tracker.core.has(locationKey(r, c)))
+        else if (tracker.core.has(makeKey(r, c)))
           return [tracker.subterrain, tracker.c_zone]
         else {
           throw new Error('Unknown zone')
@@ -224,7 +216,7 @@ export class CustomMap extends Map {
   }
 
   isLand (r, c) {
-    return this.land.has(`${r},${c}`)
+    return this.land.has(makeKey(r, c))
   }
 
   exportName () {
@@ -265,11 +257,11 @@ const withModifyable = Base =>
     }
 
     addLand (r, c) {
-      if (this.inBounds(r, c)) this.land.add(`${r},${c}`)
+      if (this.inBounds(r, c)) this.land.add(makeKey(r, c))
     }
 
     removeLand (r, c) {
-      if (this.inBounds(r, c)) this.land.delete(`${r},${c}`)
+      if (this.inBounds(r, c)) this.land.delete(makeKey(r, c))
     }
 
     addShips (ships) {

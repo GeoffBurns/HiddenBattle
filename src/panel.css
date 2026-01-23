@@ -58,8 +58,10 @@
  }
 
  .tally-box {
+     position: relative;
      width: 28px;
      height: 22px;
+     overflow: hidden;
      border-radius: 4px;
      border: 1px solid rgba(200, 210, 240, 0.06);
      display: grid;

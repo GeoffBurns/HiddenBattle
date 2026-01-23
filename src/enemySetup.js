@@ -1,15 +1,23 @@
 import { enemy } from './enemy.js'
-import { terrain } from './Shape.js'
+import { friendUI } from './friendUI.js'
+import { terrain } from './terrain.js'
 
 let otherboard = null
 const newGameBtn = document.getElementById('newGame')
-export function newGame () {
-  if (otherboard) otherboard()
+export function newGame (seek, opponentBoard) {
+  enemy.seekingMode = seek === 'seek'
   enemy.resetModel()
   enemy.resetUI(enemy.ships)
   enemy.updateMode()
   const title = document.getElementById('enemy-title')
   title.textContent = 'Enemy ' + terrain.current.mapHeading
+  if (otherboard) {
+    otherboard()
+  } else {
+    otherboard = opponentBoard
+    friendUI.clearFriendClasses()
+    enemy.setupAttachedAim()
+  }
 }
 
 function setupSeekShortcuts (placement) {
@@ -47,9 +55,7 @@ function setupSeekShortcuts (placement) {
   return () => document.removeEventListener('keydown', handleSeekShortcuts)
 }
 
-export function setupEnemy (placement, opponentBoard) {
-  otherboard = opponentBoard
-
+export function setupEnemy (placement) {
   // wire buttons
   newGameBtn.addEventListener('click', newGame)
   enemy.wireupButtons()

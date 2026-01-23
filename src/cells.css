@@ -43,6 +43,10 @@
     cursor: var(--cross-cursor-image) 16 16, auto;
 }
 
+#battleship-game-container {
+    position: relative;
+}
+
 .board.bomb {
     cursor: var(--bomb-cursor-image) 26 26, pointer;
 }
@@ -51,6 +55,327 @@
     cursor: var(--missile-cursor-image) 6 6, pointer;
 }
 
+.cell.launch.turn3 {
+    cursor: var(--launch3-cursor-image) 16 24, pointer;
+}
+
+.cell.launch.turn4 {
+    cursor: var(--launch4-cursor-image) 24 16, pointer;
+}
+
+.cell.launch,
+.board.launch {
+    cursor: var(--launch-cursor-image) 16 6, pointer;
+}
+
+.cell.launch.turn2 {
+    cursor: var(--launch2-cursor-image) 6 16, pointer;
+}
+
+@keyframes explosionShake {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    10% {
+        transform: translate(-5px, -3px);
+    }
+
+    20% {
+        transform: translate(5px, 3px);
+    }
+
+    30% {
+        transform: translate(-6px, 4px);
+    }
+
+    40% {
+        transform: translate(6px, -4px);
+    }
+
+    50% {
+        transform: translate(-4px, 2px);
+    }
+
+    60% {
+        transform: translate(4px, -2px);
+    }
+
+    70% {
+        transform: translate(-2px, 1px);
+    }
+
+    80% {
+        transform: translate(2px, -1px);
+    }
+
+    90% {
+        transform: translate(-1px, 0);
+    }
+
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+.shake {
+    animation: explosionShake 0.35s ease-out;
+}
+
+@keyframes heavyExplosion {
+    0% {
+        transform: translate(0, 0) rotate(0);
+    }
+
+    10% {
+        transform: translate(-10px, -5px) rotate(-1deg);
+    }
+
+    20% {
+        transform: translate(10px, 5px) rotate(1deg);
+    }
+
+    30% {
+        transform: translate(-12px, 8px) rotate(-1.5deg);
+    }
+
+    40% {
+        transform: translate(12px, -8px) rotate(1.5deg);
+    }
+
+    60% {
+        transform: translate(-6px, 4px) rotate(-0.5deg);
+    }
+
+    80% {
+        transform: translate(4px, -2px) rotate(0.3deg);
+    }
+
+    100% {
+        transform: translate(0, 0) rotate(0);
+    }
+}
+
+.shake-heavy {
+    animation: heavyExplosion 0.45s cubic-bezier(.36, .07, .19, .97);
+}
+
+@keyframes screenShake {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    25% {
+        transform: translate(calc(var(--shake-x) * -1), var(--shake-y));
+    }
+
+    50% {
+        transform: translate(var(--shake-x), calc(var(--shake-y) * -1));
+    }
+
+    75% {
+        transform: translate(calc(var(--shake-x) * -0.5), calc(var(--shake-y) * 0.5));
+    }
+
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+.shake2 {
+    animation: screenShake 0.3s linear;
+}
+
+
+div.tally-row.weapon div.tally-box::before {
+    content: '';
+    position: absolute;
+
+    width: 28px;
+    height: 28px;
+    z-index: 3;
+    transform: scale(1, 1.8);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: opacity 0.4s ease-in-out;
+}
+
+.tally-row.weapon.missile div.tally-box::before,
+.flying-weapon.missile {
+    background-image: var(--flying-missile-image);
+
+}
+
+div.tally-row.weapon.rail-bolt div.tally-box::before,
+.flying-weapon.rail-bolt {
+    background-image: var(--flying-bolt-image);
+
+}
+
+div.tally-row.weapon.megabomb div.tally-box::before,
+.flying-weapon.megabomb {
+    background-image: var(--flying-bomb-image);
+
+}
+
+div.tally-row.weapon.flack div.tally-box::before,
+.flying-weapon.flack {
+    background-image: var(--flying-flack-image);
+
+}
+
+div.tally-row.weapon.kinetic-strike div.tally-box::before,
+.flying-weapon.kinetic-strike {
+    background-image: var(--flying-strike-image);
+
+}
+
+div.tally-row.weapon.torpedo div.tally-box::before,
+.flying-weapon.torpedo {
+    background-image: var(--flying-torpedo-image);
+}
+
+.flying-weapon {
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    pointer-events: none;
+    background-image: var(--white-missile-image);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 6;
+    transform: translate(-50%, -50%) rotate(var(--angle));
+    transform-origin: center center;
+
+    left: var(--x);
+    top: var(--y);
+
+    animation: flyweapon var(--duration) linear forwards;
+}
+
+/* Keyframes */
+@keyframes flyweapon {
+    0% {
+        left: var(--start-x);
+        top: var(--start-y);
+        opacity: 1;
+    }
+
+    2% {
+        left: var(--start-x);
+        top: var(--start-y);
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 1;
+        left: var(--end-x);
+        top: var(--end-y);
+    }
+}
+
+.explosion {
+    width: 128px;
+    height: 128px;
+    background-image: var(--space-explode-image);
+    background-repeat: no-repeat;
+    background-size: 512px 256px;
+    z-index: 7;
+    position: fixed;
+    transform: translate(-50%, -50%);
+    transform-origin: center center;
+
+    left: var(--x);
+    top: var(--y);
+    will-change: background-position, transform, opacity;
+
+    animation:
+        explode-frames 0.6s steps(1) forwards,
+        explode-scale 0.5s ease-out forwards,
+        explode-fade 0.8s ease-out forwards;
+}
+
+.explosion.asteroid {
+    background-image: var(--asteroid-explode-image);
+}
+
+.explosion.sea {
+    background-image: var(--sea-explode-image);
+}
+
+.explosion.land {
+    background-image: var(--land-explode-image);
+}
+
+.explosion.air {
+    background-image: var(--air-explode-image);
+}
+
+.explosion.plasma {
+    background-image: var(--plasma-explode-image);
+}
+
+@keyframes explode-frames {
+    0% {
+        background-position: 0px 0px;
+    }
+
+    12.5% {
+        background-position: -128px 0px;
+    }
+
+    25% {
+        background-position: -256px 0px;
+    }
+
+    37.5% {
+        background-position: -384px 0px;
+    }
+
+    50% {
+        background-position: 0px -128px;
+    }
+
+    62.5% {
+        background-position: -128px -128px;
+    }
+
+    75% {
+        background-position: -256px -128px;
+    }
+
+    87.5% {
+        background-position: -384px -128px;
+    }
+}
+
+@keyframes explode-scale {
+    from {
+        transform: scale(var(--scale-start));
+    }
+
+    to {
+        transform: scale(var(--scale-end));
+    }
+}
+
+@keyframes explode-fade {
+    0% {
+        opacity: 1;
+    }
+
+    70% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+.cell.rail,
 .board.rail {
     cursor: var(--rail-cursor-image) 26 26, pointer;
 }

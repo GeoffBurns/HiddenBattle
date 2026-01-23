@@ -1,6 +1,6 @@
-import { Waters } from './player.js'
-import { seaAndLand } from './Shape.js'
-import { gameMap } from './maps.js'
+import { Waters } from './Waters.js'
+import { seaAndLand } from './seaAndLand.js'
+import { gameMap } from './gameMaps.js'
 import { customUI } from './customUI.js'
 
 export class Custom extends Waters {

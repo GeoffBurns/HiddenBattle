@@ -89,7 +89,7 @@ expect.extend({
         message: () => `expected an array of depth 2 got depth ${realDepth}`
       }
     }
-    if (!allHasLength(received, 2)) {
+    if (!allHasLength(received, dimension)) {
       return {
         pass: false,
         message: () =>
@@ -125,318 +125,323 @@ expect.extend({
 })
 
 // Jest test suite
-describe('Dihedral4', () => {
-  const cells = [
-    [0, 0],
-    [1, 0],
-    [2, 0],
-    [2, 1]
-  ]
-  const validator = () => true
-  const zoneDetail = 0
-  const d4Variants = [
-    [
-      [0, 0],
-      [1, 0]
-    ],
-    [
-      [0, 2],
-      [0, 1]
-    ],
-
-    [
-      [1, 1],
-      [2, 1]
-    ],
-    [
-      [1, 0],
-      [1, 1]
-    ],
-    [
-      [1, 0],
-      [2, 0]
-    ],
-    [
-      [0, 2],
-      [1, 2]
-    ],
-    [
-      [0, 1],
-      [1, 1]
-    ],
-    [
-      [1, 1],
-      [1, 2]
-    ]
-  ]
-
-  it('should create 8 subvariants for a shape', () => {
-    const d4 = new Dihedral4(null, validator, zoneDetail, d4Variants)
-    expect(d4.list).toHaveLength(8)
-
-    expect(d4.list[0]).toBeCellEqual([
-      [0, 0],
-      [1, 0]
-    ])
-    expect(d4.list[1]).toBeCellEqual([
-      [0, 1],
-      [0, 2]
-    ])
-    expect(d4.list[2]).toBeCellEqual([
-      [1, 1],
-      [2, 1]
-    ])
-    expect(d4.list[3]).toBeCellEqual([
-      [1, 0],
-      [1, 1]
-    ])
-    expect(d4.list[4]).toBeCellEqual([
-      [1, 0],
-      [2, 0]
-    ])
-    expect(d4.list[5]).toBeCellEqual([
-      [0, 2],
-      [1, 2]
-    ])
-    expect(d4.list[6]).toBeCellEqual([
-      [0, 1],
-      [1, 1]
-    ])
-    expect(d4.list[7]).toBeCellEqual([
-      [1, 1],
-      [1, 2]
-    ])
-  })
-
-  it('should create 8 variants for a shape', () => {
-    const d4 = new Dihedral4(cells, validator, zoneDetail)
-    expect(d4.list).toHaveLength(8)
-
-    expect(d4.list[1]).toBeCellEqual([
-      [0, 2],
-      [0, 1],
-      [0, 0],
-      [1, 0]
-    ])
-    expect(d4.list[2]).toBeCellEqual([
-      [2, 1],
-      [1, 1],
-      [0, 1],
-      [0, 0]
-    ])
-    expect(d4.list[3]).toBeCellEqual([
-      [1, 0],
-      [1, 1],
-      [1, 2],
-      [0, 2]
-    ])
-    expect(d4.list[4]).toBeCellEqual([
-      [2, 0],
-      [1, 0],
-      [0, 0],
-      [0, 1]
-    ])
-    expect(d4.list[5]).toBeCellEqual([
-      [0, 0],
-      [0, 1],
-      [0, 2],
-      [1, 2]
-    ])
-    expect(d4.list[6]).toBeCellEqual([
-      [0, 1],
-      [1, 1],
-      [2, 1],
-      [2, 0]
-    ])
-    expect(d4.list[7]).toBeCellEqual([
-      [0, 0],
-      [1, 0],
-      [1, 1],
-      [1, 2]
-    ])
-  })
-  it('should create variants with 4 cells', () => {
-    const d4 = new Dihedral4(cells, validator, zoneDetail)
-    expect(d4.list).toHaveLength(8)
-    expect(d4.list).allToHaveLength(4)
-    expect(d4.list).allToHaveLengthAtDepth(2, 3)
-  })
-
-  it('variant() should return the current variant', () => {
-    const d4 = new Dihedral4(cells, validator, zoneDetail)
-    expect(d4.variant()).toEqual(d4.list[0])
-    d4.index = 3
-    expect(d4.variant()).toEqual(d4.list[3])
-  })
-
-  it('should rotate index using static r', () => {
-    expect(Dihedral4.r(0)).toBe(1)
-    expect(Dihedral4.r(4)).toBe(5)
-    expect(Dihedral4.r(3)).toBe(0)
-    expect(Dihedral4.r(7)).toBe(4)
-  })
-
-  it('should flip index using static f', () => {
-    expect(Dihedral4.f(0)).toBe(4)
-    expect(Dihedral4.f(5)).toBe(1)
-  })
-
-  it('should left rotate index using static rf', () => {
-    expect(Dihedral4.rf(0)).toBe(3)
-    expect(Dihedral4.rf(1)).toBe(0)
-    expect(Dihedral4.rf(5)).toBe(4)
-    expect(Dihedral4.rf(4)).toBe(7)
-  })
-
-  it('should update index and variant on rotate()', () => {
-    const d4 = new Dihedral4(cells, validator, zoneDetail)
-    d4.index = 0
-    d4.rotate()
-    expect(d4.index).toBe(Dihedral4.r(0))
-    expect(d4.variant()).toEqual(d4.list[d4.index])
-  })
-
-  it('should update index and variant on flip()', () => {
-    const d4 = new Dihedral4(cells, validator, zoneDetail)
-    d4.index = 0
-    d4.flip()
-    expect(d4.index).toBe(Dihedral4.f(0))
-    expect(d4.variant()).toEqual(d4.list[d4.index])
-  })
-
-  it('should update index and variant on leftRotate()', () => {
-    const d4 = new Dihedral4(cells, validator, zoneDetail)
-    d4.index = 0
-    d4.leftRotate()
-    expect(d4.index).toBe(Dihedral4.rf(0))
-    expect(d4.variant()).toEqual(d4.list[d4.index])
-  })
-
-  it('cell3() should return arrays of variants with sub group info', () => {
-    const full = [
-      [0, 0],
-      [1, 0],
-      [2, 0],
-      [2, 1]
-    ]
-    const secondary = [
-      [0, 0],
-      [1, 0]
-    ]
-    const result = Dihedral4.cell3(full, [secondary])
-    expect(result).toHaveLength(8)
-    expect(result).allToHaveLength(4)
-    expect(result).allToHaveLengthAtDepth(3, 3)
-    expect(result[0]).toBeCellEqual(
-      [
-        [0, 0, 1],
-        [1, 0, 1],
-        [2, 0, 0],
-        [2, 1, 0]
-      ],
-      3
-    )
-    expect(result[1]).toBeCellEqual(
-      [
-        [0, 2, 1],
-        [0, 1, 1],
-        [0, 0, 0],
-        [1, 0, 0]
-      ],
-      3
-    )
-
-    expect(result[2]).toBeCellEqual(
-      [
-        [2, 1, 1],
-        [1, 1, 1],
-        [0, 1, 0],
-        [0, 0, 0]
-      ],
-      3
-    )
-
-    expect(result[3]).toBeCellEqual(
-      [
-        [1, 0, 1],
-        [1, 1, 1],
-        [1, 2, 0],
-        [0, 2, 0]
-      ],
-      3
-    )
-
-    expect(result[4]).toBeCellEqual(
-      [
-        [2, 0, 1],
-        [1, 0, 1],
-        [0, 0, 0],
-        [0, 1, 0]
-      ],
-      3
-    )
-
-    expect(result[5]).toBeCellEqual(
-      [
-        [0, 0, 0],
-        [0, 1, 0],
-        [0, 2, 1],
-        [1, 2, 1]
-      ],
-      3
-    )
-
-    expect(result[6]).toBeCellEqual(
-      [
-        [0, 1, 1],
-        [1, 1, 1],
-        [2, 1, 0],
-        [2, 0, 0]
-      ],
-      3
-    )
-    expect(result[7]).toBeCellEqual(
-      [
-        [0, 0, 0],
-        [1, 0, 0],
-        [1, 1, 1],
-        [1, 2, 1]
-      ],
-      3
-    )
-  })
-  describe('Invariant', () => {
+describe(
+  'Dihedral4',
+  () => {
     const cells = [
       [0, 0],
-      [0, 1],
       [1, 0],
-      [1, 1]
+      [2, 0],
+      [2, 1]
     ]
     const validator = () => true
     const zoneDetail = 0
+    const d4Variants = [
+      [
+        [0, 0],
+        [1, 0]
+      ],
+      [
+        [0, 2],
+        [0, 1]
+      ],
 
-    it('should create an Invariant with the given cells', () => {
-      const inv = new Invariant(cells, validator, zoneDetail)
-      expect(inv.list).toEqual(cells)
+      [
+        [1, 1],
+        [2, 1]
+      ],
+      [
+        [1, 0],
+        [1, 1]
+      ],
+      [
+        [1, 0],
+        [2, 0]
+      ],
+      [
+        [0, 2],
+        [1, 2]
+      ],
+      [
+        [0, 1],
+        [1, 1]
+      ],
+      [
+        [1, 1],
+        [1, 2]
+      ]
+    ]
+
+    it('should create 8 subvariants for a shape', () => {
+      const d4 = new Dihedral4(null, validator, zoneDetail, d4Variants)
+      expect(d4.list).toHaveLength(8)
+
+      expect(d4.list[0]).toBeCellEqual([
+        [0, 0],
+        [1, 0]
+      ])
+      expect(d4.list[1]).toBeCellEqual([
+        [0, 1],
+        [0, 2]
+      ])
+      expect(d4.list[2]).toBeCellEqual([
+        [1, 1],
+        [2, 1]
+      ])
+      expect(d4.list[3]).toBeCellEqual([
+        [1, 0],
+        [1, 1]
+      ])
+      expect(d4.list[4]).toBeCellEqual([
+        [1, 0],
+        [2, 0]
+      ])
+      expect(d4.list[5]).toBeCellEqual([
+        [0, 2],
+        [1, 2]
+      ])
+      expect(d4.list[6]).toBeCellEqual([
+        [0, 1],
+        [1, 1]
+      ])
+      expect(d4.list[7]).toBeCellEqual([
+        [1, 1],
+        [1, 2]
+      ])
     })
 
-    it('variant() should always return the first variant', () => {
-      const inv = new Invariant(cells, validator, zoneDetail)
-      expect(inv.variant()).toEqual(cells[0])
-      inv.index = 1
-      expect(inv.variant()).toEqual(cells[0])
+    it('should create 8 variants for a shape', () => {
+      const d4 = new Dihedral4(cells, validator, zoneDetail)
+      expect(d4.list).toHaveLength(8)
+
+      expect(d4.list[1]).toBeCellEqual([
+        [0, 2],
+        [0, 1],
+        [0, 0],
+        [1, 0]
+      ])
+      expect(d4.list[2]).toBeCellEqual([
+        [2, 1],
+        [1, 1],
+        [0, 1],
+        [0, 0]
+      ])
+      expect(d4.list[3]).toBeCellEqual([
+        [1, 0],
+        [1, 1],
+        [1, 2],
+        [0, 2]
+      ])
+      expect(d4.list[4]).toBeCellEqual([
+        [2, 0],
+        [1, 0],
+        [0, 0],
+        [0, 1]
+      ])
+      expect(d4.list[5]).toBeCellEqual([
+        [0, 0],
+        [0, 1],
+        [0, 2],
+        [1, 2]
+      ])
+      expect(d4.list[6]).toBeCellEqual([
+        [0, 1],
+        [1, 1],
+        [2, 1],
+        [2, 0]
+      ])
+      expect(d4.list[7]).toBeCellEqual([
+        [0, 0],
+        [1, 0],
+        [1, 1],
+        [1, 2]
+      ])
+    })
+    it('should create variants with 4 cells', () => {
+      const d4 = new Dihedral4(cells, validator, zoneDetail)
+      expect(d4.list).toHaveLength(8)
+      expect(d4.list).allToHaveLength(4)
+      expect(d4.list).allToHaveLengthAtDepth(2, 3)
     })
 
-    it('setByIndex() should throw an error', () => {
-      const inv = new Invariant(cells, validator, zoneDetail)
-      expect(() => inv.setByIndex(1)).toThrow('can not change this variant')
+    it('variant() should return the current variant', () => {
+      const d4 = new Dihedral4(cells, validator, zoneDetail)
+      expect(d4.variant()).toEqual(d4.list[0])
+      d4.index = 3
+      expect(d4.variant()).toEqual(d4.list[3])
     })
 
-    it('static r should return the same index', () => {
-      expect(Invariant.r(0)).toBe(0)
-      expect(Invariant.r(1)).toBe(1)
+    it('should rotate index using static r', () => {
+      expect(Dihedral4.r(0)).toBe(1)
+      expect(Dihedral4.r(4)).toBe(5)
+      expect(Dihedral4.r(3)).toBe(0)
+      expect(Dihedral4.r(7)).toBe(4)
     })
 
+    it('should flip index using static f', () => {
+      expect(Dihedral4.f(0)).toBe(4)
+      expect(Dihedral4.f(5)).toBe(1)
+    })
+
+    it('should left rotate index using static rf', () => {
+      expect(Dihedral4.rf(0)).toBe(3)
+      expect(Dihedral4.rf(1)).toBe(0)
+      expect(Dihedral4.rf(5)).toBe(4)
+      expect(Dihedral4.rf(4)).toBe(7)
+    })
+
+    it('should update index and variant on rotate()', () => {
+      const d4 = new Dihedral4(cells, validator, zoneDetail)
+      d4.index = 0
+      d4.rotate()
+      expect(d4.index).toBe(Dihedral4.r(0))
+      expect(d4.variant()).toEqual(d4.list[d4.index])
+    })
+
+    it('should update index and variant on flip()', () => {
+      const d4 = new Dihedral4(cells, validator, zoneDetail)
+      d4.index = 0
+      d4.flip()
+      expect(d4.index).toBe(Dihedral4.f(0))
+      expect(d4.variant()).toEqual(d4.list[d4.index])
+    })
+
+    it('should update index and variant on leftRotate()', () => {
+      const d4 = new Dihedral4(cells, validator, zoneDetail)
+      d4.index = 0
+      d4.leftRotate()
+      expect(d4.index).toBe(Dihedral4.rf(0))
+      expect(d4.variant()).toEqual(d4.list[d4.index])
+    })
+
+    it('cell3() should return arrays of variants with sub group info', () => {
+      const full = [
+        [0, 0],
+        [1, 0],
+        [2, 0],
+        [2, 1]
+      ]
+      const secondary = [
+        [0, 0],
+        [1, 0]
+      ]
+      const result = Dihedral4.cell3(full, [secondary])
+      expect(result).toHaveLength(8)
+      expect(result).allToHaveLength(4)
+      expect(result).allToHaveLengthAtDepth(3, 3)
+      expect(result[0]).toBeCellEqual(
+        [
+          [0, 0, 1],
+          [1, 0, 1],
+          [2, 0, 0],
+          [2, 1, 0]
+        ],
+        3
+      )
+      expect(result[1]).toBeCellEqual(
+        [
+          [0, 2, 1],
+          [0, 1, 1],
+          [0, 0, 0],
+          [1, 0, 0]
+        ],
+        3
+      )
+
+      expect(result[2]).toBeCellEqual(
+        [
+          [2, 1, 1],
+          [1, 1, 1],
+          [0, 1, 0],
+          [0, 0, 0]
+        ],
+        3
+      )
+
+      expect(result[3]).toBeCellEqual(
+        [
+          [1, 0, 1],
+          [1, 1, 1],
+          [1, 2, 0],
+          [0, 2, 0]
+        ],
+        3
+      )
+
+      expect(result[4]).toBeCellEqual(
+        [
+          [2, 0, 1],
+          [1, 0, 1],
+          [0, 0, 0],
+          [0, 1, 0]
+        ],
+        3
+      )
+
+      expect(result[5]).toBeCellEqual(
+        [
+          [0, 0, 1],
+          [0, 1, 1],
+          [0, 2, 0],
+          [1, 2, 0]
+        ],
+        3
+      )
+
+      expect(result[6]).toBeCellEqual(
+        [
+          [0, 1, 1],
+          [1, 1, 1],
+          [2, 1, 0],
+          [2, 0, 0]
+        ],
+        3
+      )
+      expect(result[7]).toBeCellEqual(
+        [
+          [0, 0, 0],
+          [1, 0, 0],
+          [1, 1, 1],
+          [1, 2, 1]
+        ],
+        3
+      )
+    })
+  },
+  describe(
+    'Invariant',
+    () => {
+      const cells = [
+        [0, 0],
+        [0, 1],
+        [1, 0],
+        [1, 1]
+      ]
+      const validator = () => true
+      const zoneDetail = 0
+
+      it('should create an Invariant with the given cells', () => {
+        const inv = new Invariant(cells, validator, zoneDetail)
+        expect(inv.list).toEqual([cells])
+      })
+
+      it('variant() should always return the first variant', () => {
+        const inv = new Invariant(cells, validator, zoneDetail)
+        expect(inv.variant()).toEqual(cells)
+        inv.index = 1
+        expect(inv.variant()).toEqual(cells)
+      })
+
+      it('setByIndex() should throw an error', () => {
+        const inv = new Invariant(cells, validator, zoneDetail)
+        expect(() => inv.setByIndex(1)).toThrow('can not change this variant')
+      })
+
+      it('static r should return the same index', () => {
+        expect(Invariant.r(0)).toBe(0)
+        expect(Invariant.r(1)).toBe(1)
+      })
+    },
     describe('Cyclic4', () => {
       const cells = [
         [0, 0],
@@ -497,5 +502,5 @@ describe('Dihedral4', () => {
         expect(c4.variant()).toEqual(c4.list[c4.index])
       })
     })
-  })
-})
+  )
+)

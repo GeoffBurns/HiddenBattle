@@ -1,6 +1,6 @@
-import { gameMaps } from './maps.js'
-import { WatersUI } from './playerUI.js'
-import { Waters } from './player.js'
+import { gameMaps } from './gameMaps.js'
+import { WatersUI } from './WatersUI.js'
+import { Waters } from './Waters.js'
 import { ScoreUI } from './ScoreUI.js'
 import {
   switchToEdit,
@@ -9,7 +9,7 @@ import {
   fetchNavBar,
   trackClick
 } from './navbar.js'
-import { terrain } from './Shape.js'
+import { terrain } from './terrain.js'
 
 class MapList {
   constructor (id) {

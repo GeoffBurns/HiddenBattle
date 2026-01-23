@@ -1,5 +1,5 @@
-import { gameMap, gameMaps } from './maps.js'
-import { gameStatus, WatersUI } from './playerUI.js'
+import { gameMap } from './gameMaps.js'
+import { WatersUI, gameStatus } from './WatersUI.js'
 
 import { trackLevelEnd } from './navbar.js'
 class EnemyUI extends WatersUI {
@@ -24,12 +24,10 @@ class EnemyUI extends WatersUI {
   }
 
   displayAsSunk (cell, letter) {
-    const maps = gameMaps()
-    cell.textContent = letter
-    cell.style.color = maps.shipLetterColors[letter] || '#fff'
-    cell.style.background = maps.shipColors[letter] || 'rgba(255,255,255,0.2)'
+    this.displaySunkCell(cell, letter)
     this.clearCell(cell)
   }
+
   cellSunkAt (r, c, letter) {
     const cell = this.gridCellAt(r, c)
     this.displayAsSunk(cell, letter)

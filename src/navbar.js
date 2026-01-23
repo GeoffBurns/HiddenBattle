@@ -1,8 +1,9 @@
 import { ChooseFromListUI, ChooseNumberUI } from './chooseUI.js'
-import { gameMaps, gameMap, TerrainMaps } from './maps.js'
+import { gameMaps, gameMap } from './gameMaps.js'
+import { TerrainMaps } from './TerrainMaps.js'
 import { custom } from './custom.js'
 import { SavedCustomMap } from './map.js'
-import { terrain } from './Shape.js'
+import { terrain } from './terrain.js'
 import { toTitleCase } from './utils.js'
 
 export function removeShortcuts () {
@@ -262,8 +263,8 @@ function setupMapControl (
 }
 
 function setMapSelector (
-  boardSetup = Function.prototype,
-  refresh = Function.prototype,
+  // boardSetup = Function.prototype,
+  // refresh = Function.prototype,
   mapName
 ) {
   const maps = gameMaps()
@@ -281,9 +282,10 @@ function setMapSelector (
     function (_index, title) {
       maps.setTo(title)
       setMapParams(title)
-      boardSetup()
-      refresh()
+      //  boardSetup()
+      //  refresh()
       maps.storeLastMap()
+      window.location.reload()
     },
     null,
     mapName
@@ -318,10 +320,9 @@ function setMapFromParams (urlParams) {
   return { mapName, targetMap }
 }
 
-function terrainSelect (
-  boardSetup = Function.prototype,
-  refresh = Function.prototype
-) {
+function terrainSelect () {
+  // boardSetup = Function.prototype,
+  // refresh = Function.prototype
   const terrainTitles = (() => {
     try {
       return TerrainMaps.titleList()
@@ -341,7 +342,9 @@ function terrainSelect (
         setSizeParams(height, width)
       }
       setTerrainParams(gameMaps())
+      window.location.reload()
 
+      /*
       var { mapName } = setMapFromParams(
         new URLSearchParams(globalThis.location.search)
       )
@@ -349,6 +352,7 @@ function terrainSelect (
       gameMaps().setTo(mapName)
       boardSetup()
       refresh()
+      */
     },
     null,
     terrain?.current?.title

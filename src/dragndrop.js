@@ -1,7 +1,8 @@
 import { DraggedShip, Brush } from './selection.js'
 import { cursor } from './cursor.js'
-import { gameMap } from './maps.js'
+import { gameMap } from './gameMaps.js'
 import { CustomMap } from './map.js'
+import { coordsFromCell } from './utilities.js'
 
 let selection = null
 
@@ -243,8 +244,7 @@ class DragNDrop {
     if (!selection) return
 
     if (selection instanceof DraggedShip) {
-      const r = Number.parseInt(cell.dataset.r)
-      const c = Number.parseInt(cell.dataset.c)
+      const [r, c] = coordsFromCell(cell)
 
       const placed = selection.place(r, c, model.shipCellGrid)
       if (placed) {
@@ -294,8 +294,7 @@ class DragNDrop {
   handleAddShipDropEvent (cell, model, viewModel) {
     if (!selection) return
     if (selection instanceof DraggedShip) {
-      const r = Number.parseInt(cell.dataset.r)
-      const c = Number.parseInt(cell.dataset.c)
+      const [r, c] = coordsFromCell(cell)
 
       const placed = selection.place(r, c, model.shipCellGrid)
       if (placed) {
@@ -380,8 +379,7 @@ class DragNDrop {
       if (!isShip) return
 
       const el = e.target
-      const r = Number.parseInt(el.dataset.r)
-      const c = Number.parseInt(el.dataset.c)
+      const [r, c] = coordsFromCell(el)
       if (lastEntered[0] === r && lastEntered[1] === c) return
 
       lastEntered = [r, c]
@@ -415,8 +413,7 @@ class DragNDrop {
       const isBrush = e.dataTransfer.types.includes('brush')
       if (!isBrush) return
       const el = e.target
-      const r = Number.parseInt(el.dataset.r)
-      const c = Number.parseInt(el.dataset.c)
+      const [r, c] = coordsFromCell(el)
       if (lastEntered[0] === r && lastEntered[1] === c) return
 
       lastEntered = [r, c]
@@ -559,15 +556,23 @@ class DragNDrop {
       shipElement.style.opacity = '0.6'
     })
   }
+  makeUndraggable (dragShip) {
+    dragShip.classlist.remove('draggable')
+    dragShip.setAttribute('draggable', 'false')
+  }
 
   makeDraggable (viewModel, dragShip, ships, weapon, subtract) {
-    dragShip.className = 'draggable'
+    const listenedTo = dragShip.classlist?.contains('dragListen')
+    dragShip.className = 'draggable dragListen'
+
     dragShip.setAttribute('draggable', 'true')
+
     if (weapon) {
-      this.dragStartWeapon(viewModel, dragShip, weapon, subtract)
+      if (!listenedTo)
+        this.dragStartWeapon(viewModel, dragShip, weapon, subtract)
       if (!subtract) this.onClickTrayItemWeapon(viewModel, dragShip, weapon)
     } else {
-      this.dragStart(viewModel, dragShip, ships)
+      if (!listenedTo) this.dragStart(viewModel, dragShip, ships)
       this.onClickTrayItem(viewModel, dragShip, ships)
     }
   }

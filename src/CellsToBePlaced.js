@@ -1,3 +1,5 @@
+import { makeKey } from './utilities.js'
+
 export class CellsToBePlaced {
   constructor (variant, r0, c0, validator, zoneDetail, target) {
     let placingTheCells = []
@@ -121,6 +123,29 @@ export class Cell3sToBePlaced extends CellsToBePlaced {
     return result
   }
 }
+
+export class CellWsToBePlaced extends Cell3sToBePlaced {
+  constructor (placable3, rr, cc, weapons, variant) {
+    super(placable3, rr, cc)
+    this.variant = variant
+    const special = this.subGroups[1].cells
+    this.weapons = special.reduce((acc, [r, c], i) => {
+      acc[makeKey(r, c)] = weapons[i]
+      return acc
+    }, {})
+  }
+  isInMatchingZone (r, c) {
+    const zoneInfo = this.zoneInfo(r, c)
+    return this.validator(zoneInfo)
+  }
+
+  isWrongZone () {
+    const result = this.cells.some(([r, c]) => {
+      return this.isInMatchingZone(r, c) === false
+    })
+    return result
+  }
+}
 export class Placeable {
   constructor (variant, validator, zoneDetail, target) {
     this.cells = variant
@@ -193,5 +218,14 @@ export class Placeable3 extends Placeable {
 
   placeAt (r, c) {
     return new Cell3sToBePlaced(this, r, c)
+  }
+}
+export class PlaceableW extends Placeable3 {
+  constructor (full, subGroups) {
+    super(full, subGroups)
+  }
+
+  placeAt (r, c) {
+    return new CellWsToBePlaced(this, r, c, this.weapons, this.variantIndex)
   }
 }

@@ -1,6 +1,6 @@
 import { PlacementUI } from './placementUI.js'
-import { gameStatus } from './playerUI.js'
-import { terrain } from './Shape.js'
+import { gameStatus } from './WatersUI.js'
+import { terrain } from './terrain.js'
 
 function landString () {
   return terrain.current?.landSubterrain?.title?.toLowerCase() || 'land'
@@ -108,7 +108,7 @@ export class CustomUI extends PlacementUI {
     this.score.weaponsLabel.classList.remove('hidden')
     this.rotateBtn.classList.remove('hidden')
     this.rotateLeftBtn.classList.remove('hidden')
-    if (terrain.current.ships.hasTransforms) {
+    if (terrain.current.hasTransforms) {
       this.transformBtn.classList.remove('hidden')
     } else {
       this.transformBtn.classList.add('hidden')

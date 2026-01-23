@@ -1,0 +1,746 @@
+import { gameMap, gameMaps } from './gameMaps.js'
+import { LoadOut } from './LoadOut.js'
+import { gameStatus } from './WatersUI.js'
+import { Score } from './Score.js'
+import { placedShipsInstance } from './selection.js'
+import { Ship } from './Ship.js'
+import { terrain } from './terrain.js'
+import {
+  randomElement,
+  parsePair,
+  keyListFromCell,
+  parseTriple,
+  findClosestCoord,
+  cellListContains,
+  coordsFromCell
+} from './utilities.js'
+import { randomPlaceShape } from './utils.js'
+
+function popFirst (arr, predicate, obj) {
+  // find index of first match
+  const idx = arr.findIndex(predicate)
+
+  let found = null
+  if (idx !== -1) {
+    // remove and store the object
+    ;[found] = arr.splice(idx, 1)
+  }
+  if (found === null && obj) {
+    console.log('not found : ', JSON.stringify(obj))
+  }
+
+  return found
+}
+
+export class Waters {
+  constructor (ui) {
+    this.ships = []
+    this.score = new Score()
+    this.opponent = null
+    this.UI = ui
+    this.shipCellGrid = []
+    this.boardDestroyed = false
+    this.preamble0 = 'Your'
+    this.preamble = 'You were '
+    this.resetShipCells()
+    this.displayInfo = gameStatus.info.bind(gameStatus)
+    this.seekingMode = false
+  }
+  clipboardKey () {
+    return 'geoffs-battleship.placed-ships'
+  }
+
+  placedShips () {
+    return {
+      ships: this.ships,
+      shipCellGrid: this.shipCellGrid,
+      map: gameMap().title
+    }
+  }
+
+  store () {
+    localStorage.setItem(
+      this.clipboardKey(),
+      JSON.stringify(this.placedShips())
+    )
+  }
+  autoPlace () {
+    const ships = this.ships
+    for (let attempt = 0; attempt < 100; attempt++) {
+      let ok = true
+      for (const ship of ships) {
+        const placed = randomPlaceShape(ship, this.shipCellGrid)
+        if (!placed) {
+          this.resetShipCells()
+          this.UI.clearVisuals()
+          placedShipsInstance.reset()
+          this.UI.placeTally(ships)
+          this.UI.displayShipInfo(ships)
+          ok = false
+          break
+        }
+        placedShipsInstance.push(ship, ship.cells)
+        ship.addToGrid(this.shipCellGrid)
+        this.UI.placement(placed, this, ship)
+      }
+      if (ok) return true
+    }
+  }
+  loadForEdit (map) {
+    map = map || gameMap()
+    const placedShips = map.example
+    if (!placedShips) {
+      this.autoPlace()
+      return
+    }
+
+    const matchableShips = [...this.ships]
+    for (const ship of placedShips.ships) {
+      const matchingShip = popFirst(
+        matchableShips,
+        s => s.letter === ship.letter,
+        ship
+      )
+      if (matchingShip) {
+        placedShipsInstance.push(matchingShip, ship.cells)
+        matchingShip.addToGrid(this.shipCellGrid)
+        this.UI.placement(ship.cells, this, matchingShip)
+      }
+    }
+    if (matchableShips.length !== 0) {
+      console.log(`${matchableShips.length} ships not matched`)
+    }
+  }
+
+  load (placedShips) {
+    const map = gameMap()
+    placedShips =
+      placedShips || JSON.parse(localStorage.getItem(this.clipboardKey()))
+    if (!placedShips || map.title !== placedShips.map) {
+      placedShips = map.example
+      if (!placedShips) {
+        this.autoPlace()
+        return
+      }
+    }
+
+    const matchableShips = [...this.ships]
+    for (const ship of placedShips.ships) {
+      const matchingShip = popFirst(
+        matchableShips,
+        s => s.letter === ship.letter,
+        ship
+      )
+
+      if (matchingShip) {
+        matchingShip.place(ship.cells)
+        matchingShip.addToGrid(this.shipCellGrid)
+
+        this.UI.placement(ship.cells, this, matchingShip)
+        const dragship = this.UI.getTrayItem(ship.id)
+        if (dragship) {
+          this.UI.removeDragShip(dragship)
+        } else {
+          //    console.log('drag ship not found : ', JSON.stringify(ship))
+        }
+      }
+    }
+    if (matchableShips.length === 0) {
+      this.UI.resetTrays()
+    } else {
+      console.log(`${matchableShips.length} ships not matched`)
+    }
+  }
+  resetMap (map) {
+    this.boardDestroyed = false
+    this.isRevealed = false
+    this.setMap(map)
+  }
+  armWeapons (map) {
+    map = map || gameMap()
+    const oppo = this.opponent
+    this.weaponShips = this.ships.filter(s => s.hasWeapon())
+
+    this.hasAttachedWeapons = this.weaponShips.length > 0
+    if (this.seekingMode && this.hasAttachedWeapons) {
+      this.weaponShips = this.createShips(map).filter(s => s.hasWeapon())
+      this.loadOut = this.makeLoadOut(map)
+    } else if (oppo) {
+      const weaponShips = oppo.ships.filter(s => s.hasWeapon())
+      this.loadOut = this.makeLoadOut(map, weaponShips)
+    } else {
+      this.loadOut = this.makeLoadOut(map)
+    }
+
+    if (this.cursorChange)
+      this.loadOut.onCursorChange = this.cursorChange.bind(this)
+    // const oppo = this.opponent
+    //this.setupAttachedAim()
+  }
+  makeLoadOut (map, ships) {
+    ships = ships || this.weaponShips
+    return new LoadOut(map.weapons, ships, this.seekingMode, this.UI)
+  }
+  autoSelectWarning (weaponName, currentShip) {
+    this.displayInfo(
+      `Auto-selected ${weaponName}, Click near ${
+        currentShip.shape().descriptionText
+      } to select a different ${weaponName}`
+    )
+  }
+  randomWeaponId () {
+    const randomShip = randomElement(this.loadOut.weaponSystem().armedShips())
+    if (!randomShip) {
+      return {
+        launchR: null,
+        launchC: null,
+        weaponId: null,
+        hintR: null,
+        hintC: null
+      }
+    }
+    const cells = randomShip.cells
+    const surround = [...this.UI.surroundCells(cells)]
+    const hintKey = randomElement(surround)
+    const [r, c] = parsePair(hintKey)
+    const opponent = this.opponent
+    const cell = opponent
+      ? opponent.UI.gridCellAt(r, c)
+      : this.UI.gridCellAt(0, 0)
+    return this.selectWeaponId(cell, r, c, 'random')
+  }
+
+  selectAndArmWps (rack, oppo, launchR, launchC, hintR, hintC) {
+    const weapon = rack?.weapon
+    const letter = weapon?.letter
+    if (letter) {
+      const old = this.loadOut.selectedWeapon
+      if (old) {
+        const [ro, co] = old.launchCoord
+        oppo.UI.cellWeaponDeactivate(ro, co)
+        this.UI.cellWeaponDeactivate(ro, co, 'rail')
+      }
+      this.loadOut.switchTo(letter)
+      if (weapon.postSelectCursor === 0) {
+        this.loadOut.clearCoords()
+      } else {
+        this.loadOut.addCoords(launchR, launchC)
+      }
+
+      rack.launchCoord = [launchR, launchC]
+      rack.hintCoord = [hintR, hintC]
+      this.loadOut.launch = (coords, onEnd) => {
+        oppo.UI.cellUseAmmo(launchR, launchC)
+
+        oppo.UI.cellWeaponDeactivate(launchR, launchC)
+        this.UI.cellWeaponDeactivate(launchR, launchC, 'rail')
+        if (weapon.givesHint) {
+          oppo.UI.cellHintReveal(hintR, hintC)
+        }
+        this.launchTo(coords, hintR, hintC, rack, onEnd)
+      }
+      this.loadOut.selectedWeapon = rack
+      oppo.UI.cellWeaponActive(launchR, launchC)
+      if (weapon.postSelectCursor > 0) {
+        this.UI.cellWeaponActive(launchR, launchC, '', 'rail')
+      }
+    }
+  }
+
+  selectAttachedWeapon (cell, r, c, oppo) {
+    const { launchR, launchC, weaponId, hintR, hintC } = this.selectWeaponId(
+      cell,
+      r,
+      c
+    )
+
+    this.selectAndArmWeaponId(weaponId, oppo, launchR, launchC, hintR, hintC)
+  }
+  randomAttachedWeapon (oppo) {
+    const { launchR, launchC, weaponId, hintR, hintC } = this.randomWeaponId()
+
+    this.selectAndArmWeaponId(weaponId, oppo, launchR, launchC, hintR, hintC)
+  }
+
+  selectAndArmWeaponId (weaponId, oppo, launchR, launchC, hintR, hintC) {
+    const rack = this.loadOut.getRackById(weaponId)
+    this.selectAndArmWps(rack, oppo, launchR, launchC, hintR, hintC)
+  }
+  launchRandomWeapon (r, c, autoSelectWarning = true) {
+    if (this.lauchedUnattachedWeapon(r, c)) return true
+    return this.launchRandomWeaponBase(autoSelectWarning)
+  }
+
+  launchRandomWeaponBase (autoSelectWarning = true) {
+    const current = this.loadOut.weaponSystem()
+    const attached = current.hasAmmo()
+    if (attached) {
+      return this.launchRandomWeaponForWps(autoSelectWarning)
+    }
+    return false
+  }
+
+  selectWeaponId (cell, hintR, hintC, random) {
+    const keyIds = keyListFromCell(cell, 'keyIds')
+    const loaded = this.loadOut.getLoadedWeapons().map(w => w.id)
+    const filteredKeyIds = keyIds.filter(k => {
+      const [, , weaponId] = parseTriple(k)
+      return loaded.includes(weaponId)
+    })
+    const wkey = findClosestCoord(filteredKeyIds, hintR, hintC, k =>
+      parseTriple(k)
+    )
+    if (!random && !wkey) {
+      return this.randomWeaponId()
+    }
+    const [launchR, launchC, weaponId] = parseTriple(wkey)
+
+    return { launchR, launchC, weaponId, hintR, hintC }
+  }
+
+  launchRandomWeaponForWps (autoSelectWarning = true) {
+    this.randomAttachedWeapon(this.opponent)
+    const currentWeapon = this.loadOut.selectedWeapon
+
+    if (!currentWeapon) return false
+    const currentShip = this.loadOut.getShipByWeaponId(currentWeapon.id)
+    const weaponName = currentWeapon.weapon?.name || 'weapon'
+    if (autoSelectWarning) this.autoSelectWarning(weaponName, currentShip)
+    this.loadOut.launch = (coords, onEnd, weapon, wps) => {
+      this.launchWeapon(wps, coords, onEnd, weapon)
+    }
+    return true
+  }
+
+  lauchSelectedWeapon (r, c) {
+    if (this.loadOut.isArmed()) {
+      this.loadOut.aim(gameMap(), r, c, this.loadOut.selectedWeapon)
+      return true
+    }
+    return false
+  }
+
+  lauchedUnattachedWeapon (r, c) {
+    const unAttached = this.loadOut.getUnattachedWeapon()
+    if (unAttached) {
+      this.loadOut.launch = (coords, onEnd) => {
+        this.launchTo(coords, gameMap().rows - 1, 0, unAttached, onEnd)
+      }
+      this.loadOut.aim(gameMap(), r, c, unAttached)
+      return true
+    }
+    return false
+  }
+  launchTo (coords, rr, cc, currentWeapon, onEnd) {
+    currentWeapon.weapon.launchTo(
+      coords,
+      rr,
+      cc,
+      onEnd,
+      gameMap(),
+      this.UI,
+      this.opponent?.UI
+    )
+  }
+  launchWeapon (wps, coords, onEnd, weapon) {
+    const [hintR, hintC] = wps.hintCoord
+    const [launchR, launchC] = wps.launchCoord
+    const oppo = this.opponent
+    if (!oppo) return
+    oppo.UI.cellUseAmmo(launchR, launchC)
+
+    if (weapon.givesHint) {
+      oppo.UI.cellHintReveal(hintR, hintC)
+    }
+    this.launchTo(coords, hintR, hintC, wps, onEnd)
+  }
+
+  setupAttachedAim () {
+    const oppo = this.opponent
+    if (this.seekingMode || !this.loadOut || !oppo) return
+    const armedShips = this.loadOut.armedShips()
+    for (const ship of armedShips) {
+      const cells = oppo.shipCells(ship.id)
+      const surround = oppo.UI.surroundCellElement(cells)
+      for (const cell of surround) {
+        if (!cell.dataset.listen && !cellListContains(cell, ship.id)) {
+          const [r, c] = coordsFromCell(cell)
+          cell.addEventListener(
+            'click',
+            this.onClickOppoCell.bind(this, r, c, ship.id)
+          )
+          cell.dataset.listen = true
+          const w = ship.weapon()
+          const cursor = w?.launchCursor
+          if (cursor) cell.classList.add(cursor)
+        }
+      }
+    }
+  }
+  resetBase () {
+    this.boardDestroyed = false
+    this.UI.board.classList.remove('destroyed')
+    this.score.reset()
+  }
+  setMap (map) {
+    map = map || gameMap()
+    if (!this.ships || this.ships.length === 0) {
+      this.ships = this.createShips(map)
+      this.armWeapons(map)
+    }
+    for (const ship of this.ships) {
+      ship.reset()
+    }
+  }
+  getHitCandidates (effect, weapon) {
+    const candidates = []
+    const map = gameMap()
+    const maps = gameMaps()
+    for (const [r, c, power] of effect) {
+      if (map.inBounds(r, c) && this.score.newShotKey(r, c) !== null) {
+        const cell = this.UI.gridCellAt(r, c)
+        if (
+          !cell.classList.contains('frd-hit') &&
+          !cell.classList.contains('miss') &&
+          !cell.classList.contains('hit')
+        ) {
+          cell.classList.add('wake')
+        }
+        const shipCell = this.shipCellAt(r, c)
+        if (shipCell !== null) {
+          const shape = maps.shapesByLetter[shipCell.letter]
+          const protection = shape.protectionAgainst(weapon.letter)
+
+          if (power >= protection || (power === 1 && protection === 2)) {
+            candidates.push([r, c, power])
+          }
+        }
+      }
+    }
+    return candidates
+  }
+  getStrikeSplash (weapon, candidates) {
+    const pick = Math.floor(Math.random() * candidates.length)
+    const cellSize = this.UI.cellSizeScreen()
+    const target = this.UI.gridCellAt(candidates[pick][0], candidates[pick][1])
+    weapon.animateSplashExplode(target, cellSize)
+    return weapon.splash(gameMap(), candidates[pick])
+  }
+  shipsSunk () {
+    return this.ships.filter(s => s.sunk)
+  }
+  shipsUnsunk () {
+    return this.ships.filter(s => !s.sunk)
+  }
+  shapesUnsunk () {
+    return [...new Set(this.shipsUnsunk().map(s => s.shape()))]
+  }
+  shapesCanBeOn (subterrain, zone) {
+    return this.shapesUnsunk().filter(s => s.canBeOn(subterrain, zone))
+  }
+  createShips (map) {
+    map = map || gameMap()
+    const terrain = map.terrain
+    const baseShapes = terrain.ships.baseShapes
+    const shipNum = map.shipNum
+    const repeatShapes = baseShapes.flatMap(
+      s => Array(shipNum[s.letter] || 0).fill(s) || []
+    )
+    const ships = Ship.createShipsFromShapes(repeatShapes)
+    return ships
+  }
+  createCandidateWeapons () {
+    const candidates = gameMap().terrain.weapons.weapons
+
+    return candidates
+  }
+  createCandidateShips () {
+    const maps = gameMaps()
+
+    const baseShapes = maps.baseShapes
+    const ships = Ship.createShipsFromShapes(baseShapes)
+    return ships
+  }
+  resetShipCells () {
+    const map = gameMap()
+    this.shipCellGrid = Array.from({ length: map.rows }, () =>
+      new Array(map.cols).fill(null)
+    )
+  }
+  armedCells () {
+    return this.cellList().filter(c => c.dataset.ammo > 0)
+  }
+  armedCellsWithWeapon (letter) {
+    return this.cellList().filter(
+      c => c.dataset.ammo > 0 && c.dataset.wletter === letter
+    )
+  }
+  shipCells (id) {
+    let list = []
+    for (const cell of this.cellsOnBoard()) {
+      if (Number.parseInt(cell.dataset.id) === id) {
+        list.push(cell)
+      }
+    }
+    return list
+  }
+  cellList () {
+    return [...this.cellsOnBoard()]
+  }
+  cellsOnBoard () {
+    return this.UI.board.children
+  }
+
+  recordAutoMiss (r, c) {
+    const key = this.score.addAutoMiss(r, c)
+    if (!key) return // already shot here
+    this.UI.cellMiss(r, c)
+  }
+  recordFleetSunk () {
+    this.displayInfo('All ' + this.preamble0 + ' Ships Destroyed!')
+    this.UI.displayFleetSunk()
+    this.boardDestroyed = true
+  }
+  checkFleetSunk () {
+    if (this.ships.every(s => s.sunk)) {
+      this.recordFleetSunk()
+    }
+  }
+  shipCellAt (r, c) {
+    return this.shipCellGrid[r]?.[c]
+  }
+  markSunk (ship, info) {
+    this.sunkWarning(ship, info)
+    this.UI.displaySurround(
+      ship.cells,
+      ship.letter,
+      (r, c) => this.recordAutoMiss(r, c),
+      (r, c, letter) => this.UI.cellSunkAt(r, c, letter)
+    )
+    this.checkFleetSunk()
+  }
+  get onSunk () {
+    return this.markSunk.bind(this)
+  }
+
+  markHit (key, r, c) {
+    this.score.semi.delete(key)
+    this.UI.cellHit(r, c)
+  }
+
+  getShipFromCell (shipCell) {
+    return this.ships.find(s => s.id === shipCell.id)
+  }
+  sunkDescription (ship) {
+    if (this.opponent) {
+      return this.preamble0 + ' ' + ship.sunkDescription(' was ')
+    }
+    return ship.sunkDescription()
+  }
+  sunkLetterDescription (letter) {
+    if (this.opponent) {
+      return (
+        this.preamble0 + ' ' + terrain.current.sunkDescription(letter, ' was ')
+      )
+    }
+    return terrain.current.sunkDescription(letter)
+  }
+  sunkWarning (ship, info = '') {
+    if (!info) {
+      info = ''
+    }
+    this.displayInfo(info + this.sunkDescription(ship))
+  }
+
+  checkForHit (r, c, key, shipCell) {
+    if (!shipCell) {
+      return
+    }
+
+    const hitShip = this.getShipFromCell(shipCell)
+    if (!hitShip) {
+      this.UI.cellMiss(r, c)
+      return { hit: false, sunk: '' }
+    }
+    this.markHit(key, r, c)
+    const sunk = hitShip.hitAt(key, this.onSunk, this.UI, this)
+    const sunkLetter = sunk ? hitShip.letter : ''
+
+    return { hit: true, sunkLetter: sunkLetter }
+  }
+
+  checkForHit2 (weapon, r, c, power, key, shipCell) {
+    if (!shipCell) {
+      return
+    }
+
+    const hitShip = this.getShipFromCell(shipCell)
+
+    if (!hitShip) {
+      this.UI.cellMiss(r, c)
+      return { hit: false, sunk: '', reveal: false }
+    }
+
+    const shape = gameMaps().shapesByLetter[shipCell.letter]
+    const protection = shape.protectionAgainst(weapon.letter)
+    if (power === 1 && protection === 2 && hitShip) {
+      this.score.shotReveal(key)
+      return this.UI.cellSemiReveal(r, c)
+    }
+
+    if (protection > power) {
+      return { hit: false, sunk: '', reveal: false }
+    }
+
+    if (power < 1) {
+      this.score.shot.add(key)
+    }
+    this.markHit(key, r, c)
+    const sunk = hitShip.hitAt(key, this.onSunk, this.UI, this)
+    const sunkLetter = sunk ? hitShip.letter : ''
+
+    return { hit: true, sunkLetter: sunkLetter }
+  }
+
+  updateMode () {
+    if (this.isRevealed || this.boardDestroyed) {
+      return
+    }
+    const { wps, cursorIdx } = this.updateWeapon()
+    gameStatus.displayAmmoStatus(wps, cursorIdx)
+  }
+  updateWeapon () {
+    const wps = this.loadOut.weaponSystem()
+    const next = this.loadOut.nextWeapon()
+    this.UI.weaponBtn.innerHTML = next.buttonHtml
+    const cursorIdx = this.loadOut.cursorIndex()
+    return { wps, cursorIdx }
+  }
+
+  fireShot2 (weapon, r, c, power, key) {
+    const shipCell = this.shipCellAt(r, c)
+    if (!shipCell) {
+      if (power > 0) {
+        this.UI.cellMiss(r, c)
+      }
+      return { hit: false, sunk: '' }
+    }
+    return this.checkForHit2(weapon, r, c, power, key, shipCell)
+  }
+
+  fireShot (r, c, key) {
+    const shipCell = this.shipCellAt(r, c)
+    if (!shipCell) {
+      this.UI.cellMiss(r, c)
+      return { hit: false, sunk: '' }
+    }
+    return this.checkForHit(r, c, key, shipCell)
+  }
+
+  hitDescription (hits) {
+    if (this.opponent) {
+      return this.preamble + ' Hit (x' + hits.toString() + ')'
+    } else {
+      return hits.toString() + ' Hits'
+    }
+  }
+  revealDescription (reveals) {
+    if (this.opponent) {
+      return this.preamble + ' positions revealed (x' + reveals.toString() + ')'
+    } else {
+      return reveals.toString() + ' positions revealed'
+    }
+  }
+
+  updateResultsOfBomb (hits, sunks, reveals = 0) {
+    if (this.boardDestroyed) {
+      // already handled  in updateUI
+    } else if (hits === 0 && reveals > 0) {
+      this.displayInfo(this.revealDescription(reveals))
+    } else if (hits === 0) {
+      if (this.opponent) {
+        this.displayInfo('The Mega Bomb missed ' + this.preamble0 + ' ships')
+      } else {
+        this.displayInfo('The Mega Bomb missed everything!')
+      }
+    } else if (sunks.length === 0) {
+      let message = this.hitDescription(hits)
+      if (reveals > 0) {
+        message += ` and ${this.revealDescription(reveals)}`
+      }
+      this.displayInfo(message)
+    } else if (sunks.length === 1) {
+      this.displayInfo(
+        this.hitDescription(hits) + ' and ' + this.sunkLetterDescription(sunks)
+      )
+    } else {
+      let message = this.hitDescription(hits) + ','
+      for (let sunk of sunks) {
+        message += ' and ' + this.sunkLetterDescription(sunk)
+      }
+      message += ' Destroyed'
+      this.displayInfo(message)
+    }
+  }
+  effectById (id, tempEffect) {
+    const element = document.getElementById(id)
+    this.effect(element, tempEffect)
+  }
+  effect (element, tempEffect, long) {
+    element.classList.add(tempEffect)
+    element.addEventListener(
+      'animationend',
+      () => {
+        element.classList.remove(tempEffect, long)
+      },
+      { once: true }
+    )
+  }
+  flash (long) {
+    this.effectById('battleship-game', 'flash')
+    this.effect(this.UI.board, 'burst', long)
+  }
+  flame (r, c, bomb) {
+    if (bomb) {
+      this.UI.delayEffect(r, c, cell => {
+        this.effect(cell, 'flames', 'short')
+      })
+    } else {
+      const cell = this.UI.gridCellAt(r, c)
+      this.effect(cell, 'flames', 'long')
+    }
+  }
+
+  processShot2 (weapon, r, c, power) {
+    if (power > 0) this.flame(r, c, weapon.hasFlash)
+
+    const key =
+      power > 0 ? this.score.createShotKey(r, c) : this.score.newShotKey(r, c)
+    if (key === null) {
+      // if we are here, it is because of carpet bomb, so we can just
+      return { hit: false, sunk: '' }
+    }
+
+    const result = this.fireShot2(weapon, r, c, power, key)
+
+    this.updateUI(this.ships)
+    return result
+  }
+
+  updateUI (ships) {
+    this.updateTally(
+      ships,
+      this.loadOut.limitedAllSystems(),
+      this.score.noOfShots()
+    )
+  }
+  updateTally (ships, weaponSystems, noOfShots) {
+    ships = ships || this.ships
+    if (this.UI.placing && this.UI.placeTally) {
+      this.UI.placeTally(ships)
+    } else {
+      this.UI.score.display(ships, noOfShots)
+      this.UI.score.buildTally(ships, weaponSystems, this.UI)
+    }
+  }
+}

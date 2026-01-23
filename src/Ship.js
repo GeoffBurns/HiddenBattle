@@ -1,18 +1,160 @@
-import { gameMap, gameMaps } from './maps.js'
-import { terrain } from './Shape.js'
+import {
+  makeKey,
+  findClosestCoord,
+  parsePair,
+  makeKeyAndId
+} from './utilities.js'
+import { terrain } from './terrain.js'
+import { gameMap, gameMaps } from './gameMaps.js'
 
+function fst (arr) {
+  if (!arr || arr.length === 0) return null
+  return arr[0]
+}
 export class Ship {
-  constructor (id, symmetry, letter) {
+  constructor (id, symmetry, letter, weapons) {
     this.id = id
     this.symmetry = symmetry
     this.letter = letter
     this.cells = []
     this.hits = new Set()
     this.sunk = false
+    this.variant = 0
+    this.weapons = weapons || {}
   }
 
-  static createFromShape (shape, id) {
-    return new Ship(id, shape.symmetry, shape.letter)
+  static id = 1
+
+  static next () {
+    Ship.id++
+  }
+  getTurn () {
+    return this.weapon().getTurn(this.variant) || ''
+  }
+  reset () {
+    this.hits = new Set()
+    this.sunk = false
+    if (this.weapons) {
+      for (const weapon of this.weaponList()) {
+        weapon.reset()
+      }
+    }
+  }
+  static createShipsFromShapes (shapes) {
+    const ships = []
+    Ship.id = 1
+    for (const shape of shapes) {
+      ships.push(Ship.createFromShape(shape))
+      Ship.next()
+    }
+    return ships
+  }
+  makeKeyIds () {
+    return this.weaponEntries()
+      .map(([k, v]) => makeKeyAndId(k, v.id))
+      .join('|')
+  }
+  hasWeapon () {
+    const weapon = this.weapons
+    return (
+      weapon !== undefined && weapon !== null && Object.keys(weapon).length > 0
+    )
+  }
+  rackAt (r, c) {
+    const key = makeKey(r, c)
+    return this.weapons[key]
+  }
+  weaponSystem () {
+    return fst(this.weaponList())
+  }
+  weapon () {
+    const first = this.weaponSystem()
+    return first?.weapon
+  }
+  closestRack (r, c) {
+    const entries = this.loadedEntries()
+    const [k, v] = findClosestCoord(entries, r, c, ([k]) => parsePair(k))
+    return [k, v]
+  }
+  getRackById (id) {
+    const wps = this.weaponList()?.find(w => w.id === id)
+    return wps
+  }
+  getShipById (id) {
+    return this.id === id ? this : null
+  }
+
+  loadedEntries () {
+    const enties = this.weaponEntries()
+    return enties.filter(([, v]) => v.hasAmmo())
+  }
+  weaponEntries () {
+    return Object.entries(this.weapons)
+  }
+  weaponList () {
+    return Object.values(this.weapons)
+  }
+
+  loadedWeapon () {
+    return fst(this.loadedWeapons())
+  }
+  loadedWeapons () {
+    return this.weaponList().filter(w => w.hasAmmo())
+  }
+  hasAmmoLeft () {
+    return this.ammoLeft() > 0
+  }
+  ammoLeft () {
+    return this.sunk
+      ? 0
+      : this.weaponList().reduce((sum, w) => sum + w.ammoLeft(), 0)
+  }
+
+  ammoTotal () {
+    return this.sunk
+      ? 0
+      : this.weaponList().reduce((sum, w) => sum + w.ammoTotal(), 0)
+  }
+  static createFromShape (shape) {
+    return new Ship(Ship.id, shape.symmetry, shape.letter, shape.weaponSystem)
+  }
+
+  destroy (model, viewmodel) {
+    for (const cell of this.cells) {
+      const key = `${cell[0]},${cell[1]}`
+      if (!this.hits.has(key)) {
+        this.hitAt(key, Function.prototype, viewmodel, model)
+      }
+    }
+  }
+
+  hitAt (key, onSink = Function.prototype, viewmodel, model) {
+    this.hits.add(key)
+    const weapon = this.weapons[key]
+    let info = null
+    if (weapon) {
+      const filled = weapon.ammo > 0
+      weapon.ammo = 0
+      if (filled && weapon.weapon.volatile) {
+        const cell = viewmodel.gridCellAt(...parsePair(key))
+        info = 'Magazine Detonated '
+        weapon.weapon.animateDetonation(cell, viewmodel.cellSizeScreen())
+        if (!this.sunk) {
+          this.sunk = true
+          this.destroy()
+          onSink(this, 'Magazine Detonated ')
+          return true
+        } else {
+          model.updateMode()
+        }
+      }
+    }
+    if (this.hits.size === this.cells.length) {
+      this.sunk = true
+      onSink(this, info)
+      return true
+    }
+    return false
   }
 
   place (placed) {
@@ -27,7 +169,13 @@ export class Ship {
     this.sunk = false
   }
   placePlaceable (placeable, r, c) {
-    this.cells = placeable.placeAt(r, c).cells
+    const placing = placeable.placeAt(r, c)
+    this.cells = placing.cells
+    const w = placing.weapons
+    if (w) {
+      this.variant = placing.variant
+      this.weapons = w
+    }
   }
   placeables () {
     return this.shape.placeables()
@@ -99,6 +247,15 @@ export class Ship {
   shape () {
     return gameMaps().shapesByLetter[this.letter]
   }
+  isInTallyGroup (tallyGroup) {
+    const shape = this.shape()
+    if (!shape) {
+      console.log('shape not found for', this)
+      return false
+    }
+    return shape.tallyGroup === tallyGroup
+  }
+
   sunkDescription (middle = ' ') {
     return terrain.current.sunkDescription(this.letter, middle)
   }

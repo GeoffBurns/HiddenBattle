@@ -1,5 +1,6 @@
-import { gameMap, gameMaps } from './maps.js'
-import { all, mixed } from './Shape.js'
+import { gameMap, gameMaps } from './gameMaps.js'
+import { all } from './seaAndLand.js'
+import { mixed } from './SpecialShips.js'
 import { dragNDrop } from './dragndrop.js'
 
 export class ScoreUI {
@@ -238,24 +239,32 @@ export class ScoreUI {
     const maps = gameMaps()
     const ammoTotal = weaponSystem.ammoTotal()
     const ammoUsed = weaponSystem.ammoUsed()
+    const ammoUnattached = weaponSystem.ammoUnattached()
     const row = document.createElement('div')
-    row.className = 'tally-row'
-    row.classList.add('weapon')
+    const weapon = weaponSystem.weapon
+    const letter = weapon.letter
+    row.className = 'tally-row weapon ' + weapon.classname
     for (let i = 0; i < ammoTotal; i++) {
       const box = document.createElement('div')
-      dragNDrop.makeDraggable(viewModel, box, null, weaponSystem.weapon, true)
-      box.className = 'tally-box'
+      if (ammoUnattached > 0) {
+        dragNDrop.makeDraggable(viewModel, box, null, weapon, true)
+      }
+
+      box.classList?.add('tally-box')
       box.style.fontSize = '105%'
       if (i < ammoUsed) {
         box.textContent = 'X'
-        box.style.background = maps.shipColors[weaponSystem.weapon.letter]
+        box.style.background = maps.shipColors[letter]
         box.style.opacity = 0.45
         box.style.color = '#000'
       } else {
-        box.textContent = weaponSystem.weapon.letter
-        box.style.background = maps.shipColors[weaponSystem.weapon.letter]
-        box.style.color = maps.shipLetterColors[weaponSystem.weapon.letter]
+        const img = document.createElement('img')
+        box.appendChild(img)
+        box.textContent = '' //weaponSystem.weapon.letter
+        box.style.background = maps.shipColors[letter]
+        box.style.color = maps.shipLetterColors[letter]
       }
+
       row.appendChild(box)
     }
     rowList.appendChild(row)
@@ -284,9 +293,7 @@ export class ScoreUI {
     function shipLetters (tallyGroup) {
       return [
         ...new Set(
-          ships
-            .filter(s => s.shape().tallyGroup === tallyGroup)
-            .map(s => s.letter)
+          ships.filter(s => s.isInTallyGroup(tallyGroup)).map(s => s.letter)
         )
       ].toSorted()
     }

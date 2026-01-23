@@ -14,7 +14,7 @@ import { placedShipsInstance } from './selection.js'
 import { Friend } from './friend.js'
 import { enemy } from './enemy.js'
 import { setupEnemy, newGame } from './enemySetup.js'
-import { gameStatus } from './playerUI.js'
+import { gameStatus } from './WatersUI.js'
 import { randomPlaceShape } from './utils.js'
 
 const friend = new Friend(friendUI)
@@ -63,7 +63,7 @@ function onClickReturnToPlacement () {
 }
 
 function resetFriendBoard () {
-  friend.restartBoard()
+  friend.restartFriendBoard()
   friend.updateUI(friend.ships)
 }
 function onClickSeek () {
@@ -82,13 +82,10 @@ function onClickSeek () {
   enemy.opponent = friend
   friend.opponent = enemy
 
-  friend.restartBoard()
-  friend.updateUI(friend.ships)
-
-  removeSeekShorcuts = setupEnemy(onClickReturnToPlacement, resetFriendBoard)
+  removeSeekShorcuts = setupEnemy(onClickReturnToPlacement)
   enemy.UI.resetBoardSize()
   friend.setupUntried()
-  newGame()
+  newGame('hide', resetFriendBoard)
 }
 function onClickAuto () {
   const ships = friend.ships
@@ -98,7 +95,7 @@ function onClickAuto () {
       const placed = randomPlaceShape(ship, friend.shipCellGrid)
       if (!placed) {
         friend.resetShipCells()
-        friendUI.clearVisuals()
+        friendUI.clearPlaceVisuals()
         friendUI.placeTally(ships)
         friendUI.displayShipInfo(ships)
         ok = false
@@ -116,7 +113,7 @@ function onClickUndo () {
   const ship = placedShipsInstance.popAndRefresh(
     friend.shipCellGrid,
     ship => {
-      friendUI.markPlaced(ship.cells, ship.letter)
+      friendUI.markPlaced(ship.cells, ship)
     },
     ship => {
       friendUI.addShipToTrays(friend.ships, ship)
@@ -216,6 +213,7 @@ function newPlacement () {
   friendUI.rotateBtn.disabled = true
   friendUI.flipBtn.disabled = true
   friendUI.rotateLeftBtn.disabled = true
+  friendUI.transformBtn.disabled = true
   friendUI.undoBtn.disabled = true
   friendUI.showMapTitle()
 }

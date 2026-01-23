@@ -1,3 +1,4 @@
+import { terrain } from './terrain.js'
 import { customUI } from './customUI.js'
 import { moveCursorBase } from './placementUI.js'
 import {
@@ -14,7 +15,7 @@ import {
 } from './dragndrop.js'
 import { placedShipsInstance } from './selection.js'
 import { custom } from './custom.js'
-import { gameMap, gameMaps } from './maps.js'
+import { gameMap, gameMaps } from './gameMaps.js'
 import {
   setupBuildOptions,
   validateHeight,
@@ -25,7 +26,6 @@ import {
   trackLevelEnd,
   tabs
 } from './navbar.js'
-import { terrain } from './Shape.js'
 customUI.resetBoardSize()
 
 placedShipsInstance.registerUndo(customUI.undoBtn, customUI.resetBtn)
@@ -36,7 +36,7 @@ function onClickUndo () {
   placedShipsInstance.popAndRefresh(
     custom.shipCellGrid,
     ship => {
-      customUI.markPlaced(ship.cells, ship.letter)
+      customUI.markPlaced(ship.cells, ship)
     },
     ship => {
       customUI.subtraction(custom, ship)

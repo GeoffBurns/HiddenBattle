@@ -1,15 +1,11 @@
-import { CellsToBePlaced, Placeable, Placeable3 } from './CellsToBePlaced.js'
-
-export function shuffleArray (array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1))
-    let temp = array[i]
-    array[i] = array[j]
-    array[j] = temp
-  }
-  return array
-}
-
+import {
+  CellsToBePlaced,
+  Placeable,
+  Placeable3,
+  PlaceableW
+} from './CellsToBePlaced.js'
+import { parsePair, shuffleArray } from './utilities.js'
+import { StandardCells, SpecialCells } from './SubShape.js'
 class Variants {
   constructor (validator, zoneDetail, symmetry) {
     if (new.target === Variants) {
@@ -178,22 +174,22 @@ export class TransformableVariants extends Variants {
 
   variant (index) {
     const { formIndex, variantIndex } = this.positionInForms(index)
-    return this.forms[formIndex].variant(variantIndex)
+    return this.forms[formIndex].variants().variant(variantIndex)
   }
 
   special (index, groupIndex = 1) {
     const idx = index || this.index
     const { formIndex, variantIndex } = this.positionInForms(idx)
-    return this.forms[formIndex].special(variantIndex, groupIndex)
+    return this.forms[formIndex].variants().special(variantIndex, groupIndex)
   }
 
   placeable (index) {
     const { formIndex, variantIndex } = this.positionInForms(index)
-    return this.forms[formIndex].placeable(variantIndex)
+    return this.forms[formIndex].variants().placeable(variantIndex)
   }
 
   allVariationsAndForms () {
-    return this.forms.flatMap(f => f.list.map(v => [f, v]))
+    return this.forms.flatMap(f => f.variants().list.map(v => [f, v]))
   }
   variationsAndForms () {
     let variants0 = this.allVariationsAndForms()
@@ -202,22 +198,22 @@ export class TransformableVariants extends Variants {
   variations () {
     return this.allVariationsAndForms().map(vf => vf[1])
   }
+  allPlaceables () {
+    return this.forms.flatMap(f => f.variants().placeables())
+  }
   placeables () {
-    let variants0 = this.variationsAndForms()
-
-    return variants0.map(
-      vf => new Placeable(vf[1], vf[0].validator, vf[0].zoneDetail)
-    )
+    let p0 = this.allPlaceables()
+    return shuffleArray(p0)
   }
   normalize (mr, mc) {
     return this.allVariationsAndForms().map(v => normalize(v[1], mr, mc))
   }
 
   height () {
-    return Math.max(...this.forms.map(f => f.height()))
+    return Math.max(...this.forms.map(f => f.variants().height()))
   }
   width () {
-    return Math.max(...this.forms.map(f => f.width()))
+    return Math.max(...this.forms.map(f => f.variants().width()))
   }
 
   setByIndex (index) {
@@ -514,10 +510,126 @@ function variantType (symmetry) {
       ) // The 'null, 2' adds indentation for readability);
   }
 }
-
-export class Variant3 extends RotatableVariant {
-  constructor (full, subGroups, symmetry) {
+export class SpecialVariant extends RotatableVariant {
+  constructor (symmetry) {
     super(Function.prototype, 0, symmetry)
+  }
+
+  special (index, groupIndex = 1) {
+    const idx = index || this.index
+    return this.variant(idx)
+      .filter(s => s[2] === groupIndex)
+      .map(s => [s[0], s[1]])
+  }
+
+  placeable (index) {
+    const idx = index || this.index
+    return new Placeable3(
+      super.placeable(idx),
+      this.subGroups.map(
+        (g, i) => new Placeable(this.special(idx, i), g.validator, g.zoneDetail)
+      )
+    )
+  }
+
+  placeables () {
+    let shuffled
+    switch (this.list.length) {
+      case 8:
+        shuffled = shuffleArray([0, 1, 2, 3, 4, 5, 6, 7])
+        break
+      case 4:
+        shuffled = shuffleArray([0, 1, 2, 3])
+        break
+      case 2:
+        shuffled = shuffleArray([0, 1])
+        break
+      case 1:
+        shuffled = [0]
+        break
+      default:
+        throw new Error('Unknown no of variants')
+    }
+
+    return shuffled.map(i => this.placeable(i))
+  }
+}
+
+export class WeaponVariant extends SpecialVariant {
+  constructor (full, weapons, symmetry, validator, zoneDetail, subterrain) {
+    super(symmetry)
+    this.validator = validator
+    this.zoneDetail = zoneDetail
+    this.subterrain = subterrain
+    const weaponObj = Object.keys(weapons)
+    const weaponGroup = weaponObj.map(p => parsePair(p))
+    this.weapons = weaponObj.map(k => weapons[k])
+    this.standardGroup = new StandardCells(validator, zoneDetail, subterrain)
+    const specialGroup = new SpecialCells(
+      weaponGroup,
+      validator,
+      zoneDetail,
+      subterrain
+    )
+    this.specialGroups = [specialGroup]
+    this.standardGroup.faction = 1
+    this.specialGroups.faction = 0
+    this.standardGroup.setCells(full, specialGroup)
+    this.subGroups = [this.standardGroup, specialGroup]
+    const VariantType = variantType(symmetry)
+    const cells = VariantType.cell3(
+      full,
+      this.specialGroups.map(g => g.cells)
+    )
+    this.list = cells
+    this.specialGroups.forEach(g => {
+      g.parent = this
+    })
+  }
+
+  static setBehaviour (v3, symmetry) {
+    const VariantType = variantType(symmetry || this.symmetry)
+    VariantType.setBehaviour(v3)
+  }
+  placeable (index) {
+    const idx = index || this.index
+    const grandparentPrototype = Object.getPrototypeOf(SpecialVariant.prototype)
+    const result = new PlaceableW(
+      grandparentPrototype.placeable.call(this, idx),
+      this.subGroups.map(
+        (g, i) => new Placeable(this.special(idx, i), g.validator, g.zoneDetail)
+      )
+    )
+    result.variantIndex = idx
+    result.weapons = this.weapons
+    return result
+  }
+  placeables () {
+    let shuffled
+    switch (this.list.length) {
+      case 8:
+        shuffled = shuffleArray([0, 1, 2, 3, 4, 5, 6, 7])
+        break
+      case 4:
+        shuffled = shuffleArray([0, 1, 2, 3])
+        break
+      case 2:
+        shuffled = shuffleArray([0, 1])
+        break
+      case 1:
+        shuffled = [0]
+        break
+      default:
+        throw new Error('Unknown no of variants')
+    }
+
+    return shuffled.map(i => this.placeable(i))
+  }
+}
+
+export class Variant3 extends SpecialVariant {
+  constructor (full, subGroups, symmetry) {
+    super(symmetry)
 
     this.subGroups = subGroups || []
 
@@ -538,41 +650,6 @@ export class Variant3 extends RotatableVariant {
   static setBehaviour (v3, symmetry) {
     const VariantType = variantType(symmetry || this.symmetry)
     VariantType.setBehaviour(v3)
-  }
-
-  special (index, groupIndex = 1) {
-    const idx = index || this.index
-    return this.variant(idx)
-      .filter(s => s[2] === groupIndex)
-      .map(s => [s[0], s[1]])
-  }
-
-  placeable (index) {
-    const idx = index || this.index
-    return new Placeable3(
-      super.placeable(idx),
-      this.subGroups.map(
-        (g, i) => new Placeable(this.special(idx, i), g.validator, g.zoneDetail)
-      )
-    )
-  }
-  placeables () {
-    let shuffled
-    switch (this.list.length) {
-      case 8:
-        shuffled = shuffleArray([0, 1, 2, 3, 4, 5, 6, 7])
-        break
-      case 4:
-        shuffled = shuffleArray([0, 1, 2, 3])
-        break
-      case 2:
-        shuffled = shuffleArray([0, 1])
-        break
-      default:
-        throw new Error('Unknown no of variants')
-    }
-
-    return shuffled.map(i => this.placeable(i))
   }
 }
 

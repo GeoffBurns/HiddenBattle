@@ -1,9 +1,9 @@
-import { gameStatus } from './playerUI.js'
+import { gameStatus } from './WatersUI.js'
 import { PlacementUI } from './placementUI.js'
-import { setupDragHandlers } from './dragndrop.js'
 import { trackLevelEnd } from './navbar.js'
-import { gameMap } from './maps.js'
-import { terrain } from './Shape.js'
+import { gameMap } from './gameMaps.js'
+
+import { terrain } from './terrain.js'
 
 export class FriendUI extends PlacementUI {
   constructor () {
@@ -29,9 +29,7 @@ export class FriendUI extends PlacementUI {
 
   cellHit (r, c) {
     const cell = this.gridCellAt(r, c)
-    cell.classList.remove('semi', 'semi-miss', 'wake')
-    cell.classList.add('frd-hit')
-    cell.textContent = ''
+    this.cellHitBase(cell)
     gameStatus.info('You where hit!')
   }
   placeMode () {
@@ -47,7 +45,7 @@ export class FriendUI extends PlacementUI {
     this.score.placedLabel.classList.remove('hidden')
     this.rotateBtn.classList.remove('hidden')
     this.rotateLeftBtn.classList.remove('hidden')
-    if (terrain.current.ships.hasTransforms) {
+    if (terrain.current.hasTransforms) {
       this.transformBtn.classList.remove('hidden')
     } else {
       this.transformBtn.classList.add('hidden')
@@ -154,5 +152,3 @@ export class FriendUI extends PlacementUI {
 }
 
 export const friendUI = new FriendUI()
-
-setupDragHandlers(friendUI)

@@ -3,11 +3,32 @@
     --flame2-image: url('flame_24.png');
     --flame-duration: 0.4s;
     --flame2-duration: 0.7s;
+    --shake-x: 8px;
+    --shake-y: 6px;
     --content-width: 600px;
     --bomb-cursor-image: url('./bomb32.png');
     --rail-cursor-image: url('./rail32.png');
     --bolt-cursor-image: url('./bolt32.png');
     --missile-cursor-image: url('./missile32.png');
+    --white-missile-image: url('./whitemissile26.png');
+    --white-rail-image: url('./whiterail26.png');
+    --flying-missile-image: url('./flyingmissile40.png');
+    --flying-bomb-image: url('./flyingbomb40.png');
+    --flying-bolt-image: url('./flyingbolt40.png');
+    --flying-torpedo-image: url('./flyingtorpedo40.png');
+    --flying-flack-image: url('./flyingFlack40.png');
+    --flying-strike-image: url('./flyingstrike40.png');
+    --flying-round-image: url('./flyinground40.png');
+    --asteroid-explode-image: url('./asteroid-explosion.png');
+    --sea-explode-image: url('./sea-explosion.png');
+    --land-explode-image: url('./land-explosion.png');
+    --space-explode-image: url('./space-explosion.png');
+    --air-explode-image: url('./air-explosion.png');
+    --plasma-explode-image: url('./plasma-explosion.png');
+    --launch-cursor-image: url('./launch32.png');
+    --launch2-cursor-image: url('./launch32_2.png');
+    --launch3-cursor-image: url('./launch32_3.png');
+    --launch4-cursor-image: url('./launch32_4.png');
     --strike-cursor-image: url('./strike32.png');
     --satelite-cursor-image: url('./sat32.png');
     --cluster-cursor-image: url('./cluster32.png');
@@ -21,10 +42,20 @@
     --logo-image-space: url('./space-logo.png');
 }
 
+.cell.flames.long::before {
+    animation: flameFade var(--flame-duration, 1.3s) ease-out forwards;
+}
+
+.cell.hit.flames.long::before {
+    animation: flameFade var(--flame2-duration, 1.95s) ease-out forwards;
+}
+
 .cell.flames::before {
     content: '';
     position: absolute;
     inset: -2px;
+
+    z-index: 3;
     /* slight bleed for edges */
     pointer-events: none;
     background:
@@ -37,15 +68,16 @@
     opacity: 0;
     /* will be set by animation */
     filter: saturate(1.15);
-    animation: flameFade var(--flame-duration, 0.3s) ease-out forwards;
+    animation: flameFade var(--flame-duration, 0.8s) ease-out forwards;
 }
 
 .cell.hit.flames::before {
+    z-index: 4;
     background:
         radial-gradient(closest-side, rgba(255, 200, 0, 0.22), transparent 70%) 0 0/33% 33%,
         radial-gradient(closest-side, rgba(255, 120, 0, 0.18), transparent 70%) 16% 20%/40% 40%,
         var(--flame2-image) center/cover no-repeat;
-    animation: flameFade var(--flame2-duration, 0.45s) ease-out forwards;
+    animation: flameFade var(--flame2-duration, 0.95s) ease-out forwards;
 }
 
 .cell.miss::after {
@@ -57,11 +89,117 @@
     transition: opacity 0.2s ease-in-out;
 }
 
+.cell.weapon:not(.active)::before {
+    content: '';
+    width: 11px;
+    height: 11px;
+    z-index: 2;
+    border-radius: 50%;
+    background: #fcd588;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.cell.weapon.active::before {
+    content: '';
+    width: 26px;
+    height: 26px;
+    z-index: 3;
+    background-image: var(--white-missile-image) !important;
+    transition: opacity 0.4s ease-in-out;
+}
+
+.cell.weapon.rail.active::before {
+    content: '';
+    width: 26px;
+    height: 26px;
+    z-index: 3;
+    background-image: var(--white-rail-image) !important;
+    transition: opacity 0.4s ease-in-out;
+}
+
+.cell.weapon.active.turn2::before {
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
+
+.cell.weapon.active.turn3::before {
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    transform: rotate(180deg);
+}
+
+.cell.weapon.active.turn4::before {
+    -webkit-transform: rotate(270deg);
+    -moz-transform: rotate(270deg);
+    -o-transform: rotate(270deg);
+    -ms-transform: rotate(270deg);
+    transform: rotate(270deg);
+}
+
+.cell.portal::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    content: '';
+    width: 26px;
+    height: 26px;
+    z-index: 2;
+    border-radius: 50%;
+    border: 3px solid #2d33e4;
+    background-color: black;
+    transform: translate(-50%, -50%);
+    animation: pulse 1.2s ease-in-out forwards;
+}
+
+@keyframes pulse {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 1;
+        width: 26px;
+        height: 26px;
+    }
+
+    80% {
+        width: 26px;
+        height: 26px;
+        opacity: 1;
+    }
+
+    100% {
+        width: 0;
+        height: 0;
+        opacity: 0;
+    }
+}
+
+.cell.weapon-empty:not(.frd-hit):not(.hit)::before {
+    content: '';
+    width: 14px;
+    height: 14px;
+    z-index: 2;
+    border-radius: 50%;
+    border: 4px solid #f8986c;
+    background-color: transparent;
+    transition: opacity 0.2s ease-in-out;
+}
+
 .cell.wake::after,
 .cell.semi-miss::after {
     position: absolute;
     inset: 0;
-    z-index: -1;
+    left: 4px;
+    top: 4px;
+    z-index: 1;
     content: '';
     display: flex;
     align-items: center;
@@ -123,6 +261,26 @@
     /* sits above cell content */
 }
 
+.cell.hint::after {
+    content: '!';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    /* vertical center the '?' */
+    justify-content: center;
+    /* horizontal center the '?' */
+    background-color: rgba(255, 255, 255, 0.3);
+    font-size: 150%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 900;
+    color: #334;
+    pointer-events: none;
+    /* clicks go through to underlying content */
+    transition: opacity 0.1s ease-in-out;
+    z-index: 2;
+    /* sits above cell content */
+}
 
 .cell.frd-hit::after {
     content: 'X';
@@ -170,7 +328,11 @@
 }
 
 .burst {
-    animation: burstLighten 0.75s ease-out forwards;
+    animation: burstLighten 0.4s ease-out forwards;
+}
+
+.burst.long {
+    animation: burstLighten 0.6s ease-out forwards;
 }
 
 @keyframes burstLighten {

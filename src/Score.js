@@ -1,3 +1,5 @@
+import { makeKey } from './utilities.js'
+
 export class Score {
   constructor () {
     this.shot = new Set()
@@ -10,7 +12,7 @@ export class Score {
     this.autoMisses = 0
   }
   newShotKey (r, c) {
-    const key = `${r},${c}`
+    const key = makeKey(r, c)
     if (this.shot.has(key)) return null
     return key
   }

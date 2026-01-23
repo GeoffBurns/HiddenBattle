@@ -1,8 +1,9 @@
 import { randomPlaceShape } from './utils.js'
-import { gameMap } from './maps.js'
+import { gameMap } from './gameMaps.js'
 import { enemyUI } from './enemyUI.js'
-import { Waters } from './player.js'
-import { gameStatus } from './playerUI.js'
+import { Waters } from './Waters.js'
+import { gameStatus } from './WatersUI.js'
+import { LoadOut } from './LoadOut.js'
 
 class Enemy extends Waters {
   constructor (enemyUI) {
@@ -17,9 +18,11 @@ class Enemy extends Waters {
 
   cursorChange (oldCursor, newCursor) {
     if (newCursor === oldCursor) return
-    if (oldCursor !== '') this.UI.board.classList.remove(oldCursor)
-    if (newCursor !== '') this.UI.board.classList.add(newCursor)
+    const board = this.UI.board.classList
+    if (oldCursor !== '') board.remove(oldCursor)
+    if (newCursor !== '') board.add(newCursor)
   }
+
   hasAmmo () {
     return !this.hasNoAmmo()
   }
@@ -96,16 +99,7 @@ class Enemy extends Waters {
     this.boardDestroyed = true
     this.isRevealed = true
   }
-  updateMode () {
-    if (this.isRevealed || this.boardDestroyed) {
-      return
-    }
 
-    const wps = this.loadOut.weaponSystem()
-    const next = this.loadOut.nextWeapon()
-    this.UI.weaponBtn.innerHTML = next.buttonHtml
-    gameStatus.displayAmmoStatus(wps, this.loadOut.cursorIndex())
-  }
   updateUI (ships) {
     ships = ships || this.ships
     // stats
@@ -118,34 +112,51 @@ class Enemy extends Waters {
     this.UI.revealBtn.disabled = this.boardDestroyed || this.isRevealed
     super.updateUI(this.ships)
   }
-  onClickCell (r, c) {
-    if (this.boardDestroyed || this.isRevealed) return
-    if (this.loadOut.hasNoCurrentAmmo()) {
-      gameStatus.info(
-        `No ${this.loadOut.weapon().plural} Left - Switching To   ${
-          this.loadOut.nextWeapon().name
-        }`
-      )
 
-      this.switchMode()
-      return
-    }
+  isTurn () {
+    if (this.boardDestroyed || this.isRevealed || this.loadOut.checkNoAmmo())
+      return false
     if (this.timeoutId) {
       gameStatus.info('Wait For Enemy To Finish Their Turn')
-      return
+      return false
     }
     if (this?.opponent?.boardDestroyed) {
       gameStatus.info('Game Over - No More Shots Allowed')
-      return
+      return false
     }
+    return true
+  }
+  onClickCell (r, c) {
+    if (!this.isTurn()) return
 
-    this.loadOut.destroy = this.tryFireAt2.bind(this)
-    this.loadOut.destroyOne = this.destroyOne.bind(this)
+    this.setWeaponHanders()
+
+    if (this.lauchSelectedWeapon(r, c)) return
+
+    if (this.launchRandomWeapon(r, c)) return
+    this.loadOut.launch = LoadOut.launchDefault.bind(this)
     this.loadOut.aim(gameMap(), r, c)
   }
 
+  setWeaponHanders () {
+    this.loadOut.destroy = this.tryFireAt2.bind(this)
+    this.loadOut.destroyOne = this.destroyOne.bind(this)
+  }
+
+  onClickOppoCell (hintR, hintC) {
+    if (!this.isTurn()) return
+    const oppo = this.opponent
+    if (!oppo) return
+
+    if (this.loadOut.isNotArming()) return
+
+    const cell = oppo.UI.gridCellAt(hintR, hintC)
+
+    this.selectAttachedWeapon(cell, hintR, hintC, oppo)
+  }
+
   destroyOne (weapon, effect) {
-    const candidates = this.getHitCandidates(effect)
+    const candidates = this.getHitCandidates(effect, weapon)
 
     if (candidates.length < 1) {
       this.tryFireAt2(weapon, effect)
@@ -178,8 +189,8 @@ class Enemy extends Waters {
     return true
   }
   fireAt2 (weapon, effect) {
-    // Mega Bomb mode: affect 3x3 area centered on (r,c)
     this.updateMode()
+    // Mega Bomb mode: affect 3x3 area centered on (r,c)
     this.processCarpetBomb2(weapon, effect)
   }
 
@@ -221,10 +232,6 @@ class Enemy extends Waters {
       this.loadOut.weaponSystem(),
       this.loadOut.cursorIndex()
     )
-    if (this.loadOut.hasNoCurrentAmmo()) {
-      this.switchMode()
-      gameStatus.display('Single Shot Mode')
-    }
   }
 
   onClickWeaponMode () {
@@ -252,7 +259,6 @@ class Enemy extends Waters {
     this.loadOut.OutOfAllAmmo = () => {
       this.UI.weaponBtn.disabled = true
       this.UI.weaponBtn.textcontent = 'single shot'
-      this.UI.board.classList.remove('bomb')
     }
     this.loadOut.OutOfAmmo = this.updateMode.bind(this)
     this.updateUI(enemy.ships)

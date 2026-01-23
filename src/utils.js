@@ -1,4 +1,4 @@
-import { gameMap } from './maps.js'
+import { gameMap } from './gameMaps.js'
 
 export function toTitleCase (str) {
   if (!str) {

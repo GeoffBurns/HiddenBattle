@@ -1,10 +1,11 @@
-import { gameMap, gameMaps } from './maps.js'
-import { WatersUI } from './playerUI.js'
+import { gameMap, gameMaps } from './gameMaps.js'
+import { WatersUI } from './WatersUI.js'
 import { ClickedShip } from './selection.js'
 import { cursor } from './cursor.js'
 import { Ship } from './Ship.js'
 import { dragNDrop } from './dragndrop.js'
-import { terrain, Terrain } from './Shape.js'
+import { terrain, Terrain } from './terrain.js'
+import { setCellCoords } from './utilities.js'
 
 export class PlacementUI extends WatersUI {
   constructor (terroritory, title) {
@@ -35,12 +36,15 @@ export class PlacementUI extends WatersUI {
     this.placelistenCancellables = []
   }
 
-  markPlaced (cells, letter) {
+  markPlaced (cells, ship) {
     this.displaySurround(
       cells,
-      letter,
-      (r, c) => this.cellMiss(r, c),
-      (r, c, letter) => this.cellPlacedAt(r, c, letter)
+      ship,
+      (r, c) => {
+        this.cellMiss(r, c)
+        this.surroundShipCellAt(ship, r, c)
+      },
+      (r, c, ship) => this.cellPlacedAt(r, c, ship)
     )
   }
 
@@ -464,14 +468,11 @@ export class PlacementUI extends WatersUI {
       this.appendEmptyCell(dragShip, r, c)
     }
   }
-  setCoords (cell, r, c) {
-    cell.dataset.r = r
-    cell.dataset.c = c
-  }
+
   makeCell (r, c) {
     const cell = document.createElement('div')
     cell.className = 'cell'
-    this.setCoords(cell, r, c)
+    setCellCoords(cell, r, c)
     return cell
   }
   appendEmptyCell (dragItem, r, c) {
@@ -521,18 +522,15 @@ export class PlacementUI extends WatersUI {
     dragItem.appendChild(cell)
   }
 
-  displayAsPlaced (cell, letter) {
-    cell.textContent = letter
-    const maps = gameMaps()
-    cell.style.color = maps.shipLetterColors[letter] || '#fff'
-    cell.style.background = maps.shipColors[letter] || 'rgba(255,255,255,0.2)'
-
+  displayAsPlaced (cell, ship, r, c) {
+    this.visibleShipCell(ship, r, c, cell)
     this.clearCell(cell)
     cell.classList.add('placed')
   }
-  cellPlacedAt (r, c, letter) {
+
+  cellPlacedAt (r, c, ship) {
     const cell = this.gridCellAt(r, c)
-    this.displayAsPlaced(cell, letter)
+    this.displayAsPlaced(cell, ship, r, c)
   }
 
   buildTrayItemPrint (shipInfo, tray) {
@@ -738,6 +736,9 @@ export class PlacementUI extends WatersUI {
         return this.specialTray
       case 'G':
         return this.buildingTray
+      case 'W':
+        return this.weaponTray
+
       default:
         throw new Error('Unknown type for ' + type)
     }
@@ -807,20 +808,18 @@ export class PlacementUI extends WatersUI {
     } else {
       box.textContent = letter
     }
-    const map = gameMap()
-    box.style.background = map.shipColors[letter] || '#333'
-    box.style.color = map.shipLetterColors[letter] || '#fff'
+    this.setShipCellColors(box, letter)
     return box
   }
 
   placeTally (ships) {
-    this.score.buildShipTally(ships, this.placeShipBox)
+    this.score.buildShipTally(ships, this.placeShipBox.bind(this))
     // no bombs row
   }
 
   placement (placed, model, ship) {
     this.showNotice(ship.description() + this.addText)
-    this.markPlaced(placed, ship.letter)
+    this.markPlaced(placed, ship)
     this.score.buildTallyFromModel(model, this)
     this.displayShipInfo(model.ships)
   }
@@ -832,19 +831,19 @@ export class PlacementUI extends WatersUI {
   }
   addition (placed, model, ship) {
     this.showNotice(ship.description() + this.addText)
-    this.markPlaced(placed, ship.letter)
+    this.markPlaced(placed, ship)
     const id = model.nextId
-    const newShip = new Ship(id, ship.symmetry, ship.letter)
     model.nextId++
     model.ships.push(ship)
-
     const map = gameMap() // Ensure map is an instance of the correct class
 
+    const shape = ship.shape()
+    const newShip = Ship.createFromShape(shape, id)
     map.addShips(model.ships)
-
     const index = model.candidateShips.findIndex(s => s.id === ship.id)
     model.candidateShips[index] = newShip
 
+    model.armWeapons(map)
     return id
   }
 
@@ -852,7 +851,7 @@ export class PlacementUI extends WatersUI {
     this.showNotice(ship.description() + this.removeText)
     const indexToRemove = model.ships.findIndex(s => s.id === ship.id)
     if (indexToRemove >= 0) model.ships.splice(indexToRemove, 1)
-
+    model.armWeapons(gameMap())
     this.score.buildTallyFromModel(model, this)
     this.displayAddInfo(model)
     this.score.displayAddZoneInfo(model)
