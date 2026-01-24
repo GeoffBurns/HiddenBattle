@@ -190,50 +190,77 @@
 div.tally-row.weapon div.tally-box::before {
     content: '';
     position: absolute;
-
+    transform: scale(0.99, 0.99);
     width: 28px;
     height: 28px;
     z-index: 3;
-    transform: scale(1, 1.8);
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
     transition: opacity 0.4s ease-in-out;
 }
 
-.tally-row.weapon.missile div.tally-box::before,
 .flying-weapon.missile {
     background-image: var(--flying-missile-image);
 
 }
 
-div.tally-row.weapon.rail-bolt div.tally-box::before,
 .flying-weapon.rail-bolt {
     background-image: var(--flying-bolt-image);
 
 }
 
-div.tally-row.weapon.megabomb div.tally-box::before,
 .flying-weapon.megabomb {
     background-image: var(--flying-bomb-image);
 
 }
 
-div.tally-row.weapon.flack div.tally-box::before,
 .flying-weapon.flack {
     background-image: var(--flying-flack-image);
 
 }
 
-div.tally-row.weapon.kinetic-strike div.tally-box::before,
 .flying-weapon.kinetic-strike {
     background-image: var(--flying-strike-image);
 
 }
 
-div.tally-row.weapon.torpedo div.tally-box::before,
 .flying-weapon.torpedo {
     background-image: var(--flying-torpedo-image);
+}
+
+.tally-row.weapon div.tally-box.hit::before {
+    background-image: url('./skull28.png');
+
+}
+
+.tally-row.weapon.missile div.tally-box:not(.hit)::before {
+    background-image: url('./boxmissile28.png');
+
+}
+
+div.tally-row.weapon.rail-bolt div.tally-box:not(.hit)::before {
+    background-image: url('./boxbolt28.png');
+
+}
+
+div.tally-row.weapon.megabomb div.tally-box:not(.hit)::before {
+    background-image: url('./boxbomb28.png');
+
+}
+
+div.tally-row.weapon.flack div.tally-box:not(.hit)::before {
+    background-image: var(--box-flack-image);
+
+}
+
+div.tally-row.weapon.kinetic-strike div.tally-box:not(.hit)::before {
+    background-image: url('./boxstrike28.png');
+
+}
+
+div.tally-row.weapon.torpedo div.tally-box:not(.hit)::before {
+    background-image: url('./boxtorpedo28.png');
 }
 
 .flying-weapon {
@@ -276,6 +303,15 @@ div.tally-row.weapon.torpedo div.tally-box::before,
     }
 }
 
+.explosion.play {
+    will-change: background-position, transform, opacity;
+
+    animation:
+        explode-frames 0.6s steps(1) forwards,
+        explode-scale 0.5s ease-out forwards,
+        explode-fade 0.8s ease-out forwards;
+}
+
 .explosion {
     width: 128px;
     height: 128px;
@@ -289,12 +325,7 @@ div.tally-row.weapon.torpedo div.tally-box::before,
 
     left: var(--x);
     top: var(--y);
-    will-change: background-position, transform, opacity;
-
-    animation:
-        explode-frames 0.6s steps(1) forwards,
-        explode-scale 0.5s ease-out forwards,
-        explode-fade 0.8s ease-out forwards;
+    animation: none;
 }
 
 .explosion.asteroid {
@@ -319,6 +350,10 @@ div.tally-row.weapon.torpedo div.tally-box::before,
 
 @keyframes explode-frames {
     0% {
+        background-position: 0px 0px;
+    }
+
+    2% {
         background-position: 0px 0px;
     }
 
@@ -363,6 +398,14 @@ div.tally-row.weapon.torpedo div.tally-box::before,
 
 @keyframes explode-fade {
     0% {
+        opacity: 0;
+    }
+
+    3% {
+        opacity: 0;
+    }
+
+    5% {
         opacity: 1;
     }
 

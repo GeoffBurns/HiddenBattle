@@ -360,11 +360,11 @@ export class Friend extends Waters {
 
     this.selectShot([...this.score.semi], hits, seeking)
   }
-  updateMode () {
+  updateMode (wps) {
     if (this.isRevealed || this.boardDestroyed) {
       return
     }
-    this.updateWeapon()
+    this.updateWeapon(wps)
   }
   resetModel () {
     this.score.reset()

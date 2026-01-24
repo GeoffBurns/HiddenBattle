@@ -34,6 +34,50 @@
     text-align: left;
 }
 
-.mode-status {
+flex-direction .mode-status {
     text-align: right;
+}
+
+
+.status .mode-icons {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    color: #111;
+}
+
+.ammo-counter {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    font-family: system-ui, sans-serif;
+    font-weight: 600;
+}
+
+/* diagonal line */
+.ammo-counter::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg,
+            transparent 48%,
+            #888 49%,
+            #888 51%,
+            transparent 52%);
+    pointer-events: none;
+}
+
+.ammo-counter .left {
+    position: absolute;
+    top: 6px;
+    left: 8px;
+    font-size: 28px;
+}
+
+.ammo-counter .right {
+    position: absolute;
+    bottom: 6px;
+    right: 8px;
+    font-size: 14px;
+    opacity: 0.75;
 }

@@ -236,39 +236,81 @@ export class ScoreUI {
 
   buildBombRow (rowList, viewModel, weaponSystem) {
     if (!weaponSystem.weapon.isLimited) return
-    const maps = gameMaps()
-    const ammoTotal = weaponSystem.ammoTotal()
-    const ammoUsed = weaponSystem.ammoUsed()
-    const ammoUnattached = weaponSystem.ammoUnattached()
     const row = document.createElement('div')
+    const maps = gameMaps()
     const weapon = weaponSystem.weapon
     const letter = weapon.letter
     row.className = 'tally-row weapon ' + weapon.classname
-    for (let i = 0; i < ammoTotal; i++) {
-      const box = document.createElement('div')
-      if (ammoUnattached > 0) {
-        dragNDrop.makeDraggable(viewModel, box, null, weapon, true)
-      }
 
-      box.classList?.add('tally-box')
-      box.style.fontSize = '105%'
-      if (i < ammoUsed) {
-        box.textContent = 'X'
-        box.style.background = maps.shipColors[letter]
-        box.style.opacity = 0.45
-        box.style.color = '#000'
-      } else {
-        const img = document.createElement('img')
-        box.appendChild(img)
-        box.textContent = '' //weaponSystem.weapon.letter
-        box.style.background = maps.shipColors[letter]
-        box.style.color = maps.shipLetterColors[letter]
-      }
+    const leaves = weaponSystem
+      .getLeafWeapons()
+      .sort((a, b) => a.ammoLeft() - b.ammoLeft())
 
-      row.appendChild(box)
+    for (const leaf of leaves) {
+      this.buildWeaponSubRow(leaf, viewModel, weapon, maps, letter, row)
     }
+
     rowList.appendChild(row)
   }
+  buildWeaponSubRow (weaponSystem, viewModel, weapon, maps, letter, row) {
+    const ammoTotal = weaponSystem.ammoTotal()
+    const ammoUsed = weaponSystem.ammoUsed()
+    const ammoUnattached = weaponSystem.ammoUnattached()
+    const hit = weaponSystem.hit
+    const wid = weaponSystem.id
+    for (let i = 0; i < ammoTotal; i++) {
+      this.buildWeaponBox(
+        ammoUnattached,
+        viewModel,
+        weapon,
+        i,
+        ammoUsed,
+        maps,
+        letter,
+        wid,
+        hit,
+        row
+      )
+    }
+  }
+
+  buildWeaponBox (
+    ammoUnattached,
+    viewModel,
+    weapon,
+    i,
+    ammoUsed,
+    maps,
+    letter,
+    wid,
+    hit,
+    row
+  ) {
+    const box = document.createElement('div')
+    if (ammoUnattached > 0) {
+      dragNDrop.makeDraggable(viewModel, box, null, weapon, true)
+    }
+    box.dataset.wid = wid
+    box.classList?.add('tally-box')
+    if (hit) {
+      box.classList?.add('hit')
+    }
+    box.style.fontSize = '105%'
+    if (i < ammoUsed) {
+      box.textContent = 'X'
+      box.style.background = maps.shipColors[letter]
+      box.style.opacity = 0.45
+      box.style.color = '#000'
+    } else {
+      const img = document.createElement('img')
+      box.appendChild(img)
+      box.textContent = '' //weaponSystem.weapon.letter
+      box.style.background = maps.shipColors[letter]
+      box.style.color = maps.shipLetterColors[letter]
+    }
+    row.appendChild(box)
+  }
+
   buildShipTally (ships, boxer) {
     this.altBuildTally(ships, [], boxer)
   }

@@ -143,6 +143,7 @@ export class WatersUI {
     const ammo = w.ammo
     cell.dataset.wletter = wletter
     cell.dataset.ammo = ammo
+    cell.dataset.wid = w.id
     cell.dataset.variant = ship.variant
     cell.textContent = ''
     cell.classList.add('weapon')
@@ -340,11 +341,15 @@ export class WatersUI {
   }
   cellUseAmmo (r, c) {
     const cell = this.gridCellAt(r, c)
+    this.useAmmoInCell(cell)
+  }
+  useAmmoInCell (cell) {
     const dataset = cell.dataset
     cell.classList.remove('weapon', 'active')
     cell.classList.add('weapon-empty')
-    dataset.ammo -= 1
+    dataset.ammo = 0
   }
+
   cellMiss (r, c) {
     const cell = this.gridCellAt(r, c)
 

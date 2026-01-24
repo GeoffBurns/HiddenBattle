@@ -562,11 +562,16 @@ export class Waters {
       this.UI.cellMiss(r, c)
       return { hit: false, sunk: '' }
     }
-    this.markHit(key, r, c)
-    const sunk = hitShip.hitAt(key, this.onSunk, this.UI, this)
-    const sunkLetter = sunk ? hitShip.letter : ''
+    const sunkLetter = this.showHit(key, r, c, hitShip)
 
     return { hit: true, sunkLetter: sunkLetter }
+  }
+
+  showHit (key, r, c, hitShip) {
+    this.markHit(key, r, c)
+    const sunk = hitShip.hitAt(key, this.onSunk, this)
+    const sunkLetter = sunk ? hitShip.letter : ''
+    return sunkLetter
   }
 
   checkForHit2 (weapon, r, c, power, key, shipCell) {
@@ -595,24 +600,24 @@ export class Waters {
     if (power < 1) {
       this.score.shot.add(key)
     }
-    this.markHit(key, r, c)
-    const sunk = hitShip.hitAt(key, this.onSunk, this.UI, this)
-    const sunkLetter = sunk ? hitShip.letter : ''
+
+    const sunkLetter = this.showHit(key, r, c, hitShip)
 
     return { hit: true, sunkLetter: sunkLetter }
   }
 
-  updateMode () {
+  updateMode (wps1) {
     if (this.isRevealed || this.boardDestroyed) {
       return
     }
-    const { wps, cursorIdx } = this.updateWeapon()
+    const { wps, cursorIdx } = this.updateWeapon(wps1)
     gameStatus.displayAmmoStatus(wps, cursorIdx)
   }
-  updateWeapon () {
-    const wps = this.loadOut.weaponSystem()
-    const next = this.loadOut.nextWeapon()
-    this.UI.weaponBtn.innerHTML = next.buttonHtml
+  updateWeapon (wps1) {
+    const wps = wps1 || this.loadOut.weaponSystem()
+    const letter = wps1?.weapon?.letter
+    const next = this.loadOut.nextWeapon(letter)
+    if (this.UI.weaponBtn) this.UI.weaponBtn.innerHTML = next.buttonHtml
     const cursorIdx = this.loadOut.cursorIndex()
     return { wps, cursorIdx }
   }

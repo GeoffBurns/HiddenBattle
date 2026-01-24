@@ -128,7 +128,6 @@ export class Weapon {
 
     // CREATE wrapper
     const explody = document.createElement('div')
-    explody.className = 'explosion ' + type
     let mod = 1
     if (power !== undefined) {
       mod = 0.5 + power / 2
@@ -139,6 +138,9 @@ export class Weapon {
     explody.style.setProperty('--y', `${end.y - 64}px`)
     explody.style.setProperty('--scale-start', `${scale * 0.6}`)
     explody.style.setProperty('--scale-end', `${scale * 1.6}`)
+
+    explody.className = 'explosion ' + type
+
     //console.log(explody)
     //explody.style.outline = '2px solid red'
     container.appendChild(explody)
@@ -146,8 +148,12 @@ export class Weapon {
     // DESTROY at end
     explody.addEventListener('animationend', () => {
       container.classList.remove(shake)
+      explody.className = ''
       explody.remove()
       if (onEnd) onEnd()
+    })
+    requestAnimationFrame(() => {
+      explody.classList.add('play')
     })
   }
 

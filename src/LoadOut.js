@@ -93,7 +93,13 @@ export class LoadOut {
     //this.weapons.find(w => w.letter === wletter) !== undefined
   }
 
-  nextWeapon () {
+  nextWeapon (letter) {
+    if (letter) {
+      const idx = this.indexFor(letter)
+      const nextIdx = this.nextIndex(idx)
+      const nextWps = this.weaponSystems[nextIdx]
+      return nextWps?.weapon
+    }
     return this.nextWeaponSystem().weapon
   }
 
@@ -213,10 +219,13 @@ export class LoadOut {
     this.OutOfAmmo()
     this.changeSince(oldCursor)
   }
-  switchTo (wletter) {
-    const idx = this.weaponSystems.findIndex(
+  indexFor (wletter) {
+    return this.weaponSystems.findIndex(
       w => w.weapon.letter === wletter && w.ammo > 0
     )
+  }
+  switchTo (wletter) {
+    const idx = this.indexFor(wletter)
     if (idx < 0) return false
     this.setIndex(idx)
     return true
@@ -232,8 +241,9 @@ export class LoadOut {
   moveToNextIndex () {
     this.setIndex(this.nextIndex())
   }
-  nextIndex () {
-    let idx = this.index
+
+  nextIndex (i) {
+    let idx = i || this.index
     idx++
     if (idx >= this.weaponSystems.length) {
       idx = 0
@@ -284,9 +294,6 @@ export class LoadOut {
   }
   isArming () {
     return !this.isNotArming()
-  }
-  onExplode (map, coords, wps) {
-    this.fire(map, coords, wps)
   }
   aim (map, r, c, wps) {
     const w = wps || this.weaponSystem()

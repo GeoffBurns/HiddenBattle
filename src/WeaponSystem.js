@@ -4,6 +4,7 @@ export class WeaponSystem {
   constructor (weapon, id) {
     this.ammo = weapon.isLimited ? weapon.ammo : null
     this.weapon = weapon
+    this.hit = false
     this.id = id || WeaponSystem.getId()
   }
 
@@ -23,6 +24,7 @@ export class WeaponSystem {
   }
   reset () {
     this.ammo = this.weapon.ammo
+    this.hit = false
   }
   armedShips () {
     return []
@@ -35,6 +37,9 @@ export class WeaponSystem {
   }
   getRackById (id) {
     return this.id === id ? this : null
+  }
+  getLeafWeapons () {
+    return [this]
   }
   getLoadedWeapons () {
     return this.hasAmmo() ? [this] : []
@@ -112,6 +117,9 @@ export class CombinedWeaponSystem extends WeaponSystem {
   add (wps) {
     this.wpss.push(wps)
     return this
+  }
+  getLeafWeapons () {
+    return this.wpss.flatMap(w => w.getLeafWeapons())
   }
   getLoadedWeapon () {
     return this.wpss.find(w => w.hasAmmo())
@@ -207,6 +215,9 @@ export class AttachedWeaponSystems extends WeaponSystem {
     return this.ships.flatMap(s => s.loadedWeapons())
   }
 
+  getLeafWeapons () {
+    return this.ships.flatMap(s => s.weaponList())
+  }
   getLoadedWeapon () {
     return randomElement(this.getLoadedWeapons())
   }

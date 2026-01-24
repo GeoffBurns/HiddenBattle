@@ -6,6 +6,7 @@ import {
 } from './utilities.js'
 import { terrain } from './terrain.js'
 import { gameMap, gameMaps } from './gameMaps.js'
+import { Friend } from './friend.js'
 
 function fst (arr) {
   if (!arr || arr.length === 0) return null
@@ -119,33 +120,42 @@ export class Ship {
     return new Ship(Ship.id, shape.symmetry, shape.letter, shape.weaponSystem)
   }
 
-  destroy (model, viewmodel) {
+  destroy (model) {
     for (const cell of this.cells) {
       const key = `${cell[0]},${cell[1]}`
       if (!this.hits.has(key)) {
-        this.hitAt(key, Function.prototype, viewmodel, model)
+        this.hitAt(key, Function.prototype, model)
       }
     }
   }
+  l
 
-  hitAt (key, onSink = Function.prototype, viewmodel, model) {
+  hitAt (key, onSink = Function.prototype, model) {
     this.hits.add(key)
-    const weapon = this.weapons[key]
+    const wps = this.weapons[key]
     let info = null
-    if (weapon) {
-      const filled = weapon.ammo > 0
-      weapon.ammo = 0
-      if (filled && weapon.weapon.volatile) {
-        const cell = viewmodel.gridCellAt(...parsePair(key))
-        info = 'Magazine Detonated '
-        weapon.weapon.animateDetonation(cell, viewmodel.cellSizeScreen())
-        if (!this.sunk) {
-          this.sunk = true
-          this.destroy()
-          onSink(this, 'Magazine Detonated ')
-          return true
+    if (wps) {
+      const filled = wps.ammo > 0
+      const weapon = wps.weapon
+      wps.ammo = 0
+      if (filled) {
+        wps.hit = true
+        model.loadOut.useAmmo(wps)
+        const cell = model.UI.gridCellAt(...parsePair(key))
+        if (model instanceof Friend) model.UI.useAmmoInCell(cell)
+        if (weapon.volatile) {
+          info = 'Magazine Detonated '
+          weapon.animateDetonation(cell, model.UI.cellSizeScreen())
+          if (!this.sunk) {
+            this.sunk = true
+            this.destroy(model)
+            onSink(this, 'Magazine Detonated ')
+            return true
+          } else {
+            //       model.updateMode(wps)
+          }
         } else {
-          model.updateMode()
+          //       model.updateMode(wps)
         }
       }
     }
