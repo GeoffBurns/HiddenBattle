@@ -470,6 +470,18 @@ const gunBoat = new Shuttle('Gun Boat', 'G', 'D', [
   [1, 0]
 ])
 // light guass
+
+const miningShip = new Shuttle('Mining Ship', '3', 'L', [
+  [0, 0],
+  [0, 1],
+  [0, 2]
+])
+const runabout = new Shuttle('Runabout', '4', 'D', [
+  [0, 0],
+  [0, 1],
+  [1, 2]
+])
+
 const scoutShip = new Shuttle('Scout Ship', '1', 'D', [
   [0, 0],
   [1, 1],
@@ -477,6 +489,7 @@ const scoutShip = new Shuttle('Scout Ship', '1', 'D', [
   [1, 2]
 ])
 // pdc light + anti-missile
+
 const shelter = new Installation('Shelter', 'S', 'D', [
   [0, 1],
   [0, 2],
@@ -637,6 +650,8 @@ export const spaceShipsCatalogue = new ShipCatalogue(
     Z: '#fff',
     1: '#fff',
     2: '#fff',
+    3: '#fff',
+    4: '#fff',
     '+': '#000',
     '|': '#000',
     '#': '#000',
@@ -673,7 +688,9 @@ export const spaceShipsCatalogue = new ShipCatalogue(
     Y: 'Observation Post',
     Z: `Starbase`,
     1: 'Scout Ship',
-    2: 'Privateer'
+    2: 'Privateer',
+    3: 'Mining Ship',
+    4: 'Runabout'
   },
 
   {
@@ -705,6 +722,8 @@ export const spaceShipsCatalogue = new ShipCatalogue(
     Z: `S`,
     1: 'A',
     2: 'A',
+    3: 'A',
+    4: 'A',
     '+': 'W',
     '^': 'W',
     '|': 'W',
@@ -736,9 +755,11 @@ export const spaceShipsCatalogue = new ShipCatalogue(
     W: 'rgba(40, 200, 120,0.3)',
     X: 'rgba(160, 80, 244,0.3)',
     Y: 'rgba(51, 51, 204,0.3)',
-    Z: 'rgba(71, 31, 2204,0.3)',
+    Z: 'rgba(71, 31, 204,0.3)',
     1: 'rgba(80, 200, 244,0.3)',
     2: 'rgba(120, 180, 244,0.3)',
+    3: 'rgba(90, 200, 220,0.3)',
+    4: 'rgba(120, 80, 244,0.3)',
     '+': '#ffd866',
     '|': '#cc3333',
     '^': '#cc3388',
@@ -772,6 +793,8 @@ spaceShipsCatalogue.addShapes([
   corvette,
   missileBoat,
   gunBoat,
+  miningShip,
+  runabout,
   lifter,
   shelter,
   mine,
