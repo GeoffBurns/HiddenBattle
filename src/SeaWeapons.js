@@ -34,9 +34,6 @@ export class Megabomb extends Weapon {
     ammo = ammo || this.ammo
     return new Megabomb(ammo)
   }
-  ammoStatus (ammoLeft) {
-    return `Bomb Mode (${ammoLeft} left)`
-  }
 
   redoCoords (_map, _base, coords) {
     return [[0, coords[0][1]], coords[0]]
@@ -191,9 +188,6 @@ export class Kinetic extends Weapon {
     ammo = ammo || this.ammo
     return new Kinetic(ammo)
   }
-  ammoStatus (ammoLeft) {
-    return `Strike Mode (${ammoLeft} left)`
-  }
 
   aoe (map, coords) {
     const r = coords[0][0]
@@ -267,9 +261,6 @@ export class Torpedo extends Weapon {
   clone (ammo) {
     ammo = ammo || this.ammo
     return new Torpedo(ammo)
-  }
-  ammoStatus (ammoLeft) {
-    return `Torpedo Mode (${ammoLeft} left)`
   }
 
   aoe (map, coords) {
@@ -346,9 +337,6 @@ export class Flack extends Weapon {
   clone (ammo) {
     ammo = ammo || this.ammo
     return new Flack(ammo)
-  }
-  ammoStatus (ammoLeft) {
-    return `Flack Mode (${ammoLeft} left)`
   }
   redoCoords (_map, _base, coords) {
     return [[0, coords[0][1]], coords[0]]
@@ -494,9 +482,6 @@ export class Sweep extends Weapon {
   clone (ammo) {
     ammo = ammo || this.ammo
     return new Sweep(ammo)
-  }
-  ammoStatus (ammoLeft) {
-    return `Radar Mode (${ammoLeft} left)`
   }
 
   aoe (_map, coords) {

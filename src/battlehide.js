@@ -31,6 +31,9 @@ function moveStatus (oldline, newLine, placement) {
   oldline.classList.add('hidden')
   newLine.classList.remove('hidden')
   const wrap = document.getElementById('statusLine-wrap')
+
+  gameStatus.counter.classList.add('hidden')
+  gameStatus.icons.classList.add('hidden')
   if (placement) {
     wrap.classList.remove('hidden')
   } else {
@@ -39,7 +42,7 @@ function moveStatus (oldline, newLine, placement) {
 }
 function moveStatusChildren (newLine) {
   newLine.appendChild(gameStatus.game)
-  newLine.appendChild(gameStatus.mode)
+  newLine.appendChild(gameStatus.right)
 }
 function onClickTest () {
   friend.test.bind(friend)()
@@ -49,6 +52,7 @@ let removeSeekShorcuts = null
 function onClickReturnToPlacement () {
   const enemyContainer = document.getElementById('enemy-container')
   enemyContainer.classList.add('hidden')
+
   moveStatus(gameStatus.line, gameStatus.line2, true)
 
   const tallyTitle = document.getElementById('tally-title')
@@ -107,6 +111,9 @@ function onClickAuto () {
   }
 }
 function onClickUndo () {
+  if (!friendUI.placingShips) {
+    friendUI.placeMode()
+  }
   friend.resetShipCells()
   friendUI.clearVisuals()
   friend.score.reset()
@@ -204,7 +211,7 @@ function newPlacement () {
   friend.testContinue = false
   friendUI.testBtn.disabled = false
   friendUI.seekBtn.disabled = false
-
+  friend.ships = []
   friendUI.clearVisuals()
   friendUI.placeMode()
   friend.resetModel()

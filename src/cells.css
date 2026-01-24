@@ -190,7 +190,6 @@
 div.tally-row.weapon div.tally-box::before {
     content: '';
     position: absolute;
-    transform: scale(0.99, 0.99);
     width: 28px;
     height: 28px;
     z-index: 3;
@@ -229,7 +228,57 @@ div.tally-row.weapon div.tally-box::before {
     background-image: var(--flying-torpedo-image);
 }
 
-.tally-row.weapon div.tally-box.hit::before {
+
+
+#modeIcons.tally-box {
+    width: 56px;
+    height: 48px;
+}
+
+#modeIcons.tally-box::before {
+    width: 56px;
+    height: 48px;
+    content: '';
+    position: absolute;
+    z-index: 3;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: opacity 0.4s ease-in-out;
+}
+
+
+#modeIcons.missile::before {
+    background-image: url('./boxmissile40.png');
+}
+
+#modeIcons.single::before {
+    background-image: var(--cross-cursor-image);
+}
+
+#modeIcons.rail-bolt::before {
+    background-image: url('./boxbolt40.png');
+
+}
+
+#modeIcons.megabomb::before {
+    background-image: url('./boxbomb40.png');
+}
+
+#modeIcons.flack::before {
+    background-image: url('./boxflack40.png');
+
+}
+
+#modeIcons.kinetic-strike::before {
+    background-image: url('./boxstrike40.png');
+}
+
+#modeIcons.torpedo::before {
+    background-image: url('./boxtorpedo40.png');
+}
+
+.tally-row.weapon .tally-box.hit::before {
     background-image: url('./skull28.png');
 
 }

@@ -33,6 +33,12 @@ export class Weapon {
     return turn
   }
 
+  ammoStatusOld (ammoLeft) {
+    return `${this.name}  Mode (${ammoLeft} left)`
+  }
+  ammoStatus (_ammoLeft) {
+    return `${this.name}  Mode`
+  }
   info () {
     return `${this.name} (${this.letter})`
   }

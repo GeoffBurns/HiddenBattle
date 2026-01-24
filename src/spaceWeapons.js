@@ -40,9 +40,7 @@ export class Missile extends Megabomb {
     ammo = ammo || this.ammo
     return new Missile(ammo)
   }
-  ammoStatus (ammoLeft) {
-    return `Missiles (${ammoLeft} left)`
-  }
+
   aoe (_map, coords) {
     if (coords.length < 1) return []
     const [r, c] = coords[0]
@@ -100,9 +98,6 @@ export class RailBolt extends Kinetic {
   clone (ammo) {
     ammo = ammo || this.ammo
     return new RailBolt(ammo)
-  }
-  ammoStatus (ammoLeft) {
-    return `Rail Mode (${ammoLeft} left)`
   }
 
   launchTo (coords, rr, cc, onEnd, map, viewModel, opposingViewModel) {
@@ -172,9 +167,6 @@ export class GuassRound extends Torpedo {
     ammo = ammo || this.ammo
     return new GuassRound(ammo)
   }
-  ammoStatus (ammoLeft) {
-    return `Gauss Round Mode (${ammoLeft} left)`
-  }
 
   static get single () {
     return new GuassRound(1)
@@ -206,9 +198,6 @@ export class Scan extends Sweep {
   clone (ammo) {
     ammo = ammo || this.ammo
     return new Scan(ammo)
-  }
-  ammoStatus (ammoLeft) {
-    return `Radar Mode (${ammoLeft} left)`
   }
 }
 

@@ -34,6 +34,7 @@ export class FriendUI extends PlacementUI {
   }
   placeMode () {
     this.placingShips = true
+    this.readyingShips = false
     const chooseControls = document.getElementById('choose-controls')
     chooseControls.classList.remove('hidden')
     this.newPlacementBtn.classList.remove('hidden')
@@ -68,14 +69,18 @@ export class FriendUI extends PlacementUI {
   }
   readyMode () {
     this.placingShips = false
+    this.readyingShips = true
     const chooseControls = document.getElementById('choose-controls')
     chooseControls.classList.add('hidden')
     this.testBtn.classList.remove('hidden')
     this.seekBtn.classList.remove('hidden')
     this.rotateBtn.classList.add('hidden')
     this.rotateLeftBtn.classList.add('hidden')
+    this.transformBtn.classList.add('hidden')
     this.flipBtn.classList.add('hidden')
     this.undoBtn.classList.add('hidden')
+    //this.undoBtn.classList.remove('hidden')
+    // this.undoBtn.disabled = false
     this.autoBtn.classList.add('hidden')
     this.stopBtn.classList.add('hidden')
     this.hideShipTrays()
@@ -97,6 +102,7 @@ export class FriendUI extends PlacementUI {
   }
   testMode () {
     this.placingShips = false
+    this.readyingShips = false
     this.testBtn.classList.remove('hidden')
     this.seekBtn.classList.remove('hidden')
     this.stopBtn.classList.remove('hidden')

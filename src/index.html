@@ -41,7 +41,14 @@
               <div class="info-wrap" id="statusLine-wrap">
                 <div class="status medium" id="statusLine">
                   <div id="gameStatus" class="game-status"></div>
-                  <div id="modeStatus" class="mode-status"></div>
+                  <div id="statusRight" class="status right">
+                    <div id="modeStatus" class="mode-status"></div>
+                    <div id="modeIcons" class="mode-icons hidden"></div>
+                    <div id="ammoCounter" class="ammo-counter hidden">
+                      <span id="ammoCounterLeft" class="left"></span>
+                      <span id="ammoCounterTotal" class="right"></span>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="board-wrap alt trays" id="tray-container">
@@ -172,11 +179,6 @@
 
               <div class="info-wrap">
                 <div class="status" id="statusLine2"></div>
-                <div id="modeIcons" class="mode-icons"></div>
-                <div id="ammoCounter" class="ammo-counter">
-                  <span class="left"></span>
-                  <span class="right"></span>
-                </div>
               </div>
             </div>
             <div class="panel-container">

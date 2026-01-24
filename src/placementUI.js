@@ -11,6 +11,7 @@ export class PlacementUI extends WatersUI {
   constructor (terroritory, title) {
     super(terroritory, title)
     this.placingShips = true
+    this.readyingShips = false
 
     this.newPlacementBtn = document.getElementById('newPlacement')
     this.rotateBtn = document.getElementById('rotateBtn')

@@ -3,10 +3,17 @@
     justify-content: space-between;
     gap: 16px;
     font-weight: bold;
-    margin-bottom: 30px;
-    margin-top: 45px;
     color: #111;
     font-size: 150%;
+}
+
+.status.right {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    margin-top: 0px;
+    gap: 8px;
 }
 
 .status.medium {
@@ -19,7 +26,7 @@
 
 .status.small {
     font-weight: bold;
-    height: 30px;
+    height: 56px;
     margin-bottom: 10px;
     margin-top: 10px;
     color: #111;
@@ -48,36 +55,45 @@ flex-direction .mode-status {
 
 .ammo-counter {
     position: relative;
-    width: 64px;
-    height: 64px;
     font-family: system-ui, sans-serif;
     font-weight: 600;
+    width: 50px;
+    height: 50px;
 }
 
 /* diagonal line */
 .ammo-counter::before {
+    width: 40px;
+    height: 40px;
+    margin-left: 12px;
+    margin-top: 7px;
     content: "";
     position: absolute;
     inset: 0;
+    z-index: 3;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: opacity 0.4s ease-in-out;
     background: linear-gradient(135deg,
-            transparent 48%,
-            #888 49%,
-            #888 51%,
-            transparent 52%);
+            transparent 46%,
+            #888 47%,
+            #888 53%,
+            transparent 54%);
     pointer-events: none;
 }
 
 .ammo-counter .left {
     position: absolute;
-    top: 6px;
-    left: 8px;
-    font-size: 28px;
+    margin-top: -3px;
+    margin-left: 10px;
+    font-size: 110%;
 }
 
 .ammo-counter .right {
     position: absolute;
-    bottom: 6px;
-    right: 8px;
-    font-size: 14px;
+    bottom: 0px;
+    right: -2px;
+    font-size: 75%;
     opacity: 0.75;
 }
