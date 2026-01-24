@@ -83,17 +83,32 @@ flex-direction .mode-status {
     pointer-events: none;
 }
 
-.ammo-counter .left {
+.small .ammo-counter .left {
     position: absolute;
     margin-top: -3px;
     margin-left: 10px;
     font-size: 110%;
 }
 
-.ammo-counter .right {
+.small .ammo-counter .right {
     position: absolute;
     bottom: 0px;
     right: -2px;
     font-size: 75%;
+    opacity: 0.75;
+}
+
+.ammo-counter .left {
+    position: absolute;
+    margin-top: -3px;
+    margin-left: 10px;
+    font-size: 80%;
+}
+
+.ammo-counter .right {
+    position: absolute;
+    bottom: 0px;
+    right: -2px;
+    font-size: 60%;
     opacity: 0.75;
 }

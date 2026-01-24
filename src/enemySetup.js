@@ -6,6 +6,7 @@ let otherboard = null
 const newGameBtn = document.getElementById('newGame')
 export function newGame (seek, opponentBoard) {
   enemy.seekingMode = seek === 'seek'
+  if (enemy.seekingMode) enemy.ships = []
   enemy.resetModel()
   enemy.resetUI(enemy.ships)
   enemy.updateMode()
@@ -57,7 +58,7 @@ function setupSeekShortcuts (placement) {
 
 export function setupEnemy (placement) {
   // wire buttons
-  newGameBtn.addEventListener('click', newGame)
+  newGameBtn.addEventListener('click', newGame.bind(null, 'seek', null))
   enemy.wireupButtons()
   return setupSeekShortcuts(placement)
 }
