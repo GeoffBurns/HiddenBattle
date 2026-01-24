@@ -1,6 +1,6 @@
 import { gameMap } from './gameMaps.js'
-import { WatersUI, gameStatus } from './WatersUI.js'
-
+import { gameStatus } from './StatusUI.js'
+import { WatersUI } from './WatersUI.js'
 import { trackLevelEnd } from './navbar.js'
 class EnemyUI extends WatersUI {
   constructor () {

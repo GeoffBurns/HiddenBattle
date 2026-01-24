@@ -10,12 +10,11 @@ import {
   setCellCoords
 } from './utilities.js'
 
-import { StatusUI } from './StatusUI.js'
+import { gameStatus } from './StatusUI.js'
 
 export let noticeTimerId = null
 export let tipsTimerId = null
 
-export const gameStatus = new StatusUI()
 export const startCharCode = 65
 
 export class WatersUI {

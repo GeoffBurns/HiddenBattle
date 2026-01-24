@@ -1,4 +1,4 @@
-import { gameStatus } from './WatersUI.js'
+import { gameStatus } from './StatusUI.js'
 import { PlacementUI } from './placementUI.js'
 import { trackLevelEnd } from './navbar.js'
 import { gameMap } from './gameMaps.js'

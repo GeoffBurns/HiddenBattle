@@ -1,8 +1,8 @@
+import { coordsFromCell } from './utilities.js'
 import { DraggedShip, Brush } from './selection.js'
 import { cursor } from './cursor.js'
 import { gameMap } from './gameMaps.js'
 import { CustomMap } from './map.js'
-import { coordsFromCell } from './utilities.js'
 
 let selection = null
 

@@ -1,6 +1,5 @@
-import { Weapon } from './Weapon.js'
 import { coordsFromCell, shuffleArray } from './utilities.js'
-import { WeaponCatelogue } from './Weapon.js'
+import { Weapon, WeaponCatelogue } from './Weapon.js'
 
 export class Megabomb extends Weapon {
   constructor (ammo, name, letter) {

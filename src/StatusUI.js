@@ -1,5 +1,3 @@
-import { gameMaps } from './gameMaps.js'
-
 export class StatusUI {
   constructor () {
     this.mode = document.getElementById('modeStatus')
@@ -21,10 +19,9 @@ export class StatusUI {
       this.info(game)
     }
   }
-  displayAmmoStatus (wps, idx = 0) {
+  displayAmmoStatus (wps, maps, idx = 0) {
     const weapon = wps.weapon
     const ammo = wps.ammoLeft()
-    const maps = gameMaps()
     const letter = weapon.letter
     this.counter.classList.remove('hidden')
     this.icons.classList.remove('hidden')
@@ -49,3 +46,5 @@ export class StatusUI {
     this.game.textContent = game
   }
 }
+
+export const gameStatus = new StatusUI()

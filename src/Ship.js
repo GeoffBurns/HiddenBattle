@@ -6,7 +6,6 @@ import {
 } from './utilities.js'
 import { terrain } from './terrain.js'
 import { gameMap, gameMaps } from './gameMaps.js'
-import { Friend } from './friend.js'
 
 function fst (arr) {
   if (!arr || arr.length === 0) return null
@@ -142,7 +141,7 @@ export class Ship {
         wps.hit = true
         model.loadOut.useAmmo(wps)
         const cell = model.UI.gridCellAt(...parsePair(key))
-        if (model instanceof Friend) model.UI.useAmmoInCell(cell)
+        if (model.showShips) model.UI.useAmmoInCell(cell)
         if (weapon.volatile) {
           info = 'Magazine Detonated '
           weapon.animateDetonation(cell, model.UI.cellSizeScreen())

@@ -1,9 +1,3 @@
-import { gameMap, gameMaps } from './gameMaps.js'
-import { LoadOut } from './LoadOut.js'
-import { gameStatus } from './WatersUI.js'
-import { Score } from './Score.js'
-import { placedShipsInstance } from './selection.js'
-import { Ship } from './Ship.js'
 import { terrain } from './terrain.js'
 import {
   randomElement,
@@ -14,7 +8,13 @@ import {
   cellListContains,
   coordsFromCell
 } from './utilities.js'
+import { placedShipsInstance } from './selection.js'
+import { Score } from './Score.js'
+import { gameStatus } from './StatusUI.js'
+import { gameMap, gameMaps } from './gameMaps.js'
 import { randomPlaceShape } from './utils.js'
+import { LoadOut } from './LoadOut.js'
+import { Ship } from './Ship.js'
 
 function popFirst (arr, predicate, obj) {
   // find index of first match
@@ -45,6 +45,7 @@ export class Waters {
     this.resetShipCells()
     this.displayInfo = gameStatus.info.bind(gameStatus)
     this.seekingMode = false
+    this.showShips = false
   }
   clipboardKey () {
     return 'geoffs-battleship.placed-ships'
@@ -611,7 +612,7 @@ export class Waters {
       return
     }
     const { wps, cursorIdx } = this.updateWeapon(wps1)
-    gameStatus.displayAmmoStatus(wps, cursorIdx)
+    gameStatus.displayAmmoStatus(wps, gameMaps(), cursorIdx)
   }
   updateWeapon (wps1) {
     const wps = wps1 || this.loadOut.weaponSystem()

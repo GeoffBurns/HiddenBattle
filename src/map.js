@@ -1,8 +1,8 @@
-import { Megabomb } from './SeaWeapons.js'
 import { addCellToFootPrint, makeKey, parsePair } from './utilities.js'
 import { terrain, oldToken } from './terrain.js'
 import { standardShot } from './Weapon.js'
 import { seaAndLand } from './seaAndLand.js'
+import { Megabomb } from './SeaWeapons.js'
 
 // geometry helper
 export const inRange = (r, c) => element =>

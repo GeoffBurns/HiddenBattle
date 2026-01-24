@@ -1,9 +1,9 @@
 import { randomPlaceShape } from './utils.js'
-import { gameMap } from './gameMaps.js'
+import { gameMap, gameMaps } from './gameMaps.js'
+import { gameStatus } from './StatusUI.js'
 import { enemyUI } from './enemyUI.js'
-import { Waters } from './Waters.js'
-import { gameStatus } from './WatersUI.js'
 import { LoadOut } from './LoadOut.js'
+import { Waters } from './Waters.js'
 
 class Enemy extends Waters {
   constructor (enemyUI) {
@@ -230,6 +230,7 @@ class Enemy extends Waters {
   updateBombStatus () {
     gameStatus.displayAmmoStatus(
       this.loadOut.weaponSystem(),
+      gameMaps(),
       this.loadOut.cursorIndex()
     )
   }

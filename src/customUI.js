@@ -1,6 +1,6 @@
-import { PlacementUI } from './placementUI.js'
-import { gameStatus } from './WatersUI.js'
 import { terrain } from './terrain.js'
+import { gameStatus } from './StatusUI.js'
+import { PlacementUI } from './placementUI.js'
 
 function landString () {
   return terrain.current?.landSubterrain?.title?.toLowerCase() || 'land'

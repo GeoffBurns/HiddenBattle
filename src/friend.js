@@ -1,12 +1,13 @@
-import { gameMap } from './gameMaps.js'
-import { Waters } from './Waters.js'
-import { gameStatus } from './WatersUI.js'
 import { makeKey } from './utilities.js'
+import { gameStatus } from './StatusUI.js'
+import { gameMap } from './gameMaps.js'
 import { setupDragHandlers } from './dragndrop.js'
+import { Waters } from './Waters.js'
 export class Friend extends Waters {
   constructor (friendUI) {
     super(friendUI)
     this.testContinue = true
+    this.showShips = true
   }
 
   randomHit (hits) {

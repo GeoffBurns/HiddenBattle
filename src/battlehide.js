@@ -1,6 +1,6 @@
+import { gameStatus } from './StatusUI.js'
+import { placedShipsInstance } from './selection.js'
 import { setupGameOptions, fetchNavBar } from './navbar.js'
-import { friendUI } from './friendUI.js'
-import { moveCursorBase } from './placementUI.js'
 import {
   dragOverPlacingHandlerSetup,
   onClickRotate,
@@ -10,12 +10,12 @@ import {
   tabCursor,
   enterCursor
 } from './dragndrop.js'
-import { placedShipsInstance } from './selection.js'
+import { randomPlaceShape } from './utils.js'
+import { friendUI } from './friendUI.js'
+import { moveCursorBase } from './placementUI.js'
 import { Friend } from './friend.js'
 import { enemy } from './enemy.js'
 import { setupEnemy, newGame } from './enemySetup.js'
-import { gameStatus } from './WatersUI.js'
-import { randomPlaceShape } from './utils.js'
 
 const friend = new Friend(friendUI)
 placedShipsInstance.registerUndo(friendUI.undoBtn)
