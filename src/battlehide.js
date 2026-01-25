@@ -10,7 +10,6 @@ import {
   tabCursor,
   enterCursor
 } from './dragndrop.js'
-import { randomPlaceShape } from './utils.js'
 import { friendUI } from './friendUI.js'
 import { moveCursorBase } from './placementUI.js'
 import { Friend } from './friend.js'

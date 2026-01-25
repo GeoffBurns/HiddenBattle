@@ -127,6 +127,16 @@ export class Waters {
         placedShipsInstance.push(matchingShip, ship.cells)
         matchingShip.addToGrid(this.shipCellGrid)
         this.UI.placement(ship.cells, this, matchingShip)
+        const values = Object.values(matchingShip.weapons)
+        if (values.length > 0) {
+          const keys = Object.keys(ship.weapons)
+          if (values.length === keys.length) {
+            matchingShip.weapons = {}
+            for (const [index, key] of keys.entries()) {
+              matchingShip.weapons[key] = values[index]
+            }
+          }
+        }
       }
     }
     if (matchableShips.length !== 0) {
@@ -139,12 +149,13 @@ export class Waters {
     placedShips =
       placedShips || JSON.parse(localStorage.getItem(this.clipboardKey()))
 
-    const { shipId, weaponId } = placedShips.reduce(
+    const { shipId, weaponId } = placedShips.ships.reduce(
       (a, s) => {
         a.shipId = Math.max(s.id, a.shipId)
-        a.weaponId = s
-          .weaponList()
-          .reduce((aw, w) => Math.max(w.id, aw), a.weaponId)
+        a.weaponId = Object.values(s.weapons).reduce(
+          (aw, w) => Math.max(w.id, aw),
+          a.weaponId
+        )
         return a
       },
       { shipId: 1, weaponId: 1 }
@@ -173,6 +184,16 @@ export class Waters {
         matchingShip.addToGrid(this.shipCellGrid)
 
         this.UI.placement(ship.cells, this, matchingShip)
+        const values = Object.values(matchingShip.weapons)
+        if (values.length > 0) {
+          const keys = Object.keys(ship.weapons)
+          if (values.length === keys.length) {
+            matchingShip.weapons = {}
+            for (const [index, key] of keys.entries()) {
+              matchingShip.weapons[key] = values[index]
+            }
+          }
+        }
         const dragship = this.UI.getTrayItem(ship.id)
         if (dragship) {
           this.UI.removeDragShip(dragship)

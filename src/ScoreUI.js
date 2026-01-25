@@ -241,9 +241,7 @@ export class ScoreUI {
     const letter = weapon.letter
     row.className = 'tally-row weapon ' + weapon.classname
 
-    const leaves = weaponSystem
-      .getLeafWeapons()
-      .sort((a, b) => a.ammoLeft() - b.ammoLeft())
+    const leaves = weaponSystem.getLeafWeapons().sort((a, b) => a.ammo - b.ammo)
 
     for (const leaf of leaves) {
       this.buildWeaponSubRow(leaf, viewModel, weapon, maps, letter, row)
