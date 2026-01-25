@@ -1,9 +1,8 @@
+import { bh } from './terrain.js'
 import { gameStatus } from './StatusUI.js'
 import { PlacementUI } from './placementUI.js'
 import { trackLevelEnd } from './navbar.js'
 import { gameMap } from './gameMaps.js'
-
-import { terrain } from './terrain.js'
 
 export class FriendUI extends PlacementUI {
   constructor () {
@@ -46,7 +45,7 @@ export class FriendUI extends PlacementUI {
     this.score.placedLabel.classList.remove('hidden')
     this.rotateBtn.classList.remove('hidden')
     this.rotateLeftBtn.classList.remove('hidden')
-    if (terrain.current.hasTransforms) {
+    if (bh.terrain.hasTransforms) {
       this.transformBtn.classList.remove('hidden')
     } else {
       this.transformBtn.classList.add('hidden')

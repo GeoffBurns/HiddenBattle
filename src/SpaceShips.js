@@ -1,252 +1,20 @@
 import { Hybrid, Transformer } from './SpecialShips.js'
-import { SpecialCells } from './SubShape.js'
-import { StandardCells } from './SubShape.js'
-import { Shape } from './Shape.js'
-import {
-  asteroid,
-  core,
-  surface,
-  all,
-  space,
-  deep,
-  near,
-  spaceAndAsteroids
-} from './space.js'
+import { SpecialCells, StandardCells } from './SubShape.js'
+import { asteroid, space } from './space.js'
 import { Missile, RailBolt } from './spaceWeapons.js'
 import { ShipGroups, ShipCatalogue } from './ShipGroups.js'
-import { WeaponVariant } from './variants.js'
+import {
+  SpaceVessel,
+  DeepSpaceVessel,
+  ArmedVessel,
+  ArmedInstallation,
+  Shuttle,
+  ArmedShuttle,
+  Installation,
+  CoreInstallation,
+  SurfaceInstallation
+} from './SpaceShapes.js'
 
-class Installation extends Shape {
-  constructor (description, letter, symmetry, cells, tip, racks) {
-    super(
-      letter,
-      symmetry,
-      cells,
-      'G',
-      tip || `place ${description} on an asteroid`,
-      racks
-    )
-    this.descriptionText = description
-    this.terrain = spaceAndAsteroids
-    this.subterrain = asteroid
-
-    this.validator = Installation.validator
-    this.zoneDetail = Installation.zoneDetail
-    this.canBeOn = Installation.canBe
-  }
-  static canBe (subterrain) {
-    return subterrain === asteroid
-  }
-  static validator = zoneInfo => Installation.canBe(zoneInfo[0])
-  static zoneDetail = 1
-  type () {
-    return 'G'
-  }
-  sunkDescriptionRaw () {
-    return 'Destroyed'
-  }
-
-  description () {
-    return this.descriptionText
-  }
-}
-
-class ArmedInstallation extends Installation {
-  variants () {
-    return new WeaponVariant(
-      this.cells,
-      this.weaponSystem,
-      this.symmetry,
-      this.validator,
-      this.zoneDetail,
-      all
-    )
-  }
-}
-class CoreInstallation extends Installation {
-  constructor (description, letter, symmetry, cells, racks) {
-    super(
-      description,
-      letter,
-      symmetry,
-      cells,
-      `place ${description} deep within an asteroid`,
-      racks
-    )
-    this.validator = CoreInstallation.validator
-    this.zoneDetail = CoreInstallation.zoneDetail
-    this.canBeOn = CoreInstallation.canBe
-    this.notes = [
-      `${description} can not touch space squares; must be surrounded by asteroid squares.`
-    ]
-  }
-  static canBe (subterrain, zone) {
-    return subterrain === asteroid && zone === core
-  }
-  static validator = zoneInfo =>
-    CoreInstallation.canBe(zoneInfo[0], zoneInfo[1])
-  static zoneDetail = 2
-}
-class SurfaceInstallation extends Installation {
-  constructor (description, letter, symmetry, cells, racks) {
-    super(
-      description,
-      letter,
-      symmetry,
-      cells,
-      `place ${description} on the surface of an asteroid`,
-      racks
-    )
-    this.validator = SurfaceInstallation.validator
-    this.zoneDetail = SurfaceInstallation.zoneDetail
-    this.canBeOn = SurfaceInstallation.canBe
-    this.notes = [`${description} must be touching sea squares.`]
-  }
-
-  static canBe (subterrain, zone) {
-    return subterrain === asteroid && zone === surface
-  }
-  static validator = zoneInfo =>
-    SurfaceInstallation.canBe(zoneInfo[0], zoneInfo[1])
-  static zoneDetail = 2
-}
-class Shuttle extends Shape {
-  constructor (description, letter, symmetry, cells, racks) {
-    super(
-      letter,
-      symmetry,
-      cells,
-      'A',
-      `place ${description} at any location`,
-      racks
-    )
-    this.descriptionText = description
-    this.terrain = spaceAndAsteroids
-    this.subterrain = all
-    this.canBeOn = Shuttle.canBe
-    this.immune = ['#']
-  }
-
-  static canBe = Function.prototype
-  static validator = Shuttle.canBe
-  static zoneDetail = 0
-
-  type () {
-    return 'A'
-  }
-  sunkDescription () {
-    return 'Shot Down'
-  }
-  description () {
-    return this.descriptionText
-  }
-
-  canBeOn () {
-    return true
-  }
-}
-class ArmedShuttle extends Shuttle {
-  variants () {
-    return new WeaponVariant(
-      this.cells,
-      this.weaponSystem,
-      this.symmetry,
-      this.validator,
-      this.zoneDetail,
-      all
-    )
-  }
-}
-class SpaceVessel extends Shape {
-  constructor (description, letter, symmetry, cells, tip, racks) {
-    super(
-      letter,
-      symmetry,
-      cells,
-      'S',
-      tip || `place ${description} in space`,
-      racks
-    )
-    this.descriptionText = description
-    this.terrain = spaceAndAsteroids
-    this.subterrain = space
-
-    this.validator = SpaceVessel.validator
-    this.zoneDetail = SpaceVessel.zoneDetail
-    this.canBeOn = SpaceVessel.canBe
-  }
-  static canBe (subterrain) {
-    return subterrain === space
-  }
-  static validator = zoneInfo => SpaceVessel.canBe(zoneInfo[0])
-  static zoneDetail = 1
-
-  type () {
-    return 'S'
-  }
-  sunkDescription () {
-    return 'destroyed'
-  }
-  description () {
-    return this.descriptionText
-  }
-}
-class ArmedVessel extends SpaceVessel {
-  variants () {
-    return new WeaponVariant(
-      this.cells,
-      this.weaponSystem,
-      this.symmetry,
-      this.validator,
-      this.zoneDetail,
-      all
-    )
-  }
-}
-class DeepSpaceVessel extends SpaceVessel {
-  constructor (description, letter, symmetry, cells, racks) {
-    super(
-      description,
-      letter,
-      symmetry,
-      cells,
-      `place ${description} in deep space`,
-      racks
-    )
-    this.validator = DeepSpaceVessel.validator
-    this.zoneDetail = DeepSpaceVessel.zoneDetail
-    this.notes = [
-      `${description} can not touch land squares; must be surrounded by sea squares.`
-    ]
-    this.canBeOn = DeepSpaceVessel.canBe
-  }
-  static canBe (subterrain, zone) {
-    return subterrain === space && zone === deep
-  }
-  static validator = zoneInfo => DeepSpaceVessel.canBe(zoneInfo[0], zoneInfo[1])
-  static zoneDetail = 2
-}
-class SpacePort extends SpaceVessel {
-  constructor (description, letter, symmetry, cells, racks) {
-    super(
-      description,
-      letter,
-      symmetry,
-      cells,
-      `place ${description} in near space`,
-      racks
-    )
-    this.validator = SpacePort.validator
-    this.zoneDetail = SpacePort.zoneDetail
-    this.notes = [`${description} must be touching asteroid squares.`]
-    this.canBeOn = SpacePort.canBe
-  }
-  static canBe (subterrain, zone) {
-    return subterrain === space && zone === near
-  }
-  static validator = zoneInfo => SpacePort.canBe(zoneInfo[0], zoneInfo[1])
-  static zoneDetail = 2
-}
 const attackCraft = new SpaceVessel('Attack Craft', 'A', 'H', [
   [0, 0],
   [2, 0],
@@ -257,6 +25,7 @@ attackCraft.notes = [
   `The ${attackCraft.descriptionText} is vulnerable against missiles.`,
   `The squares of the ${attackCraft.descriptionText} adjacent to the missiles detonation will also be destroyed.`
 ]
+
 const attackCraftCarrier = new SpaceVessel('Attack Craft Carrier', 'K', 'H', [
   [1, 0],
   [0, 1],

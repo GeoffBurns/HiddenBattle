@@ -1,11 +1,13 @@
+import { bh } from './terrain.js'
 import {
   makeKey,
   findClosestCoord,
   parsePair,
   makeKeyAndId
 } from './utilities.js'
-import { terrain } from './terrain.js'
+
 import { gameMap, gameMaps } from './gameMaps.js'
+import { WeaponSystem } from './WeaponSystem.js'
 
 function fst (arr) {
   if (!arr || arr.length === 0) return null
@@ -43,6 +45,7 @@ export class Ship {
   static createShipsFromShapes (shapes) {
     const ships = []
     Ship.id = 1
+    WeaponSystem.id = 1
     for (const shape of shapes) {
       ships.push(Ship.createFromShape(shape))
       Ship.next()
@@ -264,16 +267,15 @@ export class Ship {
     }
     return shape.tallyGroup === tallyGroup
   }
-
   sunkDescription (middle = ' ') {
-    return terrain.current.sunkDescription(this.letter, middle)
+    return bh.shipSunkText(this.letter, middle)
   }
 
   description () {
-    return terrain.current.ships.descriptions[this.letter]
+    return bh.shipDescription(this.letter)
   }
 
   type () {
-    return terrain.current.ships.types[this.letter]
+    return bh.shipType(this.letter)
   }
 }

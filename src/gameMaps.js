@@ -1,11 +1,15 @@
-import { seaAndLandMaps } from './seaAndLandMaps.js'
 import { TerrainMaps } from './TerrainMaps.js'
+import { seaAndLandMaps } from './seaAndLandMaps.js'
 import { spaceAndAsteroidsMaps } from './SpaceAndAsteroidsMaps.js'
 
-TerrainMaps.currentTerrainMaps(seaAndLandMaps)
-TerrainMaps.currentTerrainMaps(spaceAndAsteroidsMaps)
+export function assembleTerrains () {
+  if (TerrainMaps.numTerrains > 1) return
+  TerrainMaps.currentTerrainMaps(seaAndLandMaps)
+  TerrainMaps.currentTerrainMaps(spaceAndAsteroidsMaps)
+}
 
 export function gameMaps (maps) {
+  assembleTerrains()
   if (maps) {
     TerrainMaps.currentTerrainMaps(maps)
   }
@@ -16,6 +20,7 @@ export function gameMaps (maps) {
 }
 
 export function gameMap (map) {
+  assembleTerrains()
   if (map) {
     gameMaps().setToMap(map)
   }

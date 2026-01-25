@@ -1,9 +1,9 @@
+import { bh, terrains } from './terrain.js'
 import { ChooseFromListUI, ChooseNumberUI } from './chooseUI.js'
-import { gameMaps, gameMap } from './gameMaps.js'
 import { TerrainMaps } from './TerrainMaps.js'
+import { gameMaps, gameMap } from './gameMaps.js'
 import { custom } from './custom.js'
 import { SavedCustomMap } from './map.js'
-import { terrain } from './terrain.js'
 import { toTitleCase } from './utils.js'
 
 export function removeShortcuts () {
@@ -14,7 +14,7 @@ export function switchToEdit (map, huntMode) {
   const mapName = map?.title
   const params = new URLSearchParams()
   params.append('edit', mapName)
-  params.append('terrain', terrain.current.tag)
+  params.append('terrain', bh.terrain.tag)
   storeShips(params, huntMode, 'battlebuild', map)
   const location = `./battlebuild.html?${params.toString()}`
   globalThis.location.href = location
@@ -57,7 +57,7 @@ export function switchTo (target, huntMode, mapName) {
     }
     mapName = mapName || map.title
     params.append('mapName', mapName)
-    params.append('terrain', terrain.current.tag)
+    params.append('terrain', bh.terrain.tag)
     const result = storeShips(params, huntMode, target, map)
 
     if (result) {
@@ -232,7 +232,7 @@ function setMapParams (title) {
     urlParams.delete('width')
     urlParams.delete('height')
     urlParams.set('mapName', title)
-    urlParams.set('terrain', terrain?.current?.tag)
+    urlParams.set('terrain', bh.terrain?.tag)
 
     updateState(
       [
@@ -242,7 +242,7 @@ function setMapParams (title) {
         ['width', ''],
         ['x', ''],
         ['mapType', ''],
-        ['terrain', terrain?.current?.bodyTag || '']
+        ['terrain', bh.terrain?.bodyTag || '']
       ],
       url
     )
@@ -327,7 +327,7 @@ function terrainSelect () {
     try {
       return TerrainMaps.titleList()
     } catch (error) {
-      console.error('An error occurred:', error.message, terrain)
+      console.error('An error occurred:', error.message, terrains)
       return []
     }
   })()
@@ -355,7 +355,7 @@ function terrainSelect () {
       */
     },
     null,
-    terrain?.current?.title
+    terrains?.current?.title
   )
 }
 
@@ -384,8 +384,8 @@ export function validateWidth () {
   let width = Number.parseInt(widthUI.choose.value, 10)
   if (
     Number.isNaN(width) ||
-    width < terrain.minWidth ||
-    width > terrain.maxWidth
+    width < terrains.minWidth ||
+    width > terrains.maxWidth
   ) {
     width = widthUI.min
     widthUI.choose.value = width
@@ -397,8 +397,8 @@ export function validateHeight () {
   let height = Number.parseInt(heightUI.choose.value, 10)
   if (
     Number.isNaN(height) ||
-    height < terrain.minHeight ||
-    height > terrain.maxHeight
+    height < terrains.minHeight ||
+    height > terrains.maxHeight
   ) {
     height = heightUI.min
     heightUI.choose.value = height
@@ -424,7 +424,7 @@ function setSizeParams (height, width) {
     urlParams.delete('mapName')
     urlParams.set('height', height)
     urlParams.set('width', width)
-    urlParams.set('terrain', terrain?.current?.tag)
+    urlParams.set('terrain', terrains?.current?.tag)
     updateState(
       [
         ['mode', mode],
@@ -433,7 +433,7 @@ function setSizeParams (height, width) {
         ['width', width],
         ['x', 'x'],
         ['mapType', ''],
-        ['terrain', terrain?.current?.bodyTag]
+        ['terrain', terrains?.current?.bodyTag]
       ],
       url
     )
@@ -509,8 +509,8 @@ function setTerrainParams (newTerrainMap) {
   )
   const body = document.getElementsByTagName('body')[0]
   if (body) {
-    body.classList.remove(...terrain.allBodyTags())
-    body.classList.add(terrain.current.bodyTag)
+    body.classList.remove(...terrains.allBodyTags())
+    body.classList.add(bh.terrain.bodyTag)
   }
 }
 
@@ -531,14 +531,14 @@ function setupMapOptions (boardSetup, refresh, huntMode = 'build') {
   terrainSelect(boardSetup, refresh)
 
   widthUI = new ChooseNumberUI(
-    terrain.minWidth,
-    terrain.maxWidth,
+    terrains.minWidth,
+    terrains.maxWidth,
     1,
     'chooseWidth'
   )
   heightUI = new ChooseNumberUI(
-    terrain.minHeight,
-    terrain.maxHeight,
+    terrains.minHeight,
+    terrains.maxHeight,
     1,
     'chooseHeight'
   )
@@ -604,7 +604,7 @@ function setMapTypeParams (mapType) {
   const urlParams = url.searchParams
   const m = getParamMapType(urlParams)
   const terrainTag = urlParams.getAll('terrain')[0]
-  const t = terrain?.current
+  const t = terrains?.current
   let bodyTag = t?.bodyTag
 
   if (t?.tag !== terrainTag) {

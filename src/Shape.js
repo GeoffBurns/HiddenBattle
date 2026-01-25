@@ -1,4 +1,4 @@
-import { terrain } from './terrain.js'
+import { bh } from './terrain.js'
 import {
   Dihedral4,
   Klein4,
@@ -23,7 +23,7 @@ export class Shape {
         : null
     this.canAttachWeapons = racks && racks.length > 0
     this.isAttachedToRack = false
-    this.terrain = terrain.current
+    this.terrain = bh.terrain
     this.subterrain = null
     this.validator = Function.prototype
     this.zoneDetail = 0

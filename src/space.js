@@ -41,4 +41,6 @@ export const spaceAndAsteroids = new Terrain(
   'Sector'
 )
 
+spaceAndAsteroids.hasUnattachedWeapons = false
+spaceAndAsteroids.hasAttachedWeapons = true
 spaceAndAsteroids.hasTransforms = true

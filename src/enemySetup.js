@@ -1,6 +1,6 @@
+import { bh } from './terrain.js'
 import { enemy } from './enemy.js'
 import { friendUI } from './friendUI.js'
-import { terrain } from './terrain.js'
 
 let otherboard = null
 const newGameBtn = document.getElementById('newGame')
@@ -11,7 +11,8 @@ export function newGame (seek, opponentBoard) {
   enemy.resetUI(enemy.ships)
   enemy.updateMode()
   const title = document.getElementById('enemy-title')
-  title.textContent = 'Enemy ' + terrain.current.mapHeading
+  title.textContent = 'Enemy ' + bh.terrain.mapHeading
+
   if (otherboard) {
     otherboard()
   } else {

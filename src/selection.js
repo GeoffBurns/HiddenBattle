@@ -227,7 +227,6 @@ export class DraggedShip extends SelectedShip {
     this.offset = [0, 0]
     this.cursor = [0, 0]
   }
-
   leftRotate () {
     this.resetOffset()
     super.leftRotate()

@@ -4,7 +4,7 @@ export const MIN_CUSTOM_HEIGHT = 6
 export const MAX_CUSTOM_HEIGHT = 12
 export const oldToken = 'geoffs-battleship'
 
-export const terrain = {
+export const terrains = {
   current: null,
   terrains: [],
   minWidth: MIN_CUSTOM_WIDTH,
@@ -39,7 +39,78 @@ export const terrain = {
   }
 }
 
-export class SubTerrain {
+export const bh = {
+  terrainMaps: {},
+  get terrain () {
+    return terrains.current
+  },
+  get mapHeading () {
+    return terrains.current.mapHeading
+  },
+  get fleetHeading () {
+    return terrains.current.fleetHeading
+  },
+  get hasTransforms () {
+    return terrains.current.hasTransforms
+  },
+  get defaultTerrain () {
+    return terrains.default
+  },
+  terrainByTitle (title) {
+    return terrains.terrains.find(t => t.title === title) || bh.defaultTerrain
+  },
+  shipSunkText (letter, middle) {
+    return terrains?.current?.sunkDescription(letter, middle)
+  },
+  shipDescription (letter) {
+    return terrains?.current?.ships?.descriptions[letter]
+  },
+  get terrainList () {
+    return terrains?.terrains
+  },
+  get ships () {
+    return terrains?.current?.ships
+  },
+  get shipTypes () {
+    return terrains?.current?.ships?.types
+  },
+  shipType (letter) {
+    return terrains?.current?.ships?.types[letter]
+  },
+  get terrainMap () {
+    return this.terrainMaps?.current
+  },
+  set terrainMap (newCurrent) {
+    if (
+      this.terrainMaps.setCurrent &&
+      newCurrent &&
+      this.terrainMaps?.current !== newCurrent
+    ) {
+      this.terrainMaps.setCurrent(newCurrent)
+    }
+  },
+  get maps () {
+    return this.terrainMaps.current
+  },
+  set maps (newCurrent) {
+    if (
+      this.terrainMaps?.setCurrent &&
+      newCurrent &&
+      this.terrainMaps.current !== newCurrent
+    ) {
+      this.terrainMaps.setCurrent(newCurrent)
+    }
+  },
+  get map () {
+    return this.terrainMaps?.current?.current
+  },
+  set map (newMap) {
+    if (newMap && this.terrainMaps?.current?.setToMap) {
+      this.terrainMaps.current.setToMap()
+    }
+  }
+}
+export class SubTerrainBase {
   constructor (
     title,
     lightColor,
@@ -59,8 +130,11 @@ export class SubTerrain {
     this.margin = zones.find(z => z.isMarginal)
     this.core = zones.find(z => !z.isMarginal)
     this.tag = title.toLowerCase()
+    this.canBe = Function.prototype
+    this.validator = Function.prototype
+    this.zoneDetail = 0
   }
-
+  /*
   clone () {
     return new SubTerrain(
       this.title,
@@ -72,9 +146,24 @@ export class SubTerrain {
       this.zones,
       this.tag
     )
+      */
+}
+export class SubTerrain extends SubTerrainBase {
+  constructor (
+    title,
+    lightColor,
+    darkColor,
+    letter,
+    isDefault,
+    isTheLand,
+    zones
+  ) {
+    super(title, lightColor, darkColor, letter, isDefault, isTheLand, zones)
+    this.canBe = subterrain => subterrain === this
+    this.validator = zoneInfo => this.canBe(zoneInfo[0])
+    this.zoneDetail = 1
   }
 }
-
 export class Zone {
   constructor (title, letter, isMarginal) {
     this.title = title
@@ -110,6 +199,8 @@ export class Terrain {
     this.mapHeading = mapHeading || 'Waters'
     this.fleetHeading = fleetHeading || 'Fleet'
     this.bodyTag = this.defaultSubterrain.tag
+    this.hasUnattachedWeapons = true
+    this.hasAttachedWeapons = false
   }
 
   static typeDescriptions = {
@@ -257,5 +348,27 @@ export class Terrain {
   }
   addWeapons (weapons) {
     this.weapons.addWeapons(weapons)
+  }
+}
+export const all = new SubTerrain('Air', '#a77', '#955', 'A', false, false, [])
+
+export const mixed = new SubTerrain(
+  'Mixed',
+  '#888',
+  '#666',
+  'M',
+  false,
+  false,
+  []
+)
+
+export class Matcher {
+  constructor (validator, zoneDetail, subterrain) {
+    this.validator = validator
+    this.zoneDetail = zoneDetail
+    this.subterrian = subterrain
+  }
+  canBe (subterrain) {
+    return subterrain === this.subterrain
   }
 }

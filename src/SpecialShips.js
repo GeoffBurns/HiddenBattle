@@ -1,17 +1,7 @@
+import { mixed } from './terrain.js'
 import { Shape } from './Shape.js'
-import { SubTerrain } from './terrain.js'
 import { TransformableVariants, Variant3 } from './variants.js'
 import { WeaponSystem } from './WeaponSystem.js'
-
-export const mixed = new SubTerrain(
-  'Mixed',
-  '#888',
-  '#666',
-  'M',
-  false,
-  false,
-  []
-)
 
 export class Transformer extends Shape {
   constructor (forms) {

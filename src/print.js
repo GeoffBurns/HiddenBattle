@@ -1,10 +1,10 @@
+import { bh, Terrain } from './terrain.js'
 import { setupPrintOptions, fetchNavBar } from './navbar.js'
 import { friendUI } from './friendUI.js'
 import { Friend } from './friend.js'
 import { enemyUI } from './enemyUI.js'
 import { enemy } from './enemy.js'
 import { gameMap } from './gameMaps.js'
-import { terrain, Terrain } from './Shape.js'
 import { toTitleCase } from './utils.js'
 
 const friend = new Friend(friendUI)
@@ -109,7 +109,7 @@ function refresh () {
   document.title = "Geoff's Hidden Battle - " + gameMap().title
   friendUI.hideEmptyUnits(friend.ships)
 
-  const weapons = terrain.current.weapons.weapons
+  const weapons = bh.terrain.weapons.weapons
   let i = 2
   for (const weapon of weapons) {
     if (friend.loadOut.hasWeapon(weapon.letter)) {
@@ -140,12 +140,12 @@ function refresh () {
     Terrain.customizeUnitDescriptions(
       '-unit-header',
       (letter, _description) => {
-        return terrain.current.ships.unitDescriptions[letter] + ' Units'
+        return bh.terrain.ships.unitDescriptions[letter] + ' Units'
       }
     )
 
     Terrain.customizeUnitDescriptions('-unit-info', (letter, _description) => {
-      return terrain.current.ships.unitInfo[letter]
+      return bh.terrain.ships.unitInfo[letter]
     })
   }
   showNotesPrintOut()

@@ -1,214 +1,16 @@
 import {
-  seaAndLand,
-  land,
-  inland,
-  coast,
-  all,
-  sea,
-  deep,
-  littoral
-} from './seaAndLand.js'
+  Building,
+  HillFort,
+  CoastalPort,
+  SeaVessel,
+  ShallowDock,
+  Plane,
+  DeepSeaVessel
+} from './SeaShape.js'
 import { seaAndLandShipsCatalogue } from './seaShipsCatalogue.js'
-import { Shape } from './Shape.js'
 import { Hybrid } from './SpecialShips.js'
-import { SpecialCells } from './SubShape.js'
-import { StandardCells } from './SubShape.js'
+import { SpecialCells, StandardCells } from './SubShape.js'
 
-class Building extends Shape {
-  constructor (description, letter, symmetry, cells, tip, racks) {
-    super(
-      letter,
-      symmetry,
-      cells,
-      'G',
-      tip || `place ${description} on the land`,
-      racks
-    )
-    this.descriptionText = description
-    this.terrain = seaAndLand
-    this.subterrain = land
-
-    this.validator = Building.validator
-    this.zoneDetail = Building.zoneDetail
-    this.canBeOn = HillFort.canBe
-    this.immune = ['Z', '+']
-  }
-  static canBe (subterrain) {
-    return subterrain === land
-  }
-  static validator = zoneInfo => Building.canBe(zoneInfo[0])
-  static zoneDetail = 1
-  type () {
-    return 'G'
-  }
-  sunkDescriptionRaw () {
-    return 'Destroyed'
-  }
-
-  description () {
-    return this.descriptionText
-  }
-}
-class HillFort extends Building {
-  constructor (description, letter, symmetry, cells, racks) {
-    super(
-      description,
-      letter,
-      symmetry,
-      cells,
-      `place ${description} on the highlands`,
-      racks
-    )
-    this.validator = HillFort.validator
-    this.zoneDetail = HillFort.zoneDetail
-    this.canBeOn = HillFort.canBe
-    this.notes = [
-      `${description} can not touch sea squares; must be surrounded by land squares.`
-    ]
-  }
-  static canBe (subterrain, zone) {
-    return subterrain === land && zone === inland
-  }
-  static validator = zoneInfo => HillFort.canBe(zoneInfo[0], zoneInfo[1])
-  static zoneDetail = 2
-}
-class CoastalPort extends Building {
-  constructor (description, letter, symmetry, cells, racks) {
-    super(
-      description,
-      letter,
-      symmetry,
-      cells,
-      `place ${description} on the coast`,
-      racks
-    )
-    this.validator = CoastalPort.validator
-    this.zoneDetail = CoastalPort.zoneDetail
-    this.canBeOn = CoastalPort.canBe
-    this.notes = [`${description} must be touching sea squares.`]
-  }
-
-  static canBe (subterrain, zone) {
-    return subterrain === land && zone === coast
-  }
-  static validator = zoneInfo => CoastalPort.canBe(zoneInfo[0], zoneInfo[1])
-  static zoneDetail = 2
-}
-class Plane extends Shape {
-  constructor (description, letter, symmetry, cells, racks) {
-    super(
-      letter,
-      symmetry,
-      cells,
-      'A',
-      `place ${description} at any location`,
-      racks
-    )
-    this.descriptionText = description
-    this.terrain = seaAndLand
-    this.subterrain = all
-    this.canBeOn = Plane.canBe
-    this.immune = ['Z', '+']
-    this.vulnerable = ['F']
-  }
-
-  static canBe = Function.prototype
-  static validator = Plane.canBe
-  static zoneDetail = 0
-
-  type () {
-    return 'A'
-  }
-  sunkDescription () {
-    return 'Shot Down'
-  }
-  description () {
-    return this.descriptionText
-  }
-
-  canBeOn () {
-    return true
-  }
-}
-class SeaVessel extends Shape {
-  constructor (description, letter, symmetry, cells, tip, racks) {
-    super(
-      letter,
-      symmetry,
-      cells,
-      'S',
-      tip || `place ${description} in the sea`,
-      racks
-    )
-    this.descriptionText = description
-    this.terrain = seaAndLand
-    this.subterrain = sea
-
-    this.validator = SeaVessel.validator
-    this.zoneDetail = SeaVessel.zoneDetail
-    this.canBeOn = SeaVessel.canBe
-  }
-  static canBe (subterrain) {
-    return subterrain === sea
-  }
-  static validator = zoneInfo => SeaVessel.canBe(zoneInfo[0])
-  static zoneDetail = 1
-
-  type () {
-    return 'S'
-  }
-  sunkDescription () {
-    return 'Sunk'
-  }
-  description () {
-    return this.descriptionText
-  }
-}
-class DeepSeaVessel extends SeaVessel {
-  constructor (description, letter, symmetry, cells, racks) {
-    super(
-      description,
-      letter,
-      symmetry,
-      cells,
-      `place ${description} in the deep sea`,
-      racks
-    )
-    this.validator = DeepSeaVessel.validator
-    this.zoneDetail = DeepSeaVessel.zoneDetail
-    this.notes = [
-      `${description} can not touch land squares; must be surrounded by sea squares.`
-    ]
-    this.canBeOn = DeepSeaVessel.canBe
-  }
-  static canBe (subterrain, zone) {
-    return subterrain === sea && zone === deep
-  }
-  static validator = zoneInfo => DeepSeaVessel.canBe(zoneInfo[0], zoneInfo[1])
-  static zoneDetail = 2
-}
-class ShallowDock extends SeaVessel {
-  constructor (description, letter, symmetry, cells, racks) {
-    super(
-      description,
-      letter,
-      symmetry,
-      cells,
-      `place ${description} in the shallow sea`,
-      racks
-    )
-    this.validator = ShallowDock.validator
-    this.zoneDetail = ShallowDock.zoneDetail
-
-    this.notes = [`${description} must be touching land squares.`]
-    this.canBeOn = ShallowDock.canBe
-  }
-  static canBe (subterrain, zone) {
-    return subterrain === sea && zone === littoral
-  }
-  static validator = zoneInfo => ShallowDock.canBe(zoneInfo[0], zoneInfo[1])
-  static zoneDetail = 2
-}
 const undergroundBunker = new Building('Underground Bunker', 'U', 'H', [
   [0, 0],
   [1, 0],
@@ -254,17 +56,21 @@ const supplyDepot = new Hybrid(
     [1, 1]
   ],
   [
-    new StandardCells(Building.validator, Building.zoneDetail, land),
+    new StandardCells(
+      Building.validator,
+      Building.zoneDetail,
+      Building.subterrain
+    ),
     new SpecialCells(
       [[0, 0]],
       CoastalPort.validator,
       CoastalPort.zoneDetail,
-      land
+      Building.subterrain
     )
   ],
   'place Supply Depot on the coast.'
 )
-supplyDepot.subterrain = land
+supplyDepot.subterrain = Building.subterrain
 supplyDepot.canBeOn = Building.canBe
 supplyDepot.notes = [
   `the dotted parts of the ${supplyDepot.descriptionText} must be placed adjacent to sea.`
@@ -278,18 +84,22 @@ const pier = new Hybrid(
     [1, 0]
   ],
   [
-    new StandardCells(SeaVessel.validator, SeaVessel.zoneDetail, sea),
+    new StandardCells(
+      SeaVessel.validator,
+      SeaVessel.zoneDetail,
+      SeaVessel.subterrain
+    ),
     new SpecialCells(
       [[0, 0]],
       ShallowDock.validator,
       ShallowDock.zoneDetail,
-      sea
+      SeaVessel.subterrain
     )
   ],
   'place Pier adjacent to the coast.'
 )
 pier.canBeOn = SeaVessel.canBe
-pier.subterrain = sea
+pier.subterrain = SeaVessel.subterrain
 pier.notes = [
   `the dotted parts of the ${pier.descriptionText} must be placed adjacent to land.`
 ]
@@ -304,7 +114,11 @@ const navalBase = new Hybrid(
     [2, 1]
   ],
   [
-    new StandardCells(Building.validator, Building.zoneDetail, land),
+    new StandardCells(
+      Building.validator,
+      Building.zoneDetail,
+      Building.subterrain
+    ),
     new SpecialCells(
       [
         [0, 0],
@@ -312,7 +126,7 @@ const navalBase = new Hybrid(
       ],
       SeaVessel.validator,
       SeaVessel.zoneDetail,
-      sea
+      SeaVessel.subterrain
     )
   ],
   'place Naval Base half on land and half on sea.'

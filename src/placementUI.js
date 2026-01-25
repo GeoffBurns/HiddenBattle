@@ -4,7 +4,7 @@ import { ClickedShip } from './selection.js'
 import { cursor } from './cursor.js'
 import { Ship } from './Ship.js'
 import { dragNDrop } from './dragndrop.js'
-import { terrain, Terrain } from './terrain.js'
+import { bh, Terrain } from './terrain.js'
 import { setCellCoords } from './utilities.js'
 
 export class PlacementUI extends WatersUI {
@@ -713,9 +713,12 @@ export class PlacementUI extends WatersUI {
     this.checkTrays()
   }
   buildWeaponTray () {
-    const weapons = terrain.current.weapons.weapons
-    for (const weapon of weapons) {
-      this.buildTrayItemWeapon(weapon, this.weaponTray)
+    const thisTerrain = bh.terrain
+    const weapons = thisTerrain.weapons.weapons
+    if (thisTerrain.hasUnattachedWeapons) {
+      for (const weapon of weapons) {
+        this.buildTrayItemWeapon(weapon, this.weaponTray)
+      }
     }
   }
   getUnitType (ship) {
@@ -833,13 +836,13 @@ export class PlacementUI extends WatersUI {
   addition (placed, model, ship) {
     this.showNotice(ship.description() + this.addText)
     this.markPlaced(placed, ship)
-    const id = model.nextId
-    model.nextId++
+
     model.ships.push(ship)
     const map = gameMap() // Ensure map is an instance of the correct class
-
+    const id = Ship.id
     const shape = ship.shape()
-    const newShip = Ship.createFromShape(shape, id)
+    const newShip = Ship.createFromShape(shape)
+    Ship.next()
     map.addShips(model.ships)
     const index = model.candidateShips.findIndex(s => s.id === ship.id)
     model.candidateShips[index] = newShip

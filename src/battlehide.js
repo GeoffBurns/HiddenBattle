@@ -92,6 +92,8 @@ function onClickSeek () {
   newGame('hide', resetFriendBoard)
 }
 function onClickAuto () {
+  return friend.autoPlace2()
+  /*
   const ships = friend.ships
   for (let attempt = 0; attempt < 100; attempt++) {
     let ok = true
@@ -108,7 +110,7 @@ function onClickAuto () {
       friendUI.placement(placed, friend, ship)
     }
     if (ok) return true
-  }
+  } */
 }
 function onClickUndo () {
   if (!friendUI.placingShips) {

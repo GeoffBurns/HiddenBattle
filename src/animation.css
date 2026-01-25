@@ -12,6 +12,7 @@
     --missile-cursor-image: url('./missile32.png');
     --white-missile-image: url('./whitemissile26.png');
     --white-rail-image: url('./whiterail26.png');
+    --black-rail-image: url('./blackrail26.png');
     --flying-missile-image: url('./flyingmissile40.png');
     --flying-bomb-image: url('./flyingbomb40.png');
     --flying-bolt-image: url('./flyingbolt40.png');
@@ -55,7 +56,6 @@
     content: '';
     position: absolute;
     inset: -2px;
-
     z-index: 3;
     /* slight bleed for edges */
     pointer-events: none;
@@ -105,7 +105,7 @@
     width: 26px;
     height: 26px;
     z-index: 3;
-    background-image: var(--white-missile-image) !important;
+    background-image: var(--white-missile-image);
     transition: opacity 0.4s ease-in-out;
 }
 
@@ -114,8 +114,12 @@
     width: 26px;
     height: 26px;
     z-index: 3;
-    background-image: var(--white-rail-image) !important;
+    background-image: var(--white-rail-image);
     transition: opacity 0.4s ease-in-out;
+}
+
+.cell.weapon.contrast.rail.active::before {
+    background-image: var(--black-rail-image);
 }
 
 .cell.weapon.active.turn2::before {
@@ -140,6 +144,38 @@
     -o-transform: rotate(270deg);
     -ms-transform: rotate(270deg);
     transform: rotate(270deg);
+}
+
+.cell.weapon.active.turn5::before {
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+.cell.weapon.active.turn6::before {
+    -webkit-transform: rotate(135deg);
+    -moz-transform: rotate(135deg);
+    -o-transform: rotate(135deg);
+    -ms-transform: rotate(135deg);
+    transform: rotate(135deg);
+}
+
+.cell.weapon.active.turn7::before {
+    -webkit-transform: rotate(225deg);
+    -moz-transform: rotate(225deg);
+    -o-transform: rotate(225deg);
+    -ms-transform: rotate(225deg);
+    transform: rotate(225deg);
+}
+
+.cell.weapon.active.turn8::before {
+    -webkit-transform: rotate(315deg);
+    -moz-transform: rotate(315deg);
+    -o-transform: rotate(315deg);
+    -ms-transform: rotate(315deg);
+    transform: rotate(315deg);
 }
 
 .cell.portal::after {
@@ -183,7 +219,7 @@
     }
 }
 
-.cell.weapon-empty:not(.frd-hit):not(.hit)::before {
+.cell.weapon.empty:not(.frd-hit):not(.hit)::before {
     content: '';
     width: 14px;
     height: 14px;

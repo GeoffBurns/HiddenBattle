@@ -1,7 +1,6 @@
 import { addCellToFootPrint, makeKey, parsePair } from './utilities.js'
-import { terrain, oldToken } from './terrain.js'
+import { bh, oldToken } from './terrain.js'
 import { standardShot } from './Weapon.js'
-import { seaAndLand } from './seaAndLand.js'
 import { Megabomb } from './SeaWeapons.js'
 
 // geometry helper
@@ -17,7 +16,7 @@ export class Map {
     this.shipNum = shipNum
     this.landArea = landArea
     this.land = land instanceof Set ? land : new Set()
-    this.terrain = mapTerrain || terrain.current
+    this.terrain = mapTerrain || bh.terrain
 
     if (!this?.terrain.subterrains) {
       console.log('bad')
@@ -209,7 +208,7 @@ function makeTitle (terrain, cols, rows) {
 
 export class CustomMap extends Map {
   constructor (title, size, shipNum, land, mapTerrain, example) {
-    super(title, size, shipNum, [], title, mapTerrain || terrain.current, land)
+    super(title, size, shipNum, [], title, mapTerrain || bh.terrain, land)
     this.isPreGenerated = false
     this.example = example
     this.weapons = [standardShot]
@@ -282,11 +281,11 @@ const withModifyable = Base =>
 export class CustomBlankMap extends withModifyable(CustomMap) {
   constructor (rows, cols, mapTerrain) {
     super(
-      makeTitle(mapTerrain || terrain.current, cols, rows),
+      makeTitle(mapTerrain || bh.terrain, cols, rows),
       [rows, cols],
       0,
       new Set(),
-      mapTerrain || terrain.current
+      mapTerrain || bh.terrain
     )
   }
   indexToken (rows, cols) {
@@ -314,11 +313,10 @@ export class SavedCustomMap extends CustomMap {
       null,
       data.example
     )
-    this.terrain =
-      terrain.terrains.find(t => t.title === data.terrain) || seaAndLand
+    this.terrain = bh.terrainByTitle(data.terrain)
 
     const weapons = data.weapons.map(w =>
-      this.terrain.getNewWeapon(w.letter, w.ammo)
+      this.terrains.getNewWeapon(w.letter, w.ammo)
     )
     this.weapons = [standardShot].concat(weapons.filter(Boolean))
   }

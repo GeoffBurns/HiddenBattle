@@ -1,14 +1,15 @@
+import { bh } from './terrain.js'
 import { Waters } from './Waters.js'
-import { seaAndLand } from './seaAndLand.js'
-import { gameMap } from './gameMaps.js'
+import { assembleTerrains } from './gameMaps.js'
 import { customUI } from './customUI.js'
 
 export class Custom extends Waters {
   constructor (customUI, terrain) {
     super(customUI)
+    assembleTerrains()
     this.candidateShips = []
     this.ships = []
-    this.terrain = terrain || seaAndLand
+    this.terrain = terrain || bh.defaultTerrain
     this.subterrains = this.terrain.subterrains.map(s => {
       return {
         subterrain: s,
@@ -23,7 +24,7 @@ export class Custom extends Waters {
   }
 
   displacedArea () {
-    const map = gameMap()
+    const map = bh.map
     return (map.rows + 1) * (map.cols + 1) + 1
   }
 

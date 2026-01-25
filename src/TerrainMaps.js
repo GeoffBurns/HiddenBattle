@@ -226,6 +226,10 @@ export class TerrainMaps {
   isLand (r, c) {
     return this.current.isLand(r, c)
   }
+  static get numTerrains () {
+    return terrainsMaps.list.length
+  }
+
   static currentTerrainMaps (newCurrent) {
     if (newCurrent && terrainsMaps.current !== newCurrent) {
       terrainsMaps.setCurrent(newCurrent)

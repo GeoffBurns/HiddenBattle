@@ -1,15 +1,12 @@
 import { placingTarget } from './CellsToBePlaced.js'
-import { terrain } from './terrain.js'
-export const gameHost = {
-  containerWidth: 574
-}
+import { terrains, bh } from './terrain.js'
 
 export const terrainsMaps = {
   current: null,
   list: [],
   onChange: Function.prototype,
   add: function (newTM) {
-    terrain.add(newTM.terrain)
+    terrains.add(newTM.terrain)
     if (this.list?.includes(newTM)) return
     this.list.push(newTM)
   },
@@ -17,7 +14,7 @@ export const terrainsMaps = {
     if (newCurrent === this.current) return
 
     this.add(newCurrent)
-    terrain.setCurrent(newCurrent.terrain)
+    terrains.setCurrent(newCurrent.terrain)
     this.current = newCurrent
     placingTarget.boundsChecker = newCurrent.inBounds.bind(newCurrent)
     placingTarget.allBoundsChecker = newCurrent.inAllBounds.bind(newCurrent)
@@ -71,5 +68,4 @@ export const terrainsMaps = {
     return this.setByTagBase(tag) || this.setToDefault() || this.setByIndex(0)
   }
 }
-
-
+bh.terrainMaps = terrainsMaps

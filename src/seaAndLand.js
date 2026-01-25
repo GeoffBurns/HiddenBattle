@@ -1,4 +1,4 @@
-import { Terrain, SubTerrain, Zone } from './terrain.js'
+import { terrains, Terrain, SubTerrain, Zone } from './terrain.js'
 
 export const deep = new Zone('Depths', 'D', false)
 export const littoral = new Zone('Shallows', 'L', true)
@@ -22,8 +22,6 @@ export const land = new SubTerrain(
   true,
   [coast, inland]
 )
-export const all = new SubTerrain('Air', '#a77', '#955', 'A', false, false, [])
-
 export const seaAndLand = new Terrain(
   'Sea and Land',
   null,
@@ -31,3 +29,4 @@ export const seaAndLand = new Terrain(
   'SeaAndLand',
   null
 )
+terrains.default = seaAndLand

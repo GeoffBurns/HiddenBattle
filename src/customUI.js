@@ -1,12 +1,12 @@
-import { terrain } from './terrain.js'
+import { bh } from './terrain.js'
 import { gameStatus } from './StatusUI.js'
 import { PlacementUI } from './placementUI.js'
 
 function landString () {
-  return terrain.current?.landSubterrain?.title?.toLowerCase() || 'land'
+  return bh.terrain?.landSubterrain?.title?.toLowerCase() || 'land'
 }
 function seaString () {
-  return terrain.current?.defaultSubterrain?.title?.toLowerCase() || 'sea'
+  return bh.terrain?.defaultSubterrain?.title?.toLowerCase() || 'sea'
 }
 export class CustomUI extends PlacementUI {
   constructor () {
@@ -26,10 +26,10 @@ export class CustomUI extends PlacementUI {
       this.newPlacementBtn.disabled = false
 
       this.newPlacementBtn.innerHTML =
-        '<span class="shortcut">C</span>hange ' + terrain.current.mapHeading
+        '<span class="shortcut">C</span>hange ' + bh.terrain.mapHeading
     } else {
       this.newPlacementBtn.innerHTML =
-        '<span class="shortcut">C</span>lear ' + terrain.current.mapHeading
+        '<span class="shortcut">C</span>lear ' + bh.terrain.mapHeading
       this.newPlacementBtn.disabled = !this.score.hasZoneInfo()
     }
   }
@@ -108,7 +108,7 @@ export class CustomUI extends PlacementUI {
     this.score.weaponsLabel.classList.remove('hidden')
     this.rotateBtn.classList.remove('hidden')
     this.rotateLeftBtn.classList.remove('hidden')
-    if (terrain.current.hasTransforms) {
+    if (bh.terrain.hasTransforms) {
       this.transformBtn.classList.remove('hidden')
     } else {
       this.transformBtn.classList.add('hidden')

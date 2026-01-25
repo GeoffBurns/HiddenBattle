@@ -168,7 +168,7 @@ export class TransformableVariants extends Variants {
     for (let i = 0; i < formIndex; i++) {
       idx += this.forms[i].numVariants()
     }
-    idx += form.index
+    idx += form.index || 0
     return idx
   }
 
@@ -627,6 +627,19 @@ export class WeaponVariant extends SpecialVariant {
   }
 }
 
+export const Armed = Base =>
+  class extends Base {
+    variants () {
+      return new WeaponVariant(
+        this.cells,
+        this.weaponSystem,
+        this.symmetry,
+        this.validator,
+        this.zoneDetail,
+        this.subterrain
+      )
+    }
+  }
 export class Variant3 extends SpecialVariant {
   constructor (full, subGroups, symmetry) {
     super(symmetry)

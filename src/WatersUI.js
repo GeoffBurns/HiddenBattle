@@ -1,7 +1,6 @@
+import { bh } from './terrain.js'
 import { gameMap, gameMaps } from './gameMaps.js'
-import { gameHost } from './maps.js'
 import { ScoreUI } from './ScoreUI.js'
-import { terrain } from './terrain.js'
 import {
   addKeyToCell,
   coordsFromCell,
@@ -14,7 +13,9 @@ import { gameStatus } from './StatusUI.js'
 
 export let noticeTimerId = null
 export let tipsTimerId = null
-
+export const gameHost = {
+  containerWidth: 574
+}
 export const startCharCode = 65
 
 export class WatersUI {
@@ -33,10 +34,10 @@ export class WatersUI {
     titleEl.textContent = this.terroritoryTitle + ' ' + name
   }
   showMapTitle () {
-    this.showTitle(terrain.current.mapHeading)
+    this.showTitle(bh.mapHeading)
   }
   showFleetTitle () {
-    this.showTitle(terrain.current.fleetHeading)
+    this.showTitle(bh.fleetHeading)
   }
 
   cellSizeScreen (map) {
@@ -167,11 +168,8 @@ export class WatersUI {
       const [r, c] = coordsFromCell(cell)
       const w = ship?.rackAt(r, c)
       if (w) {
-        if ((Number.parseInt(cell.dataset.ammo) || 0) > 0) {
-          cell.classList.add('weapon')
-        } else {
-          cell.classList.add('weapon-empty')
-        }
+        cell.dataset.ammo = 1
+        cell.classList.add('weapon')
         cell.textContent = ''
       } else {
         cell.textContent = letter
@@ -229,7 +227,8 @@ export class WatersUI {
       'wake',
       'semi-miss',
       'placed',
-      'weapon-empty'
+      'hint',
+      'empty'
     )
   }
   clearPlaceCell (cell) {
@@ -237,7 +236,7 @@ export class WatersUI {
       'miss',
       'placed',
       'weapon',
-      'weapon-empty',
+      'empty',
       'turn2',
       'turn3',
       'turn4',
@@ -264,7 +263,7 @@ export class WatersUI {
       'semi-miss',
       'wake',
       'weapon',
-      'weapon-empty',
+      'empty',
       'active'
     )
     cell.classList.add('frd-hit')
@@ -282,7 +281,7 @@ export class WatersUI {
       'semi',
       'semi-miss',
       'wake',
-      'weapon-empty',
+      'empty',
       'weapon',
       'active'
     )
@@ -322,7 +321,7 @@ export class WatersUI {
     const cell = this.gridCellAt(r, c)
 
     if (extra) {
-      cell.classList.add('weapon', 'active', extra)
+      cell.classList.add('weapon', 'active', 'contrast', extra)
     } else {
       cell.classList.add('active')
     }
@@ -344,8 +343,8 @@ export class WatersUI {
   }
   useAmmoInCell (cell) {
     const dataset = cell.dataset
-    cell.classList.remove('weapon', 'active')
-    cell.classList.add('weapon-empty')
+    cell.classList.remove('active')
+    cell.classList.add('empty')
     dataset.ammo = 0
   }
 

@@ -1,4 +1,4 @@
-import { terrain } from './terrain.js'
+import { bh } from './terrain.js'
 import {
   randomElement,
   parsePair,
@@ -15,6 +15,7 @@ import { gameMap, gameMaps } from './gameMaps.js'
 import { randomPlaceShape } from './utils.js'
 import { LoadOut } from './LoadOut.js'
 import { Ship } from './Ship.js'
+import { WeaponSystem } from './WeaponSystem.js'
 
 function popFirst (arr, predicate, obj) {
   // find index of first match
@@ -64,6 +65,26 @@ export class Waters {
       this.clipboardKey(),
       JSON.stringify(this.placedShips())
     )
+  }
+
+  autoPlace2 () {
+    const ships = this.ships
+    for (let attempt = 0; attempt < 100; attempt++) {
+      let ok = true
+      for (const ship of ships) {
+        const placed = randomPlaceShape(ship, this.shipCellGrid)
+        if (!placed) {
+          this.resetShipCells()
+          this.UI.clearPlaceVisuals()
+          this.UI.placeTally(ships)
+          this.UI.displayShipInfo(ships)
+          ok = false
+          break
+        }
+        this.UI.placement(placed, this, ship)
+      }
+      if (ok) return true
+    }
   }
   autoPlace () {
     const ships = this.ships
@@ -117,6 +138,20 @@ export class Waters {
     const map = gameMap()
     placedShips =
       placedShips || JSON.parse(localStorage.getItem(this.clipboardKey()))
+
+    const { shipId, weaponId } = placedShips.reduce(
+      (a, s) => {
+        a.shipId = Math.max(s.id, a.shipId)
+        a.weaponId = s
+          .weaponList()
+          .reduce((aw, w) => Math.max(w.id, aw), a.weaponId)
+        return a
+      },
+      { shipId: 1, weaponId: 1 }
+    )
+
+    Ship.id = shipId + 1
+    WeaponSystem.id = weaponId + 1
     if (!placedShips || map.title !== placedShips.map) {
       placedShips = map.example
       if (!placedShips) {
@@ -540,11 +575,9 @@ export class Waters {
   }
   sunkLetterDescription (letter) {
     if (this.opponent) {
-      return (
-        this.preamble0 + ' ' + terrain.current.sunkDescription(letter, ' was ')
-      )
+      return this.preamble0 + ' ' + bh.terrain.sunkDescription(letter, ' was ')
     }
-    return terrain.current.sunkDescription(letter)
+    return bh.shipSunkText(letter)
   }
   sunkWarning (ship, info = '') {
     if (!info) {

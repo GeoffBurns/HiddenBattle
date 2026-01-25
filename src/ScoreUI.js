@@ -1,6 +1,5 @@
+import { all, mixed } from './terrain.js'
 import { gameMap, gameMaps } from './gameMaps.js'
-import { all } from './seaAndLand.js'
-import { mixed } from './SpecialShips.js'
 import { dragNDrop } from './dragndrop.js'
 
 export class ScoreUI {

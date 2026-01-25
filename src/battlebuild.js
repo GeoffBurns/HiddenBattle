@@ -1,4 +1,4 @@
-import { terrain } from './terrain.js'
+import { bh } from './terrain.js'
 import { customUI } from './customUI.js'
 import { moveCursorBase } from './placementUI.js'
 import {
@@ -206,7 +206,7 @@ function newPlacement () {
   customUI.buildBoard((_r, _c) => {})
   customUI.showBrushTrays()
   customUI.makeBrushable()
-  customUI.buildBrushTray(terrain.current)
+  customUI.buildBrushTray(bh.terrain)
   customUI.brushMode()
   customUI.acceptBtn.disabled = false
   setReuseBtn()

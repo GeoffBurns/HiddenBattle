@@ -1,3 +1,4 @@
+import { bh } from './terrain.js'
 import { gameMaps } from './gameMaps.js'
 import { WatersUI } from './WatersUI.js'
 import { Waters } from './Waters.js'
@@ -9,7 +10,6 @@ import {
   fetchNavBar,
   trackClick
 } from './navbar.js'
-import { terrain } from './terrain.js'
 
 class MapList {
   constructor (id) {
@@ -223,7 +223,7 @@ class MapList {
 
   makeList (listIncludes) {
     const titleEl = document.getElementById('list-title')
-    const listOF = terrain.current.mapHeading + ' List'
+    const listOF = bh.mapHeading + ' List'
     listIncludes = listIncludes || this.listIncludes
     this.listIncludes = listIncludes
 
