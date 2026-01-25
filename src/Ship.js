@@ -130,7 +130,6 @@ export class Ship {
       }
     }
   }
-  l
 
   hitAt (key, onSink = Function.prototype, model) {
     this.hits.add(key)
