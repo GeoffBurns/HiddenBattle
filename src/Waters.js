@@ -127,6 +127,7 @@ export class Waters {
         placedShipsInstance.push(matchingShip, ship.cells)
         matchingShip.addToGrid(this.shipCellGrid)
         this.UI.placement(ship.cells, this, matchingShip)
+        matchingShip.variant = ship.variant
         const values = Object.values(matchingShip.weapons)
         if (values.length > 0) {
           const keys = Object.keys(ship.weapons)
@@ -184,6 +185,7 @@ export class Waters {
         matchingShip.addToGrid(this.shipCellGrid)
 
         this.UI.placement(ship.cells, this, matchingShip)
+        matchingShip.variant = ship.variant
         const values = Object.values(matchingShip.weapons)
         if (values.length > 0) {
           const keys = Object.keys(ship.weapons)
