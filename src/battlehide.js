@@ -32,7 +32,8 @@ function moveStatus (oldline, newLine, placement) {
   const wrap = document.getElementById('statusLine-wrap')
 
   gameStatus.counter.classList.add('hidden')
-  gameStatus.icons.classList.add('hidden')
+  gameStatus.icon1.classList.add('hidden')
+  gameStatus.icon2.classList.add('hidden')
   if (placement) {
     wrap.classList.remove('hidden')
   } else {

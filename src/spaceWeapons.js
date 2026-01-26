@@ -9,6 +9,7 @@ export class Missile extends Megabomb {
     this.postSelectCursor = 0
     this.givesHint = true
     this.launchCursor = 'launch'
+    this.totalCursors = 2
     this.cursors = ['missile'] //['launch', 'missile']
     this.animateOnTarget = true
     this.explodeOnTarget = true
@@ -76,6 +77,7 @@ export class RailBolt extends Kinetic {
     this.plural = 'Rail Bolts'
     this.launchCursor = 'rail'
     this.postSelectCursor = 1
+    this.totalCursors = 2
     this.cursors = ['rail', 'bolt']
     this.hints = [
       'Click on square to start rail bolt',

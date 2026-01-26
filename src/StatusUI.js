@@ -6,7 +6,8 @@ export class StatusUI {
     this.counter = document.getElementById('ammoCounter')
     this.total = document.getElementById('ammoCounterTotal')
     this.left = document.getElementById('ammoCounterLeft')
-    this.icons = document.getElementById('modeIcons')
+    this.icon1 = document.getElementById('modeIcon1')
+    this.icon2 = document.getElementById('modeIcon2')
     this.line = document.getElementById('statusLine')
     this.line2 = document.getElementById('statusLine2')
   }
@@ -24,19 +25,29 @@ export class StatusUI {
     const ammo = wps.ammoLeft()
     const letter = weapon.letter
     this.counter.classList.remove('hidden')
-    this.icons.classList.remove('hidden')
+    this.icon1.classList.remove('hidden')
     if (weapon.isLimited) {
       const total = wps.ammoTotal()
+
       this.total.textContent = total
       this.left.textContent = ammo
-      this.icons.textContent = '' //weaponSystem.weapon.letter
-      this.icons.style.background = maps.shipColors[letter]
-      this.icons.className = 'tally-box ' + weapon.classname
+      if (weapon.totalCursors >= 2) {
+        this.icon2.textContent = ''
+        this.icon2.style.background = maps.shipColors[letter + `2`]
+        this.icon2.className = 'mode-icon tally-box ' + weapon.classname
+        this.icon2.classList.remove('hidden')
+      } else {
+        this.icon2.classList.add('hidden')
+      }
+      this.icon1.textContent = ''
+      this.icon1.style.background = maps.shipColors[letter + `1`]
+      this.icon1.className = 'mode-icon tally-box ' + weapon.classname
     } else {
       this.total.textContent = '∞'
       this.left.textContent = '∞'
-      this.icons.style.background = 'white' // 'transparent'
-      this.icons.className = 'tally-box single'
+      this.icon1.style.background = 'white'
+      this.icon1.className = 'mode-icon tally-box single'
+      this.icon2.classList.add('hidden')
     }
 
     //return this.display(weapon.ammoStatus(ammo), weapon.hints[idx])

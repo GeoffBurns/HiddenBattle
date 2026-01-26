@@ -530,7 +530,11 @@ export const spaceShipsCatalogue = new ShipCatalogue(
     3: 'rgba(90, 200, 220,0.3)',
     4: 'rgba(120, 80, 244,0.3)',
     '+': '#ffd866',
+    '+1': '#D96B4C',
+    '+2': '#ffd866',
     '|': '#cc3333',
+    '|1': '#1F2A44',
+    '|2': '#cc3333',
     '^': '#cc3388',
     '*': '#3333cc',
     '@': '#66ffcc', // Seafoam Green

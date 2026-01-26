@@ -97,11 +97,18 @@ export const seaAndLandShipsCatalogue = new ShipCatalogue(
     I: 'rgba(204, 51, 204,0.3)',
     Y: 'rgba(51, 51, 204,0.3)',
     M: '#ffd866',
-    K: '#cc3333',
+    M1: '#ffd866',
+    K: '#d84444',
+    K1: '#2FA4A9',
+    K2: '#cc3333',
     W: '#3333cc',
-    '+': '#66ffcc', // Seafoam Green
+    '@': '#66ffcc', // Seafoam Green
+    '+': '#8FE3D6',
+    '+1': '#1F7F7A', //'#5Fa3b6',
+    '+2': '#ff8f7a',
     E: '#9966ff',
     F: '#33ccff',
+    F1: '#33ccff',
     Z: '#33cc33'
   }
 )

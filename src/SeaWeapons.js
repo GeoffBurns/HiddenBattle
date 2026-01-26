@@ -16,6 +16,7 @@ export class Megabomb extends Weapon {
     this.nonAttached = true
     this.animateOnTarget = true
     this.explodeOnTarget = true
+
     this.splashCoords = this.aoe(null, [[2, 2]])
     this.dragShape = [
       [0, 0, 0],
@@ -150,6 +151,8 @@ export class Kinetic extends Weapon {
     super(name || 'Kinetic Strike', letter || 'K', true, true, 2)
     this.ammo = ammo
     this.cursors = ['satelite', 'strike']
+
+    this.totalCursors = 2
     this.hints = [
       'Click on square to start kinetic strike',
       'Click on square end kinetic strike'
@@ -222,6 +225,7 @@ export class Torpedo extends Weapon {
     super('Torpedo', '+', true, true, 2)
     this.ammo = ammo
     this.cursors = ['torpedo', 'periscope']
+    this.totalCursors = 2
     this.hints = [
       'Click on square to start torpedo',
       'Click on square aim torpedo'
@@ -302,6 +306,7 @@ export class Flack extends Weapon {
     super('Flack', 'F', true, true, 1)
     this.ammo = ammo
     this.cursors = ['cluster']
+    this.totalCursors = 1
     this.hints = ['Click on square to initiate flack']
     this.buttonHtml = '<span class="shortcut">F</span>lack'
     this.tip = ''
@@ -459,6 +464,7 @@ export class Sweep extends Weapon {
     super('Radar Sweep', 'W', true, false, 2)
     this.ammo = ammo
     this.cursors = ['dish', 'sweep']
+    this.totalCursors = 2
     this.hints = [
       'Click on square to start radar scan',
       'Click on square end radar scan'

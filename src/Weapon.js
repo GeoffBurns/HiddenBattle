@@ -12,6 +12,7 @@ export class Weapon {
     this.destroys = destroys
     this.points = points
     this.hasFlash = false
+    this.totalCursors = 1
     this.tip = `drag on to the map to increase the tally of ${this.name}`
     this.isOneAndDone = false
     this.splashPower = -1

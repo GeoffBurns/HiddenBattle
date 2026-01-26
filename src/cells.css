@@ -220,14 +220,16 @@
 
 
 
-#modeIcons.tally-box {
+.mode-icon.tally-box {
     width: 56px;
     height: 48px;
+    border-radius: 8px;
 }
 
-#modeIcons.tally-box::before {
-    width: 56px;
-    height: 48px;
+.mode-icon.tally-box::before {
+    width: 50px;
+    height: 42px;
+    border-radius: 8px;
     content: '';
     position: absolute;
     z-index: 3;
@@ -238,33 +240,54 @@
 }
 
 
-#modeIcons.missile::before {
-    background-image: url('./boxmissile40.png');
+.mode-icon.off::before {
+    opacity: 0.45;
 }
 
-#modeIcons.single::before {
+#modeIcon1.single::before {
     background-image: var(--cross-cursor-image);
 }
 
-#modeIcons.rail-bolt::before {
+#modeIcon1.missile::before {
+    background-image: url('./boxlaunch56.png');
+}
+
+#modeIcon2.missile::before {
+    background-image: url('./boxmissile40.png');
+}
+
+#modeIcon1.rail-bolt::before {
+    background-image: url('./boxrail56.png');
+
+}
+
+#modeIcon2.rail-bolt::before {
     background-image: url('./boxbolt40.png');
 
 }
 
-#modeIcons.megabomb::before {
+#modeIcon1.megabomb::before {
     background-image: url('./boxbomb40.png');
 }
 
-#modeIcons.flack::before {
+#modeIcon1.flack::before {
     background-image: url('./boxflack40.png');
 
 }
 
-#modeIcons.kinetic-strike::before {
-    background-image: url('./boxstrike40.png');
+#modeIcon1.kinetic-strike::before {
+    background-image: url('./sat56.png');
 }
 
-#modeIcons.torpedo::before {
+#modeIcon2.kinetic-strike::before {
+    background-image: url('./boxstrike56.png');
+}
+
+#modeIcon1.torpedo::before {
+    background-image: url('./periscope56.png');
+}
+
+#modeIcon2.torpedo::before {
     background-image: url('./boxtorpedo40.png');
 }
 
