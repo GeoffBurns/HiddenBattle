@@ -57,6 +57,7 @@ export class WeaponSystem {
   useAmmo () {
     if (!this.weapon.isLimited) return
     this.ammo--
+    if (this.ammo < 0) this.ammo = 0
   }
   ammoAttached () {
     return 0

@@ -187,17 +187,7 @@
 }
 
 
-div.tally-row.weapon div.tally-box::before {
-    content: '';
-    position: absolute;
-    width: 28px;
-    height: 28px;
-    z-index: 3;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    transition: opacity 0.4s ease-in-out;
-}
+
 
 .flying-weapon.missile {
     background-image: var(--flying-missile-image);
@@ -278,14 +268,44 @@ div.tally-row.weapon div.tally-box::before {
     background-image: url('./boxtorpedo40.png');
 }
 
+
+div.tally-row.weapon div.tally-box::before {
+    content: '';
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    z-index: 3;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: opacity 0.4s ease-in-out;
+}
+
 .tally-row.weapon .tally-box.hit::before {
     background-image: url('./skull28.png');
 
 }
 
+.tally-row.weapon .tally-box.damaged::before {
+    background-image: url('./skullol28.png');
+}
+
+.tally-row.weapon div.tally-box.used::before {
+    text-align: center;
+    line-height: 28px;
+    color: '#fff';
+    content: 'X';
+}
+
 .tally-row.weapon.missile div.tally-box:not(.hit)::before {
     background-image: url('./boxmissile28.png');
+}
 
+
+
+.tally-row.weapon.missile div.tally-box.used::before {
+    background-image: url('./boxmissileol28.png');
+    opacity: 0.6;
 }
 
 div.tally-row.weapon.rail-bolt div.tally-box:not(.hit)::before {
@@ -293,13 +313,27 @@ div.tally-row.weapon.rail-bolt div.tally-box:not(.hit)::before {
 
 }
 
+div.tally-row.weapon.rail-bolt div.tally-box.used::before {
+    background-image: url('./boxboltol28.png');
+}
+
 div.tally-row.weapon.megabomb div.tally-box:not(.hit)::before {
     background-image: url('./boxbomb28.png');
 
 }
 
+div.tally-row.weapon.megabomb div.tally-box.used::before {
+    background-image: url('./boxbombol28.png');
+    opacity: 0.6;
+}
+
 div.tally-row.weapon.flack div.tally-box:not(.hit)::before {
     background-image: var(--box-flack-image);
+
+}
+
+div.tally-row.weapon.flack div.tally-box.used::before {
+    background-image: url('./boxflackol28.png');
 
 }
 
@@ -308,8 +342,19 @@ div.tally-row.weapon.kinetic-strike div.tally-box:not(.hit)::before {
 
 }
 
+div.tally-row.weapon.kinetic-strike div.tally-box.used::before {
+    background-image: url('./boxstrikeol28.png');
+
+}
+
 div.tally-row.weapon.torpedo div.tally-box:not(.hit)::before {
     background-image: url('./boxtorpedo28.png');
+
+}
+
+div.tally-row.weapon.torpedo div.tally-box.used::before {
+    background-image: url('./boxtorpedool28.png');
+    opacity: 0.6;
 }
 
 .flying-weapon {

@@ -169,10 +169,10 @@ const railgunSpace = new ArmedVessel(
   ],
   null,
   [
-    [0, 1],
-    [1, 0],
-    [1, 2],
-    [2, 1]
+    [0, 1, 1],
+    [1, 0, 2],
+    [1, 2, 2],
+    [2, 1, 1]
   ]
 )
 railgunSpace.attachWeapon(() => {
@@ -191,10 +191,10 @@ const railgunAsteroid = new ArmedInstallation(
   ],
   null,
   [
-    [0, 0],
-    [2, 0],
-    [0, 2],
-    [2, 2]
+    [0, 0, 5],
+    [2, 0, 6],
+    [0, 2, 6],
+    [2, 2, 5]
   ]
 )
 railgunAsteroid.attachWeapon(() => {

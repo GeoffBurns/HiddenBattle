@@ -1,4 +1,4 @@
-import { all, mixed } from './terrain.js'
+import { all, mixed, bh } from './terrain.js'
 import { gameMap, gameMaps } from './gameMaps.js'
 import { dragNDrop } from './dragndrop.js'
 
@@ -253,8 +253,7 @@ export class ScoreUI {
     const ammoTotal = weaponSystem.ammoTotal()
     const ammoUsed = weaponSystem.ammoUsed()
     const ammoUnattached = weaponSystem.ammoUnattached()
-    const hit = weaponSystem.hit
-    const wid = weaponSystem.id
+
     for (let i = 0; i < ammoTotal; i++) {
       this.buildWeaponBox(
         ammoUnattached,
@@ -264,8 +263,7 @@ export class ScoreUI {
         ammoUsed,
         maps,
         letter,
-        wid,
-        hit,
+        weaponSystem,
         row
       )
     }
@@ -279,12 +277,14 @@ export class ScoreUI {
     ammoUsed,
     maps,
     letter,
-    wid,
-    hit,
+    weaponSystem,
     row
   ) {
+    const hit = weaponSystem.hit
+    const damaged = weaponSystem.damaged
+    const wid = weaponSystem.id
     const box = document.createElement('div')
-    if (ammoUnattached > 0) {
+    if (bh.terrain.hasUnattachedWeapons && ammoUnattached > i) {
       dragNDrop.makeDraggable(viewModel, box, null, weapon, true)
     }
     box.dataset.wid = wid
@@ -292,16 +292,20 @@ export class ScoreUI {
     if (hit) {
       box.classList?.add('hit')
     }
+    if (damaged) {
+      box.classList?.add('damaged')
+    }
     box.style.fontSize = '105%'
     if (i < ammoUsed) {
-      box.textContent = 'X'
       box.style.background = maps.shipColors[letter]
       box.style.opacity = 0.45
-      box.style.color = '#000'
+      box.textContent = ''
+      box.style.color = '#fff'
+      if (!hit && !damaged) {
+        box.classList?.add('used')
+      }
     } else {
-      const img = document.createElement('img')
-      box.appendChild(img)
-      box.textContent = '' //weaponSystem.weapon.letter
+      box.textContent = ''
       box.style.background = maps.shipColors[letter]
       box.style.color = maps.shipLetterColors[letter]
     }

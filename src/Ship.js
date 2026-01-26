@@ -138,8 +138,9 @@ export class Ship {
     if (wps) {
       const filled = wps.ammo > 0
       const weapon = wps.weapon
-      wps.ammo = 0
-      if (filled) {
+      if (!filled) {
+        wps.damaged = true
+      } else {
         wps.hit = true
         model.loadOut.useAmmo(wps)
         const cell = model.UI.gridCellAt(...parsePair(key))

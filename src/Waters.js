@@ -124,9 +124,6 @@ export class Waters {
         ship
       )
       if (matchingShip) {
-        placedShipsInstance.push(matchingShip, ship.cells)
-        matchingShip.addToGrid(this.shipCellGrid)
-        this.UI.placement(ship.cells, this, matchingShip)
         matchingShip.variant = ship.variant
         const values = Object.values(matchingShip.weapons)
         if (values.length > 0) {
@@ -138,6 +135,9 @@ export class Waters {
             }
           }
         }
+        placedShipsInstance.push(matchingShip, ship.cells)
+        matchingShip.addToGrid(this.shipCellGrid)
+        this.UI.placement(ship.cells, this, matchingShip)
       }
     }
     if (matchableShips.length !== 0) {
@@ -181,10 +181,6 @@ export class Waters {
       )
 
       if (matchingShip) {
-        matchingShip.place(ship.cells)
-        matchingShip.addToGrid(this.shipCellGrid)
-
-        this.UI.placement(ship.cells, this, matchingShip)
         matchingShip.variant = ship.variant
         const values = Object.values(matchingShip.weapons)
         if (values.length > 0) {
@@ -196,6 +192,9 @@ export class Waters {
             }
           }
         }
+        matchingShip.place(ship.cells)
+        matchingShip.addToGrid(this.shipCellGrid)
+        this.UI.placement(ship.cells, this, matchingShip)
         const dragship = this.UI.getTrayItem(ship.id)
         if (dragship) {
           this.UI.removeDragShip(dragship)

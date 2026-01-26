@@ -112,7 +112,7 @@ export class LoadOut {
   hasCurrentAmmo () {
     const wps = this.weaponSystem()
     if (!wps.weapon.isLimited) return true
-    return wps.ammoLeft() !== 0
+    return wps.ammoLeft() > 0
   }
   hasAllAmmo () {
     const wps = this.weaponSystem()

@@ -316,7 +316,7 @@ export class SavedCustomMap extends CustomMap {
     this.terrain = bh.terrainByTitle(data.terrain)
 
     const weapons = data.weapons.map(w =>
-      this.terrains.getNewWeapon(w.letter, w.ammo)
+      this.terrain.getNewWeapon(w.letter, w.ammo)
     )
     this.weapons = [standardShot].concat(weapons.filter(Boolean))
   }
