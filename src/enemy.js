@@ -233,7 +233,7 @@ class Enemy extends Waters {
       this.loadOut.weaponSystem(),
       gameMaps(),
       this.loadOut.cursorIndex(),
-      this.toadOut.coords.length
+      this.loadOut.coords.length
     )
   }
 
