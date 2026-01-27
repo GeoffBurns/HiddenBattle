@@ -190,7 +190,7 @@ export class AttachedWeaponSystems extends WeaponSystem {
     return this.ships.find(s => s.hasAmmoLeft()).loadedWeapon()
   }
   getUnattachedWeapon () {
-    return this.opponent && !this.seekingMode ? null : this
+    return null
   }
   getRackById (id) {
     const ship = this.ships.find(s => s.getRackById(id) !== null)

@@ -108,6 +108,15 @@ export const bh = {
     if (newMap && this.terrainMaps?.current?.setToMap) {
       this.terrainMaps.current.setToMap()
     }
+  },
+  inBounds (r, c) {
+    return this.terrainMaps?.current?.current?.inBounds(r, c)
+  },
+  isLand (r, c) {
+    return this.terrainMaps?.current?.current?.isLand(r, c)
+  },
+  shapesByLetter (letter) {
+    return this.terrainMaps?.current?.shapesByLetter[letter]
   }
 }
 export class SubTerrainBase {

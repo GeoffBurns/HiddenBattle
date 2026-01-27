@@ -1,12 +1,10 @@
 import { bh } from './terrain.js'
 import { Waters } from './Waters.js'
-import { assembleTerrains } from './gameMaps.js'
 import { customUI } from './customUI.js'
 
 export class Custom extends Waters {
   constructor (customUI, terrain) {
     super(customUI)
-    assembleTerrains()
     this.candidateShips = []
     this.ships = []
     this.terrain = terrain || bh.defaultTerrain

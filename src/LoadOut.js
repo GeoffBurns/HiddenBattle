@@ -1,4 +1,4 @@
-import { gameMaps } from './gameMaps.js'
+import { bh } from './terrain.js'
 import { WeaponSystem, AttachedWeaponSystems } from './WeaponSystem.js'
 
 export class LoadOut {
@@ -205,7 +205,7 @@ export class LoadOut {
     return r
   }
   switchToPrefered () {
-    const prefs = gameMaps().weaponPreference
+    const prefs = bh.maps.weaponPreference
     for (const [letter, op] of prefs) {
       if (this.switchTo(letter)) {
         return op
@@ -307,7 +307,12 @@ export class LoadOut {
       this.clearCoords()
       this.useAmmo(w)
       this.checkNoAmmo()
-      this.launch(fireCoords, this.fire.bind(this, map, fireCoords, w), weapon)
+      this.launch(
+        fireCoords,
+        this.fire.bind(this, map, fireCoords, w),
+        weapon,
+        w
+      )
     }
   }
 

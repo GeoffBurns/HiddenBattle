@@ -1,5 +1,5 @@
 import { bh } from './terrain.js'
-import { gameMaps } from './gameMaps.js'
+import { assembleTerrains } from './gameMaps.js'
 import { WatersUI } from './WatersUI.js'
 import { Waters } from './Waters.js'
 import { ScoreUI } from './ScoreUI.js'
@@ -13,6 +13,7 @@ import {
 
 class MapList {
   constructor (id) {
+    assembleTerrains()
     this.listId = id || 'list-container'
     this.container = document.getElementById(this.listId)
     this.input = document.getElementById('inputField')
@@ -232,15 +233,15 @@ class MapList {
     switch (listIncludes) {
       case '0':
         titleEl.textContent = 'Custom ' + listOF
-        maps = gameMaps().customMapList()
+        maps = bh.maps.customMapList()
         break
       case '1':
         titleEl.textContent = listOF
-        maps = gameMaps().maps()
+        maps = bh.maps.maps()
         break
       case '2':
         titleEl.textContent = 'Standard ' + listOF
-        maps = gameMaps().preGenMapList()
+        maps = bh.maps.preGenMapList()
         break
       default:
         throw new Error('unknown list display option')

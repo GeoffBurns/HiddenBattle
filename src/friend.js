@@ -1,8 +1,9 @@
-import { makeKey } from './utilities.js'
+import { bh } from './terrain.js'
+import { makeKey, shuffleArray } from './utilities.js'
 import { gameStatus } from './StatusUI.js'
-import { gameMap } from './gameMaps.js'
 import { setupDragHandlers } from './dragndrop.js'
 import { Waters } from './Waters.js'
+
 export class Friend extends Waters {
   constructor (friendUI) {
     super(friendUI)
@@ -30,7 +31,7 @@ export class Friend extends Waters {
     }
   }
   seekHit (r, c) {
-    if (!gameMap().inBounds(r, c)) return false
+    if (!bh.inBounds(r, c)) return false
 
     this.flame(r, c, false)
     const key = this.score.createShotKey(r, c)
@@ -45,7 +46,7 @@ export class Friend extends Waters {
   }
 
   seekHit2 (weapon, r, c, power) {
-    if (!gameMap().inBounds(r, c)) return false
+    if (!bh.inBounds(r, c)) return false
 
     if (power > 0) this.flame(r, c, weapon.hasFlash)
     const key =
@@ -61,7 +62,7 @@ export class Friend extends Waters {
   }
 
   walkShot (r, c) {
-    const dir = gameMap().isLand(r, c) ? 5 : 4
+    const dir = bh.isLand(r, c) ? 5 : 4
     const p = Math.floor(Math.random() * dir)
     switch (p) {
       case 0:
@@ -86,7 +87,7 @@ export class Friend extends Waters {
     }
   }
   seekBomb (weapon, effect) {
-    const map = gameMap()
+    const map = bh.map
     this.updateUI()
     let hit = false
     for (const position of effect) {
@@ -100,7 +101,7 @@ export class Friend extends Waters {
   }
 
   randomBomb (seeking) {
-    const map = gameMap()
+    const map = bh.map
     this.loadOut.destroy = this.seekBomb.bind(this)
 
     for (let impact = 9; impact > 1; impact--)
@@ -112,8 +113,8 @@ export class Friend extends Waters {
         const r = Math.floor(Math.random() * (map.rows - 2)) + 1
         const c = Math.floor(Math.random() * (map.cols - 2)) + 1
         if (this.score.newShotKey(r, c)) {
-          this.launchRandomWeapon(r, c)
-          this.loadOut.aim(gameMap(), r, c, this.loadOut.selectedWeapon)
+          this.launchRandomWeapon(r, c, false)
+          this.loadOut.aim(bh.map, r, c, this.loadOut.selectedWeapon)
           return
         }
       }
@@ -130,7 +131,7 @@ export class Friend extends Waters {
   }
 
   randomDestroyOne (seeking) {
-    const map = gameMap()
+    const map = bh.map
     this.loadOut.destroyOne = this.destroyOne.bind(this)
 
     if (seeking && (!this.testContinue || this.boardDestroyed)) {
@@ -139,7 +140,7 @@ export class Friend extends Waters {
     }
 
     const r = this.randomLine()
-    this.launchRandomWeapon(r, 0)
+    this.launchRandomWeapon(r, 0, false)
     this.loadOut.aim(map, r, map.cols - 1, this.loadOut.selectedWeapon)
     // this.loadOut.aim(map, r, 0)
     /// this.loadOut.aim(map, r, map.cols - 1)
@@ -147,7 +148,7 @@ export class Friend extends Waters {
 
   randomSeekOld (seeking) {
     const maxAttempts = 130
-    const map = gameMap()
+    const map = bh.map
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       if (seeking && (!this.testContinue || this.boardDestroyed)) {
@@ -216,7 +217,7 @@ export class Friend extends Waters {
     this.seek()
   }
   setupUntried () {
-    const map = gameMap()
+    const map = bh.map
     this.untried = new Set()
     for (let r = 0; map.rows > r; r++) {
       for (let c = 0; map.cols > c; c++) {
@@ -255,7 +256,8 @@ export class Friend extends Waters {
       return acc
     }, {})
 
-    let line = Object.entries(tally)
+    const ordered = Object.entries(tally)
+    let line = shuffleArray(ordered)
     line.sort((a, b) => b[1] - a[1])
 
     const idx = line.findIndex(i => i[1] < line[0][1])
@@ -288,7 +290,7 @@ export class Friend extends Waters {
   }
   scan (weapon, effect) {
     this.updateUI()
-    const map = gameMap()
+    const map = bh.map
     for (const position of effect) {
       const [r, c] = position
 
@@ -299,7 +301,7 @@ export class Friend extends Waters {
     /// reveal
   }
   randomScan (seeking) {
-    const map = gameMap()
+    const map = bh.map
     this.loadOut.reveal = this.scan.bind(this)
     if (seeking && (!this.testContinue || this.boardDestroyed)) {
       clearInterval(seeking)

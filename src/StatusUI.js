@@ -20,33 +20,51 @@ export class StatusUI {
       this.info(game)
     }
   }
-  displayAmmoStatus (wps, maps, idx = 0, numCoords = -1) {
+  displayAmmoStatus (wps, maps, idx = 0, numCoords = -1, selectedWps = null) {
+    if (
+      !wps ||
+      (selectedWps && wps.weapon.letter !== selectedWps.weapon.letter)
+    )
+      return
     const weapon = wps.weapon
+    const selected = selectedWps ? 1 : 0
 
     this.icon1.className = 'mode-icon tally-box'
     this.icon2.className = 'mode-icon tally-box'
     if (weapon.isLimited) {
       const ammo = wps.ammoLeft()
       const letter = weapon.letter
-      this.displayLimitedAmmoStatus(wps, ammo, weapon, numCoords, maps, letter)
+      this.displayLimitedAmmoStatus(
+        wps,
+        ammo,
+        weapon,
+        numCoords,
+        maps,
+        letter,
+        selected
+      )
     } else {
       this.displaySingleShotStatus()
     }
 
     return this.display('', weapon.hints[idx])
   }
-  displayLimitedAmmoStatus (wps, ammo, weapon, numCoords, maps, letter) {
+  displayLimitedAmmoStatus (wps, ammo, weapon, numCoords, maps, letter, select) {
     this.displayAmmoLeft(wps, ammo)
 
     const numCursors = this.seekingMode
       ? weapon.cursors.length
       : weapon.totalCursors
+
     if (numCursors >= 2) {
-      this.diplayWhichLaunchStep(numCoords)
+      const idx = this.seekingMode
+        ? numCoords
+        : weapon.totalCursorIdx(numCoords, select)
+      this.diplayWhichLaunchStep(idx)
       this.displayAimStep(maps, letter, weapon)
       this.displayLaunchFirstStep(maps, letter, weapon)
     } else {
-      if (weapon.launchCursor && weapon.launchCursor !== weapon.cursors[0]) {
+      if (weapon.hasExtraSelectCursor) {
         this.icon1.classList.add('hidden')
         this.displayAimStep(maps, letter, weapon)
       } else {

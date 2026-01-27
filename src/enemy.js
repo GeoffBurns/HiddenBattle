@@ -1,6 +1,5 @@
 import { bh } from './terrain.js'
 import { randomPlaceShape } from './utils.js'
-import { assembleTerrains } from './gameMaps.js'
 import { gameStatus } from './StatusUI.js'
 import { enemyUI } from './enemyUI.js'
 import { LoadOut } from './LoadOut.js'
@@ -9,7 +8,6 @@ import { Waters } from './Waters.js'
 class Enemy extends Waters {
   constructor (enemyUI) {
     super(enemyUI)
-    assembleTerrains()
     this.preamble0 = 'Enemy'
     this.preamble = 'The enemy was '
     this.isRevealed = false
@@ -211,7 +209,7 @@ class Enemy extends Waters {
     // update status
     this.updateResultsOfBomb(hits, sunks, reveals)
 
-    this.updateBombStatus()
+    this.updateWeaponStatus()
     this.flash()
   }
 
@@ -228,15 +226,6 @@ class Enemy extends Waters {
       }
     }
     return { hits, sunks, reveals }
-  }
-
-  updateBombStatus () {
-    gameStatus.displayAmmoStatus(
-      this.loadOut.weaponSystem(),
-      bh.maps,
-      this.loadOut.cursorIndex(),
-      this.loadOut.coords.length
-    )
   }
 
   onClickWeaponMode () {

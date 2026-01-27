@@ -33,7 +33,15 @@ export class Weapon {
     let turn = ''
     return turn
   }
-
+  totalCursorIdx (numCoords, select) {
+    if (this.launchCursor) {
+      return numCoords + select - this.postSelectCursor
+    }
+    return numCoords
+  }
+  get hasExtraSelectCursor () {
+    return this.launchCursor && this.launchCursor !== this.cursors[0]
+  }
   ammoStatusOld (ammoLeft) {
     return `${this.name}  Mode (${ammoLeft} left)`
   }

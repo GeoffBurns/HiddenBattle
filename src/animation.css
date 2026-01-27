@@ -118,6 +118,7 @@
     transition: opacity 0.4s ease-in-out;
 }
 
+.cell.weapon.contrast.bolt.active::before,
 .cell.weapon.contrast.rail.active::before {
     background-image: var(--black-rail-image);
 }
