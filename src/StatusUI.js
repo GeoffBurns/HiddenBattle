@@ -22,9 +22,12 @@ export class StatusUI {
   }
   displayAmmoStatus (wps, maps, idx = 0, numCoords = -1) {
     const weapon = wps.weapon
-    const ammo = wps.ammoLeft()
-    const letter = weapon.letter
+
+    this.icon1.className = 'mode-icon tally-box'
+    this.icon2.className = 'mode-icon tally-box'
     if (weapon.isLimited) {
+      const ammo = wps.ammoLeft()
+      const letter = weapon.letter
       this.displayLimitedAmmoStatus(wps, ammo, weapon, numCoords, maps, letter)
     } else {
       this.displaySingleShotStatus()
@@ -37,7 +40,6 @@ export class StatusUI {
     this.displayAmmoLeft(wps, ammo)
     if (weapon.totalCursors >= 2) {
       this.diplayWhichLaunchStep(numCoords)
-
       this.displayAimStep(maps, letter, weapon)
     } else {
       this.icon2.classList.add('hidden')
@@ -46,33 +48,38 @@ export class StatusUI {
   }
 
   displayLaunchFirstStep (maps, letter, weapon) {
-    this.icon1.classList.remove('hidden')
     this.icon1.textContent = ''
     this.icon1.style.background = maps.shipColors[letter + `1`]
     this.icon1.classList.add('mode-icon', 'tally-box', weapon.classname)
   }
 
   displayAimStep (maps, letter, weapon) {
-    this.icon1.classList.remove('hidden')
     this.icon2.textContent = ''
     this.icon2.style.background = maps.shipColors[letter + `2`]
     this.icon2.classList.add('mode-icon', 'tally-box', weapon.classname)
-    this.icon2.classList.remove('hidden')
   }
-
+  noLaunchSteps () {
+    this.icon1.classList.remove('off')
+    this.icon2.classList.remove('off')
+    this.icon1.classList.remove('on')
+    this.icon2.classList.remove('on')
+  }
   diplayWhichLaunchStep (numCoords) {
     switch (numCoords) {
       case 0:
         this.icon1.classList.remove('off')
         this.icon2.classList.add('off')
+        this.icon1.classList.add('on')
+        this.icon2.classList.remove('on')
         break
       case 1:
         this.icon1.classList.add('off')
         this.icon2.classList.remove('off')
+        this.icon1.classList.remove('on')
+        this.icon2.classList.add('on')
         break
       default:
-        this.icon1.classList.remove('off')
-        this.icon2.classList.remove('off')
+        this.noLaunchSteps()
         break
     }
   }
@@ -90,9 +97,8 @@ export class StatusUI {
   }
 
   displaySShotIcon () {
-    this.icon1.classList.remove('hidden')
     this.icon1.style.background = 'white'
-    this.icon1.className = 'mode-icon tally-box single'
+    this.icon1.classList.add('single')
     this.icon2.classList.add('hidden')
   }
 
