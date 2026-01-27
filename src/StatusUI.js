@@ -49,14 +49,14 @@ export class StatusUI {
     this.icon1.classList.remove('hidden')
     this.icon1.textContent = ''
     this.icon1.style.background = maps.shipColors[letter + `1`]
-    this.icon1.className = 'mode-icon tally-box ' + weapon.classname
+    this.icon1.classList.add('mode-icon', 'tally-box', weapon.classname)
   }
 
   displayAimStep (maps, letter, weapon) {
     this.icon1.classList.remove('hidden')
     this.icon2.textContent = ''
     this.icon2.style.background = maps.shipColors[letter + `2`]
-    this.icon2.className = 'mode-icon tally-box ' + weapon.classname
+    this.icon2.classList.add('mode-icon', 'tally-box', weapon.classname)
     this.icon2.classList.remove('hidden')
   }
 
