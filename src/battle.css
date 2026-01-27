@@ -1,6 +1,11 @@
 body {
     background-image: var(--background-image);
     background-repeat: repeat;
+    display: flex;
+    flex-flow: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start
 }
 
 body.space {
@@ -15,6 +20,9 @@ body.space img.logo {
 .battleship {
     box-sizing: border-box;
     color: #0e1530;
+    flex: 1;
+    align-self: stretch;
+    width: 100%;
 }
 
 .battleship.blog {
@@ -225,6 +233,14 @@ select {
     display: block;
 }
 
+.battleship {
+    display: flex;
+    flex-flow: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start
+}
+
 .battleship .print-only {
     display: none;
 }
@@ -283,12 +299,20 @@ select {
     text-align: center;
 }
 
+#navbar {
+    margin: 0 0;
+    flex: 1;
+    align-self: stretch;
+    width: 100%;
+}
+
 @media (max-width: 600px) {
 
     .game-container:not(.print-preview) {
         width: var(--content-width);
 
     }
+
 
     .game-container {
         margin: 0 auto;
@@ -313,14 +337,17 @@ select {
     }
 }
 
-
 @media (min-width: 1200px) {
 
+    #navbar:not(.print-preview),
     .battleship:not(.print-preview),
     .battleship:not(.print-preview) .title-wrap {
         width: 1200px !important;
     }
 
+
+
+    .footer-wrap,
     .title-wrap,
     .centered-title {
         margin: 0 auto;

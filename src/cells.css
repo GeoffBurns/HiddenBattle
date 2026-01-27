@@ -43,6 +43,8 @@
     cursor: var(--cross-cursor-image) 16 16, auto;
 }
 
+
+#navbar,
 #battleship-game-container {
     position: relative;
 }

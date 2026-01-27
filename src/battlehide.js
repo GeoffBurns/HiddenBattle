@@ -21,6 +21,8 @@ placedShipsInstance.registerUndo(friendUI.undoBtn)
 
 friendUI.resetBoardSize()
 
+function moveFooter () {}
+
 function moveStatus (oldline, newLine, placement) {
   moveStatusChildren(newLine)
 
@@ -53,7 +55,7 @@ function onClickReturnToPlacement () {
   const enemyContainer = document.getElementById('enemy-container')
   enemyContainer.classList.add('hidden')
 
-  moveStatus(gameStatus.line, gameStatus.line2, true)
+  //moveStatus(gameStatus.line, gameStatus.line2, true)
 
   const tallyTitle = document.getElementById('tally-title')
   const tallyBox = document.getElementById('friend-tally-container')
@@ -75,7 +77,7 @@ function onClickSeek () {
   const enemyContainer = document.getElementById('enemy-container')
   enemyContainer.classList.remove('hidden')
 
-  moveStatus(gameStatus.line, gameStatus.line2, false)
+  //moveStatus(gameStatus.line, gameStatus.line2, false)
   gameStatus.line.classList.add('small')
 
   const tallyTitle = document.getElementById('tally-title')
