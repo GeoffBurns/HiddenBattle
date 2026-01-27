@@ -360,8 +360,6 @@ div.tally-row.weapon div.tally-box::before {
     background-image: url('./boxmissile28.png');
 }
 
-
-
 .tally-row.weapon.missile div.tally-box.used::before {
     background-image: url('./boxmissileol28.png');
     opacity: 0.6;
