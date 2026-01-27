@@ -231,7 +231,8 @@ class Enemy extends Waters {
     gameStatus.displayAmmoStatus(
       this.loadOut.weaponSystem(),
       gameMaps(),
-      this.loadOut.cursorIndex()
+      this.loadOut.cursorIndex(),
+      this.toadOut.coords.length
     )
   }
 
