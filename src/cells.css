@@ -47,6 +47,8 @@
 #navbar,
 #battleship-game-container {
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .board.bomb {

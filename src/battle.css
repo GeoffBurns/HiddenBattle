@@ -225,10 +225,6 @@ select {
     width: var(--content-width);
 }
 
-.panel-container {
-    margin: 0 auto;
-}
-
 .screen-only {
     display: block;
 }
@@ -316,6 +312,23 @@ select {
 
     .game-container {
         margin: 0 auto;
+    }
+}
+
+.panel-container {
+    flex: 1;
+    align-self: stretch;
+    width: 100% !important;
+}
+
+@media (min-width: 1024px) and (max-width: 1200px) {
+
+    .game-container,
+    .player-container,
+    .player-body {
+        flex: 1;
+        align-self: stretch;
+        width: 100% !important;
     }
 }
 
