@@ -20,39 +20,65 @@ export class StatusUI {
       this.info(game)
     }
   }
-  displayAmmoStatus (wps, maps, idx = 0) {
+  displayAmmoStatus (wps, maps, idx = 0, numCoords = -1) {
     const weapon = wps.weapon
     const ammo = wps.ammoLeft()
     const letter = weapon.letter
-    this.counter.classList.remove('hidden')
-    this.icon1.classList.remove('hidden')
     if (weapon.isLimited) {
-      const total = wps.ammoTotal()
-
-      this.total.textContent = total
-      this.left.textContent = ammo
-      if (weapon.totalCursors >= 2) {
-        this.icon2.textContent = ''
-        this.icon2.style.background = maps.shipColors[letter + `2`]
-        this.icon2.className = 'mode-icon tally-box ' + weapon.classname
-        this.icon2.classList.remove('hidden')
-      } else {
-        this.icon2.classList.add('hidden')
-      }
-      this.icon1.textContent = ''
-      this.icon1.style.background = maps.shipColors[letter + `1`]
-      this.icon1.className = 'mode-icon tally-box ' + weapon.classname
+      this.displayLimitedAmmoStatus(wps, ammo, weapon, numCoords, maps, letter)
     } else {
-      this.total.textContent = '∞'
-      this.left.textContent = '∞'
-      this.icon1.style.background = 'white'
-      this.icon1.className = 'mode-icon tally-box single'
-      this.icon2.classList.add('hidden')
+      this.displaySingleShotStatus()
     }
 
     //return this.display(weapon.ammoStatus(ammo), weapon.hints[idx])
     return this.display('', weapon.hints[idx])
   }
+  displayLimitedAmmoStatus (wps, ammo, weapon, numCoords, maps, letter) {
+    this.counter.classList.remove('hidden')
+    this.icon1.classList.remove('hidden')
+    const total = wps.ammoTotal()
+    this.total.textContent = total
+    this.left.textContent = ammo
+    if (weapon.totalCursors >= 2) {
+      switch (numCoords) {
+        case 0:
+          this.icon1.classList.remove('off')
+          this.icon2.classList.add('off')
+          break
+        case 1:
+          this.icon1.classList.add('off')
+          this.icon2.classList.remove('off')
+          break
+        default:
+          this.icon1.classList.remove('off')
+          this.icon2.classList.remove('off')
+          break
+      }
+
+      this.counter.classList.remove('hidden')
+      this.icon1.classList.remove('hidden')
+      this.icon2.textContent = ''
+      this.icon2.style.background = maps.shipColors[letter + `2`]
+      this.icon2.className = 'mode-icon tally-box ' + weapon.classname
+      this.icon2.classList.remove('hidden')
+    } else {
+      this.icon2.classList.add('hidden')
+    }
+    this.icon1.textContent = ''
+    this.icon1.style.background = maps.shipColors[letter + `1`]
+    this.icon1.className = 'mode-icon tally-box ' + weapon.classname
+  }
+
+  displaySingleShotStatus () {
+    this.counter.classList.remove('hidden')
+    this.icon1.classList.remove('hidden')
+    this.total.textContent = '∞'
+    this.left.textContent = '∞'
+    this.icon1.style.background = 'white'
+    this.icon1.className = 'mode-icon tally-box single'
+    this.icon2.classList.add('hidden')
+  }
+
   info (game) {
     this.game.textContent = game
   }
