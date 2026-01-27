@@ -667,7 +667,12 @@ export class Waters {
       return
     }
     const { wps, cursorIdx } = this.updateWeapon(wps1)
-    gameStatus.displayAmmoStatus(wps, gameMaps(), cursorIdx)
+    gameStatus.displayAmmoStatus(
+      wps,
+      gameMaps(),
+      cursorIdx,
+      this.loadOut.coords.length
+    )
   }
   updateWeapon (wps1) {
     const wps = wps1 || this.loadOut.weaponSystem()
