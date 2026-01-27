@@ -33,18 +33,27 @@ export class StatusUI {
       this.displaySingleShotStatus()
     }
 
-    //return this.display(weapon.ammoStatus(ammo), weapon.hints[idx])
     return this.display('', weapon.hints[idx])
   }
   displayLimitedAmmoStatus (wps, ammo, weapon, numCoords, maps, letter) {
     this.displayAmmoLeft(wps, ammo)
-    if (weapon.totalCursors >= 2) {
+
+    const numCursors = this.seekingMode
+      ? weapon.cursors.length
+      : weapon.totalCursors
+    if (numCursors >= 2) {
       this.diplayWhichLaunchStep(numCoords)
       this.displayAimStep(maps, letter, weapon)
+      this.displayLaunchFirstStep(maps, letter, weapon)
     } else {
-      this.icon2.classList.add('hidden')
+      if (weapon.launchCursor && weapon.launchCursor !== weapon.cursors[0]) {
+        this.icon1.classList.add('hidden')
+        this.displayAimStep(maps, letter, weapon)
+      } else {
+        this.icon2.classList.add('hidden')
+        this.displayLaunchFirstStep(maps, letter, weapon)
+      }
     }
-    this.displayLaunchFirstStep(maps, letter, weapon)
   }
 
   displayLaunchFirstStep (maps, letter, weapon) {

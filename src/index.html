@@ -34,10 +34,12 @@
             <h2 id="friend-title" class="centered-title">Friendly Waters</h2>
           </div>
           <div class="player-body">
-            <div class="player-main">
+            <div class="player-main" id="friend-main">
               <div class="board-wrap">
                 <div class="board" id="friend-board"></div>
               </div>
+            </div>
+            <div class="footer" id="friend-footer">
               <div class="info-wrap" id="statusLine-wrap">
                 <div class="status medium" id="statusLine">
                   <div id="gameStatus" class="game-status"></div>
@@ -60,8 +62,7 @@
                 <div id="weaponTray" class="tray"></div>
               </div>
             </div>
-
-            <div class="panel-container">
+            <div class="panel-container" id="friend-panel">
               <div class="board-wrap">
                 <div class="panel">
                   <div class="panel-controls" id="place-controls">
@@ -149,7 +150,7 @@
 
                   <div class="info-container">
                     <div class="info" id="friend-placed-label">
-                      Placed: <span id="friend-placed">0 </span>
+                      Placed: <span class="no-wrap" id="friend-placed">0 </span>
                     </div>
                     <div class="info hidden" id="friend-shots-label">
                       Shots: <span id="friend-shots">0 </span>
@@ -165,7 +166,7 @@
               </div>
             </div>
           </div>
-          <div class="footer-wrap" id="friend-footer"></div>
+          <div class="footer-wrap" id="friend-footer-wrap"></div>
         </div>
 
         <div class="player-container hidden" id="enemy-container">
@@ -179,7 +180,7 @@
                 <div class="board" id="enemy-board"></div>
               </div>
 
-              <div class="info-wrap">
+              <div class="info-wrap hidden">
                 <div class="status hidden" id="statusLine2"></div>
               </div>
             </div>
@@ -206,13 +207,13 @@
                   </div>
                   <div class="info-container">
                     <div class="info" id="enemy-shots-label">
-                      Shots: <span id="enemy-shots">0 </span>
+                      Shots: <span class="no-wrap" id="enemy-shots">0 </span>
                     </div>
                     <div class="info" id="enemy-hits-label">
-                      Hits: <span id="enemy-hits">0 </span>
+                      Hits: <span class="no-wrap" id="enemy-hits">0 </span>
                     </div>
                     <div class="info" id="enemy-sunk-label">
-                      Sunk: <span id="enemy-sunk">0 / 8</span>
+                      Sunk: <span class="no-wrap" id="enemy-sunk">0 / 8</span>
                     </div>
                   </div>
                 </div>

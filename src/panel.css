@@ -48,7 +48,8 @@
  .tally-row {
      display: flex;
      gap: 6px;
-     align-items: center
+     align-items: center;
+     flex-wrap: wrap;
  }
 
  .tally-col {
