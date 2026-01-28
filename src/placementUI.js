@@ -1,10 +1,9 @@
-import { gameMap, gameMaps } from './gameMaps.js'
+import { bh, Terrain } from './terrain.js'
 import { WatersUI } from './WatersUI.js'
 import { ClickedShip } from './selection.js'
 import { cursor } from './cursor.js'
 import { Ship } from './Ship.js'
 import { dragNDrop } from './dragndrop.js'
-import { bh, Terrain } from './terrain.js'
 import { setCellCoords } from './utilities.js'
 
 export class PlacementUI extends WatersUI {
@@ -445,7 +444,7 @@ export class PlacementUI extends WatersUI {
     }
   }
   createDragShipCell (dragShip, cells, letter, r, c, special) {
-    const maps = gameMaps()
+    const maps = bh.maps
     if (cells.some(shipcell => shipcell[0] === r && shipcell[1] === c)) {
       this.appendCell(
         dragShip,
@@ -506,20 +505,10 @@ export class PlacementUI extends WatersUI {
     }
     dragItem.appendChild(cell)
   }
-  static get spashTags () {
-    return {
-      0: 'destroy-vunerable',
-      1: 'destroy-normal',
-      2: 'destroy-hardened',
-      10: 'reveal-vunerable',
-      11: 'reveal-normal',
-      12: 'reveal-hardened',
-      20: 'weapon-path'
-    }
-  }
+
   appendSplashCell (dragItem, power) {
     const cell = this.makeCell()
-    cell.classList.add(PlacementUI.spashTags[power])
+    cell.classList.add(bh.spashTags[power])
     dragItem.appendChild(cell)
   }
 
@@ -838,7 +827,7 @@ export class PlacementUI extends WatersUI {
     this.markPlaced(placed, ship)
 
     model.ships.push(ship)
-    const map = gameMap() // Ensure map is an instance of the correct class
+    const map = bh.map
     const id = Ship.id
     const shape = ship.shape()
     const newShip = Ship.createFromShape(shape)
@@ -855,7 +844,7 @@ export class PlacementUI extends WatersUI {
     this.showNotice(ship.description() + this.removeText)
     const indexToRemove = model.ships.findIndex(s => s.id === ship.id)
     if (indexToRemove >= 0) model.ships.splice(indexToRemove, 1)
-    model.armWeapons(gameMap())
+    model.armWeapons(bh.map)
     this.score.buildTallyFromModel(model, this)
     this.displayAddInfo(model)
     this.score.displayAddZoneInfo(model)
@@ -909,7 +898,7 @@ export class PlacementUI extends WatersUI {
 
 function moveGridCursor (event, shipCellGrid, viewModel) {
   event.preventDefault()
-  const map = gameMap()
+  const map = bh.map
   switch (event.key) {
     case 'ArrowUp':
       cursor.x--

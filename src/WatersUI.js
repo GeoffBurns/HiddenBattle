@@ -1,5 +1,4 @@
 import { bh } from './terrain.js'
-import { gameMap, gameMaps } from './gameMaps.js'
 import { ScoreUI } from './ScoreUI.js'
 import {
   addKeyToCell,
@@ -41,14 +40,14 @@ export class WatersUI {
   }
 
   cellSizeScreen (map) {
-    map = map || gameMap()
+    map = map || bh.map
     return this.containerWidth / (map?.cols || 18)
   }
   cellSizeList () {
     return this.containerWidth / 22
   }
   cellSizePrint (map) {
-    map = map || gameMap()
+    map = map || bh.map
     return 600 / (map.cols + 1)
   }
 
@@ -70,7 +69,7 @@ export class WatersUI {
     return this.cellSizePrint() + this.cellUnit()
   }
   gridCellRawAt (r, c) {
-    return this.board.children[r * gameMap().cols + c]
+    return this.board.children[r * bh.map.cols + c]
   }
   gridCellAt (r, c) {
     const result = this.gridCellRawAt(r, c)
@@ -155,7 +154,7 @@ export class WatersUI {
     cell.textContent = letter
   }
   setShipCellColors (cell, letter) {
-    const maps = gameMaps()
+    const maps = bh.maps
     cell.style.color = maps.shipLetterColors[letter] || '#fff'
     cell.style.background = maps.shipColors[letter] || 'rgba(255,255,255,0.2)'
   }
@@ -356,7 +355,7 @@ export class WatersUI {
     cell.classList.remove('wake')
   }
   surrounder (map, r, c, adder) {
-    const m = map || gameMap()
+    const m = map || bh.map
     // surrounding water misses
     for (let dr = -1; dr <= 1; dr++)
       for (let dc = -1; dc <= 1; dc++) {
@@ -395,7 +394,7 @@ export class WatersUI {
     return this.surroundCells(cells).difference(this.cellSet(cells))
   }
   surroundCells (cells) {
-    const map = gameMap()
+    const map = bh.map
     let surroundings = new Set()
     for (const [r, c] of cells) {
       // surrounding water misses
@@ -404,7 +403,7 @@ export class WatersUI {
     return surroundings
   }
   surroundCellElement (cells, container) {
-    const map = gameMap()
+    const map = bh.map
     let surroundings = container || {}
     for (const cell of cells) {
       const [r, c] = coordsFromCell(cell)
@@ -425,7 +424,7 @@ export class WatersUI {
     }
   }
   resetBoardSize (map, cellSize) {
-    if (!map) map = gameMap()
+    if (!map) map = bh.map
     cellSize = cellSize || this.cellSizeString()
     this.board.style.setProperty('--cols', map?.cols || 18)
     this.board.style.setProperty('--rows', map?.rows || 8)
@@ -433,7 +432,7 @@ export class WatersUI {
     this.board.innerHTML = ''
   }
   resetBoardSizePrint (map) {
-    if (!map) map = gameMap()
+    if (!map) map = bh.map
     const cellSize = this.cellSizeStringPrint()
     this.board.style.setProperty('--cols', map.cols + 1)
     this.board.style.setProperty('--rows', map.rows + 1)
@@ -475,7 +474,7 @@ export class WatersUI {
     this.colorizeCell(cell, r, c)
   }
   colorizeCell (cell, r, c, map) {
-    if (!map) map = gameMap()
+    if (!map) map = bh.map
 
     map.tagCell(cell.classList, r, c)
 
@@ -529,7 +528,7 @@ export class WatersUI {
     this.board.appendChild(cell)
   }
   buildBoardPrint (map) {
-    map = map || gameMap()
+    map = map || bh.map
     this.board.innerHTML = ''
     this.buildEmptyCell()
 
@@ -544,7 +543,7 @@ export class WatersUI {
     }
   }
   buildBoard (onClickCell, thisRef, map) {
-    map = map || gameMap()
+    map = map || bh.map
     this.board.innerHTML = ''
     for (let r = 0; r < map.rows; r++) {
       for (let c = 0; c < map.cols; c++) {
@@ -554,6 +553,27 @@ export class WatersUI {
       }
     }
   }
+  removeHighlightAoE () {
+    for (const el of this.board.children) {
+      el.classList.remove(
+        'destroy-vunerable',
+        'destroy-normal',
+        'destroy-hardened',
+        'reveal-vunerable',
+        'reveal-normal',
+        'reveal-hardened',
+        'weapon-path'
+      )
+    }
+  }
+  buildBoardHover (onEnter, onLeave, thisRef, weaponSource) {
+    for (const el of this.board.children) {
+      const [r, c] = coordsFromCell(el)
+      el.addEventListener('mouseenter', onEnter.bind(null, weaponSource, r, c))
+      el.addEventListener('mouseleave', onLeave.bind(thisRef, r, c))
+    }
+  }
+
   clearVisualsBase (details, classClear) {
     const clear = classClear || this.clearCell.bind(this)
     const children = this.board?.children

@@ -1,7 +1,7 @@
+import { bh } from './terrain.js'
 import { coordsFromCell } from './utilities.js'
 import { DraggedShip, Brush } from './selection.js'
 import { cursor } from './cursor.js'
-import { gameMap } from './gameMaps.js'
 import { CustomMap } from './map.js'
 
 let selection = null
@@ -215,7 +215,7 @@ class DraggedWeapon {
     // nothing to remove
   }
   addToMap (map) {
-    map = map || gameMap()
+    map = map || bh.map
     const weapons = map.weapons
 
     const idx = weapons.findIndex(w => w.letter === this.weapon.letter)
@@ -346,7 +346,7 @@ class DragNDrop {
   }
 
   highlight (viewModel, shipCellGrid, r, c) {
-    const map = gameMap()
+    const map = bh.map
     if (!selection?.ghost) return
     if (r === null) r = lastEntered[0]
     if (c === null) c = lastEntered[1]
@@ -420,7 +420,7 @@ class DragNDrop {
 
       const size = selection?.size
       const subterrain = selection?.subterrain
-      const map = gameMap()
+      const map = bh.map
 
       if (!(selection?.size && subterrain && map instanceof CustomMap)) return
 

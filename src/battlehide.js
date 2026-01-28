@@ -50,6 +50,26 @@ function onClickSeek () {
   friendUI.seekMode()
   playBH()
 }
+
+function highlightAoE (model, r, c) {
+  const map = bh.map
+  if (!map.inBounds(r, c)) return
+  const viewModel = model.UI
+  const coords = model.loadOut?.coords
+  const wps = model.loadOut?.selectedWeapon || model.loadOut.weaponSystem()
+  const weapon = wps?.weapon
+  viewModel.removeHighlightAoE()
+  const newCoords = [...coords, [r, c]]
+  if (!weapon || weapon.points > newCoords.length) return
+  const cells = weapon.aoe(map, newCoords)
+  for (const [rr, cc, power] of cells) {
+    if (map.inBounds(rr, cc)) {
+      const cellClass = bh.spashTags[power]
+      const cell = viewModel.gridCellAt(rr, cc)
+      cell.classList.add(cellClass)
+    }
+  }
+}
 function playBH () {
   const enemyContainer = document.getElementById('enemy-container')
   enemyContainer.classList.remove('hidden')
@@ -67,7 +87,14 @@ function playBH () {
   removeSeekShorcuts = setupEnemy(onClickReturnToPlacement)
   enemy.UI.resetBoardSize()
   friend.setupUntried()
+
   newGame('hide', resetFriendBoard)
+  enemy.UI.buildBoardHover(
+    highlightAoE,
+    enemy.UI.removeHighlightAoE,
+    enemy.UI,
+    enemy
+  )
 }
 
 function onClickAuto () {

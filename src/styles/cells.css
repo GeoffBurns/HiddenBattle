@@ -443,31 +443,31 @@ div.tally-row.weapon div.tally-box::before {
 }
 
 .cell.destroy-vunerable {
-    background: #c9e673
+    background: #c9e673 !important;
 }
 
 .cell.destroy-normal {
-    background: #f5b44c
+    background: #f5b44c !important;
 }
 
 .cell.destroy-hardened {
-    background: #6c0135
+    background: #6c0135 !important;
 }
 
 .cell.reveal-vunerable {
-    background: #73bce6
+    background: #73bce6 !important;
 }
 
 .cell.reveal-normal {
-    background: #4f4cf5
+    background: #4f4cf5 !important;
 }
 
 .cell.reveal-hardened {
-    background: #540181
+    background: #540181 !important;
 }
 
 .cell.weapon-path {
-    background: #a6f9e1
+    background: #a6f9e1 !important;
 }
 
 .cell.empty,

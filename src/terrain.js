@@ -159,6 +159,19 @@ export const bh = {
       this.terrainMaps.setToDefault() ||
       this.terrainMaps.setByIndex(0)
     )
+  },
+  get spashTags () {
+    return {
+      0: 'destroy-vunerable',
+      1: 'destroy-normal',
+      2: 'destroy-hardened',
+      3: 'destroy-hardened',
+      4: 'destroy-hardened',
+      10: 'reveal-vunerable',
+      11: 'reveal-normal',
+      12: 'reveal-hardened',
+      20: 'weapon-path'
+    }
   }
 }
 export class SubTerrainBase {
