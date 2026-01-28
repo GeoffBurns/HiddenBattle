@@ -2,7 +2,7 @@ import { bh } from './terrain.js'
 import { WeaponSystem, AttachedWeaponSystems } from './WeaponSystem.js'
 
 export class LoadOut {
-  constructor (weapons, ships, seekingMode, viewModel) {
+  constructor (weapons, ships, viewModel) {
     this.OutOfAllAmmo = Function.prototype
     this.OutOfAmmo = Function.prototype
     this.destroy = Function.prototype
@@ -11,10 +11,9 @@ export class LoadOut {
     this.sound = Function.prototype
     this.index = 0
     this.viewModel = viewModel
-    this.seekingMode = seekingMode
     const hasAttachedWeapons = ships.length > 0
     this.hasAttachedWeapons = hasAttachedWeapons
-    this.selectRack = !seekingMode && hasAttachedWeapons
+    this.selectRack = !bh.seekingMode && hasAttachedWeapons
     this.selectedWeapon = null
     this.hintCoord = []
     this.coords = []
@@ -254,7 +253,7 @@ export class LoadOut {
     const oldCursor = this.cursor()
     this.coords = []
     let wps = this.getUnattachedWeapon()
-    if (this.seekingMode && !wps) {
+    if (bh.seekingMode && !wps) {
       wps = this.getRack()
     }
     if (wps && wps.weapon.unattachedCursor > 0) {
@@ -281,7 +280,7 @@ export class LoadOut {
     return this.coords.length
   }
   isArmed () {
-    const ishide = !this.seekingMode
+    const ishide = !bh.seekingMode
     const selected = this.selectedWeapon
     const result =
       ishide &&

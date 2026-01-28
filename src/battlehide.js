@@ -1,3 +1,4 @@
+import { bh } from './terrain.js'
 import { gameStatus } from './StatusUI.js'
 import { placedShipsInstance } from './selection.js'
 import { setupGameOptions, fetchNavBar } from './navbar.js'
@@ -21,31 +22,6 @@ placedShipsInstance.registerUndo(friendUI.undoBtn)
 
 friendUI.resetBoardSize()
 
-function moveFooter () {}
-
-function moveStatus (oldline, newLine, placement) {
-  moveStatusChildren(newLine)
-
-  const temp = newLine
-  gameStatus.line2 = oldline
-  gameStatus.line = temp
-  oldline.classList.add('hidden')
-  newLine.classList.remove('hidden')
-  const wrap = document.getElementById('statusLine-wrap')
-
-  gameStatus.counter.classList.add('hidden')
-  gameStatus.icon1.classList.add('hidden')
-  gameStatus.icon2.classList.add('hidden')
-  if (placement) {
-    wrap.classList.remove('hidden')
-  } else {
-    wrap.classList.add('hidden')
-  }
-}
-function moveStatusChildren (newLine) {
-  newLine.appendChild(gameStatus.game)
-  newLine.appendChild(gameStatus.right)
-}
 function onClickTest () {
   friend.test.bind(friend)()
 }
@@ -54,8 +30,6 @@ let removeSeekShorcuts = null
 function onClickReturnToPlacement () {
   const enemyContainer = document.getElementById('enemy-container')
   enemyContainer.classList.add('hidden')
-
-  //moveStatus(gameStatus.line, gameStatus.line2, true)
 
   const tallyTitle = document.getElementById('tally-title')
   const tallyBox = document.getElementById('friend-tally-container')
@@ -74,10 +48,12 @@ function resetFriendBoard () {
 }
 function onClickSeek () {
   friendUI.seekMode()
+  playBH()
+}
+function playBH () {
   const enemyContainer = document.getElementById('enemy-container')
   enemyContainer.classList.remove('hidden')
 
-  //moveStatus(gameStatus.line, gameStatus.line2, false)
   gameStatus.line.classList.add('small')
 
   const tallyTitle = document.getElementById('tally-title')
@@ -93,26 +69,12 @@ function onClickSeek () {
   friend.setupUntried()
   newGame('hide', resetFriendBoard)
 }
+
 function onClickAuto () {
-  return friend.autoPlace2()
-  /*
-  const ships = friend.ships
-  for (let attempt = 0; attempt < 100; attempt++) {
-    let ok = true
-    for (const ship of ships) {
-      const placed = randomPlaceShape(ship, friend.shipCellGrid)
-      if (!placed) {
-        friend.resetShipCells()
-        friendUI.clearPlaceVisuals()
-        friendUI.placeTally(ships)
-        friendUI.displayShipInfo(ships)
-        ok = false
-        break
-      }
-      friendUI.placement(placed, friend, ship)
-    }
-    if (ok) return true
-  } */
+  friend.autoPlace2()
+  if (!bh.test) {
+    playBH()
+  }
 }
 function onClickUndo () {
   if (!friendUI.placingShips) {
@@ -247,6 +209,6 @@ fetchNavBar('hide', "Geoff's Hidden Battle (Hide & Seek)", function () {
   if (placedShips) {
     friend.load(null)
     friend.updateUI(friend.ships)
-    friendUI.readyMode()
+    friendUI.gotoNextStageAfterPlacement()
   }
 })

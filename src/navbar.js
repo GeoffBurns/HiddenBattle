@@ -1,7 +1,6 @@
 import { bh, terrains } from './terrain.js'
 import { ChooseFromListUI, ChooseNumberUI } from './chooseUI.js'
-import { TerrainMaps } from './TerrainMaps.js'
-import { gameMaps, gameMap } from './gameMaps.js'
+import { assembleTerrains } from './gameMaps.js'
 import { custom } from './custom.js'
 import { SavedCustomMap } from './map.js'
 import { toTitleCase } from './utils.js'
@@ -21,17 +20,17 @@ export function switchToEdit (map, huntMode) {
 }
 
 function resetCustomMap () {
-  const map = gameMap()
+  const map = bh.map
   saveCustomMap(map)
 
-  gameMaps().setToBlank(map.rows, map.cols)
+  bh.maps.setToBlank(map.rows, map.cols)
 }
 function saveCustomMap (map) {
   trackLevelEnd(map, false)
   if (custom.noOfPlacedShips() > 0) {
     map.weapons = map.weapons.filter(w => w.ammo > 0 || w.unlimited)
     custom.store()
-    gameMaps().addCurrentCustomMap(custom.placedShips())
+    bh.maps.addCurrentCustomMap(custom.placedShips())
   }
 }
 
@@ -50,7 +49,7 @@ function storeShips (params, huntMode, target, map) {
 export function switchTo (target, huntMode, mapName) {
   if (target) {
     const params = new URLSearchParams()
-    const map = gameMap()
+    const map = bh.map
     if (!mapName) {
       params.append('height', map.rows)
       params.append('width', map.cols)
@@ -129,7 +128,7 @@ export function setupTabs (huntMode) {
       try {
         const text = await file.text()
         const map = new SavedCustomMap(JSON.parse(text))
-        const maps = gameMaps()
+        const maps = bh.maps
         if (maps.getMap(map.title) || maps.getCustomMap(map.title)) {
           if (
             !confirm(
@@ -253,12 +252,12 @@ function setupMapControl (
   boardSetup = Function.prototype,
   refresh = Function.prototype
 ) {
+  terrainSelect()
   var { mapName, targetMap } = setMapFromParams(urlParams)
 
   setMapSelector(boardSetup, refresh, mapName)
 
-  terrainSelect(boardSetup, refresh)
-  gameMaps().setTo(mapName)
+  bh.maps.setTo(mapName)
   return targetMap
 }
 
@@ -267,7 +266,7 @@ function setMapSelector (
   // refresh = Function.prototype,
   mapName
 ) {
-  const maps = gameMaps()
+  const maps = bh.maps
   const mapTitles = (() => {
     try {
       return maps.mapTitles()
@@ -295,7 +294,7 @@ function setMapSelector (
 function setMapFromParams (urlParams) {
   let mapName = getParamMap(urlParams)
   const [height, width] = getParamSize(urlParams)
-  const maps = gameMaps()
+  const maps = bh.maps
   let targetMap = null
   try {
     targetMap = maps.getMap(mapName)
@@ -321,11 +320,9 @@ function setMapFromParams (urlParams) {
 }
 
 function terrainSelect () {
-  // boardSetup = Function.prototype,
-  // refresh = Function.prototype
   const terrainTitles = (() => {
     try {
-      return TerrainMaps.titleList()
+      return bh.terrainTitleList
     } catch (error) {
       console.error('An error occurred:', error.message, terrains)
       return []
@@ -334,14 +331,14 @@ function terrainSelect () {
   const terrainUI = new ChooseFromListUI(terrainTitles, 'chooseTerrain')
   terrainUI.setup(
     function (_index, title) {
-      const old = gameMap()
+      const old = bh.map
       const height = old?.rows
       const width = old?.cols
-      TerrainMaps.setByTitle(title)
+      bh.setTerrainByTitle(title)
       if (height && width) {
         setSizeParams(height, width)
       }
-      setTerrainParams(gameMaps())
+      setTerrainParams(bh.maps)
       window.location.reload()
 
       /*
@@ -362,14 +359,10 @@ function terrainSelect () {
 function setupMapSelectionPrint (boardSetup, refresh) {
   const urlParams = new URLSearchParams(globalThis.location.search)
 
-  setupTerrain(urlParams)
-
   return setupMapControl(urlParams, boardSetup, refresh)
 }
 function setupMapSelection (boardSetup, refresh) {
   const urlParams = new URLSearchParams(globalThis.location.search)
-
-  setupTerrain(urlParams)
 
   const placedShips = urlParams.has('placedShips')
 
@@ -463,7 +456,7 @@ function updateState (tokens, url) {
 }
 function setupTerrain (urlParams) {
   const terrainTag = urlParams.getAll('terrain')[0]
-  const newTerrainMap = TerrainMaps.setByTag(terrainTag)
+  const newTerrainMap = bh.setTerrainByTag(terrainTag)
   const newTerrainTag = newTerrainMap?.terrain?.tag
   if (newTerrainTag && terrainTag !== newTerrainTag) {
     setTerrainParams(newTerrainTag, newTerrainMap)
@@ -486,7 +479,7 @@ function setTerrainParams (newTerrainMap) {
   let w = ''
   let x = ''
   if (mapName && (Number.isNaN(height) || Number.isNaN(width))) {
-    const map = gameMap()
+    const map = bh.map
     height = map?.rows
     width = map?.cols
   }
@@ -507,11 +500,7 @@ function setTerrainParams (newTerrainMap) {
     ],
     url
   )
-  const body = document.getElementsByTagName('body')[0]
-  if (body) {
-    body.classList.remove(...terrains.allBodyTags())
-    body.classList.add(bh.terrain.bodyTag)
-  }
+  bh.setTheme()
 }
 
 function getParamSize (urlParams) {
@@ -526,9 +515,7 @@ function setupMapOptions (boardSetup, refresh, huntMode = 'build') {
   const refreshSizeParams =
     huntMode === 'build' ? setSizeParams : Function.prototype
 
-  setupTerrain(urlParams)
-
-  terrainSelect(boardSetup, refresh)
+  terrainSelect()
 
   widthUI = new ChooseNumberUI(
     terrains.minWidth,
@@ -542,7 +529,7 @@ function setupMapOptions (boardSetup, refresh, huntMode = 'build') {
     1,
     'chooseHeight'
   )
-  const maps = gameMaps()
+  const maps = bh.maps
   const targetMap = maps.getEditableMap(getParamEditMap(urlParams))
 
   const templateMap =
@@ -557,7 +544,7 @@ function setupMapOptions (boardSetup, refresh, huntMode = 'build') {
   widthUI.setup(function (_index) {
     const width = validateWidth()
     const height = validateHeight()
-    const maps = gameMaps()
+    const maps = bh.maps
     maps.setToBlank(height, width)
     maps.storeLastWidth(width)
 
@@ -569,7 +556,7 @@ function setupMapOptions (boardSetup, refresh, huntMode = 'build') {
   heightUI.setup(function (_index) {
     const width = validateWidth()
     const height = validateHeight()
-    const maps = gameMaps()
+    const maps = bh.maps
     maps.setToBlank(height, width)
     maps.storeLastHeight(height)
     boardSetup()
@@ -578,7 +565,7 @@ function setupMapOptions (boardSetup, refresh, huntMode = 'build') {
   }, mapHeight)
 
   if (targetMap) {
-    gameMap(targetMap)
+    bh.map = targetMap
     boardSetup()
     refresh()
   } else {
@@ -608,7 +595,7 @@ function setMapTypeParams (mapType) {
   let bodyTag = t?.bodyTag
 
   if (t?.tag !== terrainTag) {
-    const newTerrainMap = TerrainMaps.setByTag(terrainTag)
+    const newTerrainMap = bh.setTerrainByTag(terrainTag)
     bodyTag = newTerrainMap?.terrain?.bodyTag
   }
 
@@ -640,7 +627,6 @@ export function setupMapListOptions (refresh) {
   const mapType = getParamMapType(urlParams)
   const mapTypeIdx = mapTypeIndex(mapType)
 
-  setupTerrain(urlParams)
   const listUI = new ChooseFromListUI(mapTypes, 'chooseList')
 
   listUI.setup(function (index, text) {
@@ -650,9 +636,7 @@ export function setupMapListOptions (refresh) {
   }, mapTypeIdx)
 
   mapTypeIncludes = mapTypeIdx.toString()
-  terrainSelect(Function.prototype, () => {
-    refresh(mapTypeIncludes)
-  })
+  terrainSelect()
 
   return mapTypeIncludes
 }
@@ -666,13 +650,13 @@ export function setupGameOptions (boardSetup, refresh) {
 export function setupPrintOptions (boardSetup, refresh) {
   const targetMap = setupMapSelectionPrint(boardSetup, refresh)
   boardSetup()
-  setTerrainParams(gameMaps())
+  setTerrainParams(bh.maps)
   return targetMap
 }
 
 export function setupBuildOptions (boardSetup, refresh, huntMode, editHandler) {
   const targetMap = setupMapOptions(boardSetup, refresh, huntMode)
-  const maps = gameMaps()
+  const maps = bh.maps
   maps.onChange = resetCustomMap
   if (targetMap && editHandler) {
     editHandler(targetMap)
@@ -716,6 +700,11 @@ export function initGA (GA_ID) {
 
 export async function fetchNavBar (tab, title, callback) {
   initGA(GA_ID)
+  const urlParams = new URLSearchParams(globalThis.location.search)
+  assembleTerrains()
+  setupTerrain(urlParams)
+  bh.setTheme()
+  bh.setTest(urlParams)
 
   try {
     // The await keyword pauses the execution until the fetch() promise settles (resolves or rejects)
@@ -753,7 +742,7 @@ export function trackLevelEnd (map, success) {
     console.warn('GA not initialized')
     return
   }
-  map = map || gameMap()
+  map = map || bh.map
 
   const params = {
     level_name: map.title || 'unknown',
@@ -772,7 +761,7 @@ export function trackClick (map, button) {
     console.warn('GA not initialized')
     return
   }
-  map = map || gameMap()
+  map = map || bh.map
 
   const params = {
     event_category: 'Engagement',

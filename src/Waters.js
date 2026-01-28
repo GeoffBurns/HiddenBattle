@@ -46,7 +46,6 @@ export class Waters {
     this.preamble = 'You were '
     this.resetShipCells()
     this.displayInfo = gameStatus.info.bind(gameStatus)
-    this.seekingMode = false
     this.showShips = false
   }
   clipboardKey () {
@@ -221,7 +220,7 @@ export class Waters {
     this.weaponShips = this.ships.filter(s => s.hasWeapon())
 
     this.hasAttachedWeapons = this.weaponShips.length > 0
-    if (this.seekingMode && this.hasAttachedWeapons) {
+    if (bh.seekingMode && this.hasAttachedWeapons) {
       this.weaponShips = this.createShips(map).filter(s => s.hasWeapon())
       this.loadOut = this.makeLoadOut(map)
     } else if (oppo) {
@@ -238,7 +237,7 @@ export class Waters {
   }
   makeLoadOut (map, ships) {
     ships = ships || this.weaponShips
-    return new LoadOut(map.weapons, ships, this.seekingMode, this.UI)
+    return new LoadOut(map.weapons, ships, this.UI)
   }
   autoSelectWarning (weaponName, currentShip) {
     this.displayInfo(
@@ -325,7 +324,8 @@ export class Waters {
     gameStatus.displayAmmoStatus(
       this.loadOut.weaponSystem(),
       bh.maps,
-      this.loadOut.cursorIndex(),
+      // this.loadOut.cursorIndex(),
+      null,
       this.loadOut.coords.length,
       this.loadOut.selectedWeapon
     )
@@ -442,7 +442,7 @@ export class Waters {
 
   setupAttachedAim () {
     const oppo = this.opponent
-    if (this.seekingMode || !this.loadOut || !oppo) return
+    if (bh.seekingMode || !this.loadOut || !oppo) return
     const armedShips = this.loadOut.armedShips()
     for (const ship of armedShips) {
       const cells = oppo.shipCells(ship.id)
@@ -697,8 +697,10 @@ export class Waters {
     gameStatus.displayAmmoStatus(
       wps,
       bh.maps,
-      cursorIdx,
-      this.loadOut.coords.length
+      null,
+      // cursorIdx,
+      this.loadOut.coords.length,
+      this.loadOut.selectedWeapon
     )
   }
   updateWeapon (wps1) {

@@ -8,14 +8,7 @@ body {
     justify-content: flex-start
 }
 
-body.space {
-    background-image: var(--background-image-space);
-    background-repeat: repeat;
-}
 
-body.space img.logo {
-    content: var(--logo-image-space);
-}
 
 .battleship {
     box-sizing: border-box;

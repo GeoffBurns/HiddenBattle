@@ -152,7 +152,12 @@ export class FriendUI extends PlacementUI {
     gameStatus.line2.classList.add('small')
   }
   gotoNextStageAfterPlacement () {
-    this.readyMode()
+    if (bh.test) {
+      friendUI.readyMode()
+    } else {
+      friendUI.readyMode()
+      friendUI.seekMode()
+    }
   }
 }
 

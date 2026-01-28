@@ -117,6 +117,48 @@ export const bh = {
   },
   shapesByLetter (letter) {
     return this.terrainMaps?.current?.shapesByLetter[letter]
+  },
+  setTheme () {
+    const terrainTheme = document.getElementById('terrainTheme')
+    const body = document.getElementsByTagName('body')[0]
+    if (terrainTheme) {
+      const bodyTag = terrains?.current.bodyTag || 'default'
+
+      if (body.classList.contains(bodyTag)) return
+      body.className = 'hidden-battle ' + bodyTag
+      terrainTheme.href = `./styles/${bodyTag}.css`
+    }
+  },
+  setTest (urlParams) {
+    const testTag = urlParams.getAll('test')[0]
+    this.test = testTag ? true : false
+  },
+  get terrainTitleList () {
+    return this.terrainMaps.list.map(t => t?.terrain?.title)
+  },
+  setTerrainByTitle (title) {
+    let result = null
+    if (title) {
+      result = this.terrainMaps.setByTitle(title)
+    }
+
+    return (
+      result ||
+      this.terrainMaps.setToDefault() ||
+      this.terrainMaps.setByIndex(0)
+    )
+  },
+  setTerrainByTag (tag) {
+    let result = null
+    if (tag) {
+      result = this.terrainMaps.setByTag(tag)
+    }
+
+    return (
+      result ||
+      this.terrainMaps.setToDefault() ||
+      this.terrainMaps.setByIndex(0)
+    )
   }
 }
 export class SubTerrainBase {

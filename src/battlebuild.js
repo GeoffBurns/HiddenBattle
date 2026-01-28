@@ -15,7 +15,6 @@ import {
 } from './dragndrop.js'
 import { placedShipsInstance } from './selection.js'
 import { custom } from './custom.js'
-import { gameMap, gameMaps } from './gameMaps.js'
 import {
   setupBuildOptions,
   validateHeight,
@@ -62,7 +61,7 @@ function onClickAccept (editingMap) {
   )
 }
 function onClickDefault () {
-  gameMaps().setToDefaultBlank(validateHeight(), validateWidth())
+  bh.maps.setToDefaultBlank(validateHeight(), validateWidth())
   customUI.refreshAllColor()
 
   customUI.score.displayZoneInfo()
@@ -87,22 +86,22 @@ function onClickClear () {
     return
   }
 
-  gameMaps().clearBlank()
+  bh.maps.clearBlank()
   customUI.refreshAllColor()
   customUI.score.displayZoneInfo()
   customUI.resetClearBtn()
 }
 function seekMap () {
-  trackLevelEnd(gameMap(), true)
+  trackLevelEnd(bh.map, true)
   switchTo('battleseek', 'build')
 }
 function playMap () {
-  trackLevelEnd(gameMap(), true)
+  trackLevelEnd(bh.map, true)
   switchTo('index', 'build')
 }
 
 function saveMap () {
-  const saveMap = gameMap()
+  const saveMap = bh.map
   trackLevelEnd(saveMap, false)
   switchToEdit(saveMap, 'build')
 }
@@ -195,7 +194,7 @@ function setupBuildShortcuts () {
 }
 
 function setReuseBtn () {
-  customUI.reuseBtn.disabled = !gameMaps().hasMapSize(
+  customUI.reuseBtn.disabled = !bh.maps.hasMapSize(
     validateHeight(),
     validateWidth()
   )

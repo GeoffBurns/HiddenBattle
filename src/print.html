@@ -10,14 +10,15 @@
       content="Play a challenging Battleship style game with no-touch placement rules and special ships."
     />
     <link rel="icon" type="image/png" href="../favicon.png" />
-    <link rel="stylesheet" href="animation.css" />
-    <link rel="stylesheet" href="tab.css" />
-    <link rel="stylesheet" href="battle.css" />
-    <link rel="stylesheet" href="panel.css" />
-    <link rel="stylesheet" href="cells.css" />
-    <link rel="stylesheet" href="status.css" />
-    <link rel="stylesheet" href="battlehide.css" />
-    <link rel="stylesheet" media="print" href="print.css" />
+    <link rel="stylesheet" href="./styles/default.css" id="terrainTheme" />
+    <link rel="stylesheet" href="./styles/animation.css" />
+    <link rel="stylesheet" href="./styles/tab.css" />
+    <link rel="stylesheet" href="./styles/battle.css" />
+    <link rel="stylesheet" href="./styles/panel.css" />
+    <link rel="stylesheet" href="./styles/cells.css" />
+    <link rel="stylesheet" href="./styles/status.css" />
+    <link rel="stylesheet" href="./styles/battlehide.css" />
+    <link rel="stylesheet" media="print" href="./styles/print.css" />
   </head>
   <body class="hidden-battle">
     <div class="battleship print-preview" id="battleship-game">
@@ -145,7 +146,7 @@
         </p>
         <h3>On your turn, you can do one of the following:</h3>
         <ol>
-          <li id="-single" data-list-text="1.">
+          <li id="weapon-info-single" data-list-text="1.">
             <h4>Standard Attack:</h4>
             <ul>
               <li data-list-text="◦">

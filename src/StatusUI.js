@@ -20,7 +20,7 @@ export class StatusUI {
       this.info(game)
     }
   }
-  displayAmmoStatus (wps, maps, idx = 0, numCoords = -1, selectedWps = null) {
+  displayAmmoStatus (wps, maps, idx = -1, numCoords = -1, selectedWps = null) {
     if (
       !wps ||
       (selectedWps && wps.weapon.letter !== selectedWps.weapon.letter)
@@ -28,13 +28,13 @@ export class StatusUI {
       return
     const weapon = wps.weapon
     const selected = selectedWps ? 1 : 0
-
     this.icon1.className = 'mode-icon tally-box'
     this.icon2.className = 'mode-icon tally-box'
+    let idxUsed = idx
     if (weapon.isLimited) {
       const ammo = wps.ammoLeft()
       const letter = weapon.letter
-      this.displayLimitedAmmoStatus(
+      idxUsed = this.displayLimitedAmmoStatus(
         wps,
         ammo,
         weapon,
@@ -44,34 +44,27 @@ export class StatusUI {
         selected
       )
     } else {
-      this.displaySingleShotStatus()
+      idxUsed = this.displaySingleShotStatus()
     }
-
-    return this.display('', weapon.hints[idx])
+    return this.display('', weapon.stepHint(idxUsed))
   }
   displayLimitedAmmoStatus (wps, ammo, weapon, numCoords, maps, letter, select) {
     this.displayAmmoLeft(wps, ammo)
-
-    const numCursors = this.seekingMode
-      ? weapon.cursors.length
-      : weapon.totalCursors
-
-    if (numCursors >= 2) {
-      const idx = this.seekingMode
-        ? numCoords
-        : weapon.totalCursorIdx(numCoords, select)
+    if (weapon.numStep >= 2) {
+      const idx = weapon.stepIdx(numCoords, select)
       this.diplayWhichLaunchStep(idx)
       this.displayAimStep(maps, letter, weapon)
       this.displayLaunchFirstStep(maps, letter, weapon)
-    } else {
-      if (weapon.hasExtraSelectCursor) {
-        this.icon1.classList.add('hidden')
-        this.displayAimStep(maps, letter, weapon)
-      } else {
-        this.icon2.classList.add('hidden')
-        this.displayLaunchFirstStep(maps, letter, weapon)
-      }
+      return idx
     }
+    if (weapon.hasExtraSelectCursor) {
+      this.icon1.classList.add('hidden')
+      this.displayAimStep(maps, letter, weapon)
+      return 1
+    }
+    this.icon2.classList.add('hidden')
+    this.displayLaunchFirstStep(maps, letter, weapon)
+    return 0
   }
 
   displayLaunchFirstStep (maps, letter, weapon) {

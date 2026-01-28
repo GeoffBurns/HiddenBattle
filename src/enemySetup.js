@@ -1,14 +1,12 @@
 import { bh } from './terrain.js'
-import { gameStatus } from './StatusUI.js'
 import { enemy } from './enemy.js'
 import { friendUI } from './friendUI.js'
 
 let otherboard = null
 const newGameBtn = document.getElementById('newGame')
 export function newGame (seek, opponentBoard) {
-  enemy.seekingMode = seek === 'seek'
-  gameStatus.seekingMode = enemy.seekingMode
-  if (enemy.seekingMode) {
+  bh.seekingMode = seek === 'seek'
+  if (bh.seekingMode) {
     enemy.ships = []
   }
   enemy.resetModel()

@@ -236,25 +236,7 @@ export class TerrainMaps {
     }
     return terrainsMaps.current
   }
-  static setByTag (tag) {
-    let result = null
-    if (tag) {
-      result = terrainsMaps.setByTag(tag)
-    }
 
-    return result || terrainsMaps.setToDefault() || terrainsMaps.setByIndex(0)
-  }
-  static setByTitle (title) {
-    let result = null
-    if (title) {
-      result = terrainsMaps.setByTitle(title)
-    }
-
-    return result || terrainsMaps.setToDefault() || terrainsMaps.setByIndex(0)
-  }
-  static titleList () {
-    return terrainsMaps.list.map(t => t?.terrain?.title)
-  }
   static setByIndex (idx) {
     if (idx) {
       return terrainsMaps.setByIndex(idx)

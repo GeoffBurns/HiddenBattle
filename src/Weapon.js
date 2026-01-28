@@ -1,3 +1,5 @@
+import { bh } from './terrain.js'
+
 export class Weapon {
   constructor (name, letter, isLimited, destroys, points) {
     if (new.target === Weapon) {
@@ -33,11 +35,28 @@ export class Weapon {
     let turn = ''
     return turn
   }
-  totalCursorIdx (numCoords, select) {
+
+  stepIdx (numCoords, select) {
+    if (bh.seekingMode) {
+      return numCoords
+    }
     if (this.launchCursor) {
       return numCoords + select - this.postSelectCursor
     }
     return numCoords
+  }
+  stepHint (idx) {
+    switch (idx) {
+      case 0:
+        return (
+          'Click on square in friendly ' + bh.mapHeading + ' to select weapon'
+        )
+      default:
+        return 'Click on square in enemy ' + bh.mapHeading + ' to fire'
+    }
+  }
+  get numStep () {
+    return bh.seekingMode ? this.cursors.length : this.totalCursors
   }
   get hasExtraSelectCursor () {
     return this.launchCursor && this.launchCursor !== this.cursors[0]

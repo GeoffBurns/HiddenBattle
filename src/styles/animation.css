@@ -1,47 +1,14 @@
 :root {
-    --flame1-image: url('flame_20.png');
-    --flame2-image: url('flame_24.png');
+    --flame1-image: url('../images/flame_20.png');
+    --flame2-image: url('../images/flame_24.png');
     --flame-duration: 0.4s;
     --flame2-duration: 0.7s;
     --shake-x: 8px;
     --shake-y: 6px;
     --content-width: 600px;
-    --bomb-cursor-image: url('./bomb32.png');
-    --rail-cursor-image: url('./rail32.png');
-    --bolt-cursor-image: url('./bolt32.png');
-    --missile-cursor-image: url('./missile32.png');
-    --white-missile-image: url('./whitemissile26.png');
-    --white-rail-image: url('./whiterail26.png');
-    --black-rail-image: url('./blackrail26.png');
-    --flying-missile-image: url('./flyingmissile40.png');
-    --flying-bomb-image: url('./flyingbomb40.png');
-    --flying-bolt-image: url('./flyingbolt40.png');
-    --flying-torpedo-image: url('./flyingtorpedo40.png');
-    --flying-flack-image: url('./flyingFlack40.png');
-    --flying-strike-image: url('./flyingstrike40.png');
-    --flying-round-image: url('./flyinground40.png');
-    --box-flack-image: url('./boxFlack28.png');
-    --asteroid-explode-image: url('./asteroid-explosion.png');
-    --sea-explode-image: url('./sea-explosion.png');
-    --land-explode-image: url('./land-explosion.png');
-    --space-explode-image: url('./space-explosion.png');
-    --air-explode-image: url('./air-explosion.png');
-    --plasma-explode-image: url('./plasma-explosion.png');
-    --launch-cursor-image: url('./launch32.png');
-    --launch2-cursor-image: url('./launch32_2.png');
-    --launch3-cursor-image: url('./launch32_3.png');
-    --launch4-cursor-image: url('./launch32_4.png');
-    --strike-cursor-image: url('./strike32.png');
-    --satelite-cursor-image: url('./sat32.png');
-    --cluster-cursor-image: url('./cluster32.png');
-    --dish-cursor-image: url('./dish32.png');
-    --sweep-cursor-image: url('./sweep32.png');
-    --torpedo-cursor-image: url('./torpedo32.png');
-    --periscope-cursor-image: url('./periscope32.png');
-    --cross-cursor-image: url('./cross32.png');
-    --background-image: url('./fleet.png');
-    --background-image-space: url('./spacefleet.png');
-    --logo-image-space: url('./space-logo.png');
+    --white-missile-image: url('../images/whitemissile26.png');
+    --air-explode-image: url('../images/air-explosion.png');
+    --cross-cursor-image: url('../images/cross32.png');
 }
 
 .cell.flames.long::before {
