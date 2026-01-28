@@ -41,18 +41,22 @@ export class Weapon {
       return numCoords
     }
     if (this.launchCursor) {
-      return numCoords + select - this.postSelectCursor
+      let selectOffset = select - this.postSelectCursor
+      if (selectOffset < 0) selectOffset = 0
+      return numCoords + selectOffset
     }
     return numCoords
   }
   stepHint (idx) {
     switch (idx) {
       case 0:
-        return (
-          'Click on square in friendly ' + bh.mapHeading + ' to select weapon'
-        )
+        return this.launchCursor
+          ? 'Click on square in Friendly ' + bh.mapHeading + ' to select weapon'
+          : 'Click on square in Enemy ' +
+              bh.mapHeading +
+              ' to select launch point'
       default:
-        return 'Click on square in enemy ' + bh.mapHeading + ' to fire'
+        return 'Click on square in Enemy ' + bh.mapHeading + ' to aim and fire'
     }
   }
   get numStep () {
