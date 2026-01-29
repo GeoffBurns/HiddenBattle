@@ -45,7 +45,7 @@ export class Waters {
     this.preamble0 = 'Your'
     this.preamble = 'You were '
     this.resetShipCells()
-    this.displayInfo = gameStatus.info.bind(gameStatus)
+    this.displayInfo = gameStatus.info2.bind(gameStatus)
     this.showShips = false
   }
   clipboardKey () {

@@ -67,7 +67,7 @@ class Enemy extends Waters {
       }
     }
 
-    gameStatus.info(
+    gameStatus.info2(
       `Having difficulty placing all ships (${(attempt1 + 1) * 25} attempts)`
     )
 
@@ -80,7 +80,7 @@ class Enemy extends Waters {
 
     this.disableBtns(false)
 
-    gameStatus.info('Failed to place all ships after many attempts')
+    gameStatus.info2('Failed to place all ships after many attempts')
     this.boardDestroyed = true
     throw new Error('Failed to place all ships after many attempts')
   }

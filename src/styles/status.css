@@ -149,15 +149,15 @@ flex-direction .mode-status {
 
 .ammo-counter .left {
     position: absolute;
-    margin-top: -3px;
+    margin-top: -6px;
     margin-left: 10px;
-    font-size: 80%;
+    font-size: 70%;
 }
 
 .ammo-counter .right {
     position: absolute;
-    bottom: 0px;
+    bottom: -1px;
     right: -2px;
-    font-size: 60%;
+    font-size: 55%;
     opacity: 0.75;
 }

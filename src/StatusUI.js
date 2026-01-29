@@ -15,6 +15,7 @@ export class StatusUI {
     this.list = document.getElementById('statusList')
     this.chevronBox = document.getElementById('chevron-box')
     this.chevron = document.getElementById('chevron')
+    this.important = false
   }
   clear () {
     this.display('', '')
@@ -44,7 +45,6 @@ export class StatusUI {
     }
   }
   display (mode, game) {
-    this.prependLine(this.mode.textContent)
     this.mode.textContent = mode
     if (game) {
       this.info(game)
@@ -76,7 +76,10 @@ export class StatusUI {
     } else {
       idxUsed = this.displaySingleShotStatus()
     }
-    return this.display('', weapon.stepHint(idxUsed))
+    const timerId = setTimeout(() => {
+      this.display('', weapon.stepHint(idxUsed))
+    }, 1000)
+    return timerId
   }
   displayLimitedAmmoStatus (wps, ammo, weapon, numCoords, maps, letter, select) {
     this.displayAmmoLeft(wps, ammo)
@@ -159,7 +162,17 @@ export class StatusUI {
   }
 
   info (game) {
-    this.prependLine(this.game.textContent)
+    this.infoBase(game)
+    this.important = false
+  }
+  info2 (game) {
+    this.infoBase(game)
+    this.important = true
+  }
+  infoBase (game) {
+    if (this.important) {
+      this.prependLine(this.game.textContent)
+    }
     this.game.textContent = game
   }
 }
