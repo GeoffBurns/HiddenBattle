@@ -74,8 +74,8 @@ function highlightAoE (model, r, c) {
 function playBH () {
   const enemyContainer = document.getElementById('enemy-container')
   enemyContainer.classList.remove('hidden')
-
   gameStatus.line.classList.add('small')
+  gameStatus.chevron.classList.remove('hidden')
 
   const tallyTitle = document.getElementById('tally-title')
   const placeControls = document.getElementById('place-controls')

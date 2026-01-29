@@ -1,3 +1,5 @@
+const MAX_LINES = 20
+
 export class StatusUI {
   constructor () {
     this.mode = document.getElementById('modeStatus')
@@ -10,11 +12,29 @@ export class StatusUI {
     this.icon2 = document.getElementById('modeIcon2')
     this.line = document.getElementById('statusLine')
     this.line2 = document.getElementById('statusLine2')
+    this.list = document.getElementById('statusList')
+    this.chevronLabel = document.getElementById('chevronLabel')
+    this.chevron = document.getElementById('chevron')
   }
   clear () {
     this.display('', '')
   }
+
+  prependLine (text) {
+    if (!text || text === '') return
+    const line = document.createElement('div')
+    line.textContent = text
+
+    // add to beginning
+    this.list.prepend(line)
+
+    // remove excess lines from bottom
+    while (this.list.children.length > MAX_LINES) {
+      this.list.removeChild(this.list.lastChild)
+    }
+  }
   display (mode, game) {
+    this.prependLine(this.mode.textContent)
     this.mode.textContent = mode
     if (game) {
       this.info(game)
