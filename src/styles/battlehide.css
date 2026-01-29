@@ -29,46 +29,6 @@
     background: transparent;
 }
 
-.toggle {
-    display: block;
-    cursor: pointer;
-}
-
-.toggle input {
-    display: none;
-}
-
-.chevron {
-    display: inline-block;
-    margin-left: 8px;
-    width: 8px;
-    height: 8px;
-    border-right: 2px solid currentColor;
-    border-bottom: 2px solid currentColor;
-    transform: rotate(45deg);
-    transition: transform 0.2s ease;
-}
-
-#statusList {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.25s ease;
-    font-family: monospace;
-    white-space: pre-wrap;
-    /* preserve line breaks */
-    border: 1px solid #ccc;
-    padding: 8px;
-}
-
-.toggle input:checked~.chevron {
-    transform: rotate(-135deg);
-}
-
-.toggle input:checked~#statusList {
-    max-height: 200px;
-    /* or large value */
-}
-
 .cell.bad {
     border: 2px solid red;
 }

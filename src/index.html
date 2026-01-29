@@ -41,27 +41,24 @@
             </div>
             <div class="footer" id="friend-footer">
               <div class="info-wrap" id="statusLine-wrap">
-                <label
-                  id="chevronLabel"
-                  class="toggle"
-                  title="Toggle status details"
-                >
-                  <div class="status medium" id="statusLine">
-                    <div id="gameStatus" class="game-status"></div>
-                    <div id="statusRight" class="status right">
-                      <div id="modeStatus" class="mode-status"></div>
-                      <div id="modeIcon1" class="mode-icon hidden"></div>
-                      <div id="modeIcon2" class="mode-icon hidden"></div>
-                      <div id="ammoCounter" class="ammo-counter hidden">
-                        <span id="ammoCounterLeft" class="left"></span>
-                        <span id="ammoCounterTotal" class="right"></span>
+                <details class="chevron-box">
+                  <summary>
+                    <div class="status medium" id="statusLine">
+                      <div id="gameStatus" class="game-status"></div>
+                      <div id="statusRight" class="status right">
+                        <div id="modeStatus" class="mode-status"></div>
+                        <div id="modeIcon1" class="mode-icon hidden"></div>
+                        <div id="modeIcon2" class="mode-icon hidden"></div>
+                        <div id="ammoCounter" class="ammo-counter hidden">
+                          <span id="ammoCounterLeft" class="left"></span>
+                          <span id="ammoCounterTotal" class="right"></span>
+                        </div>
                       </div>
-                      <input type="checkbox" title="Toggle status details" />
-                      <span id="chevron" class="chevron hidden"></span>
                     </div>
-                  </div>
-                  <div class="status detail small hidden" id="statusList"></div>
-                </label>
+                    <span id="chevron" class="chevron hidden"></span>
+                  </summary>
+                  <div class="status-list-content hidden" id="statusList"></div>
+                </details>
               </div>
               <div class="board-wrap alt trays" id="tray-container">
                 <div id="shipTray" class="tray"></div>

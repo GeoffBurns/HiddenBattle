@@ -37,23 +37,25 @@
               </div>
             </div>
             <div class="footer" id="friend-footer">
-              <div class="info-wrap">
-                <div class="status" id="statusLine">
-                  <div id="gameStatus" class="game-status">
-                    Click On Square To Fire
-                  </div>
-                  <div id="statusRight" class="status right">
-                    <div id="modeStatus" class="mode-status">
-                      Single Shot Mode
+              <div class="info-wrap" id="statusLine-wrap">
+                <details class="chevron-box">
+                  <summary>
+                    <div class="status medium" id="statusLine">
+                      <div id="gameStatus" class="game-status"></div>
+                      <div id="statusRight" class="status right">
+                        <div id="modeStatus" class="mode-status"></div>
+                        <div id="modeIcon1" class="mode-icon hidden"></div>
+                        <div id="modeIcon2" class="mode-icon hidden"></div>
+                        <div id="ammoCounter" class="ammo-counter hidden">
+                          <span id="ammoCounterLeft" class="left"></span>
+                          <span id="ammoCounterTotal" class="right"></span>
+                        </div>
+                      </div>
                     </div>
-                    <div id="modeIcon1" class="mode-icon hidden"></div>
-                    <div id="modeIcon2" class="mode-icon hidden"></div>
-                    <div id="ammoCounter" class="ammo-counter hidden">
-                      <span id="ammoCounterLeft" class="left"></span>
-                      <span id="ammoCounterTotal" class="right"></span>
-                    </div>
-                  </div>
-                </div>
+                    <span id="chevron" class="chevron hidden"></span>
+                  </summary>
+                  <div class="status-list-content hidden" id="statusList"></div>
+                </details>
               </div>
             </div>
             <div class="panel-container">

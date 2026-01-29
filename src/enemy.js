@@ -129,7 +129,7 @@ class Enemy extends Waters {
   }
   onClickCell (r, c) {
     if (!this.isTurn()) return
-
+    this.UI.removeHighlightAoE()
     this.setWeaponHanders()
 
     if (this.lauchSelectedWeapon(r, c)) return
@@ -148,7 +148,7 @@ class Enemy extends Waters {
     if (!this.isTurn()) return
     const oppo = this.opponent
     if (!oppo) return
-
+    this.UI.removeHighlightAoE()
     if (this.loadOut.isNotArming()) return
 
     const cell = oppo.UI.gridCellAt(hintR, hintC)

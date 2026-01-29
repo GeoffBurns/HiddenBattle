@@ -22,6 +22,7 @@
     margin-top: 15px;
     color: #111;
     font-size: 115%;
+    width: 100%;
 }
 
 .status.small {
@@ -31,10 +32,58 @@
     margin-top: 10px;
     color: #111;
     font-size: 90%;
+    width: 100%;
+}
+
+.status.small.detail-line {
+    font-weight: bold;
+    height: 40px;
+    color: #111;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    font-size: 90%;
 }
 
 .status.hidden {
     display: none;
+}
+
+
+.chevron-box summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    list-style: none;
+}
+
+.chevron-box summary::-webkit-details-marker {
+    display: none;
+}
+
+.chevron {
+    width: 20px;
+    height: 20px;
+    border-right: 5px solid currentColor;
+    border-bottom: 5px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+    margin-left: 30px;
+    margin-top: -20px;
+}
+
+details[open] .chevron {
+    transform: rotate(-135deg);
+}
+
+.status-list-content {
+    padding: 0.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow: hidden;
+    font-family: monospace;
+    white-space: pre-wrap;
 }
 
 .game-status {
@@ -85,9 +134,9 @@ flex-direction .mode-status {
 
 .small .ammo-counter .left {
     position: absolute;
-    margin-top: -3px;
-    margin-left: 10px;
-    font-size: 110%;
+    margin-top: -6px;
+    margin-left: 5px;
+    font-size: 105%;
 }
 
 .small .ammo-counter .right {

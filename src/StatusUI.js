@@ -13,7 +13,7 @@ export class StatusUI {
     this.line = document.getElementById('statusLine')
     this.line2 = document.getElementById('statusLine2')
     this.list = document.getElementById('statusList')
-    this.chevronLabel = document.getElementById('chevronLabel')
+    this.chevronBox = document.getElementById('chevron-box')
     this.chevron = document.getElementById('chevron')
   }
   clear () {
@@ -21,8 +21,9 @@ export class StatusUI {
   }
 
   prependLine (text) {
-    if (!text || text === '') return
+    if (!text || text === '' || text === 'Single Shot Mode') return
     const line = document.createElement('div')
+    line.className = 'status small detail-line'
     line.textContent = text
 
     // add to beginning
@@ -31,6 +32,15 @@ export class StatusUI {
     // remove excess lines from bottom
     while (this.list.children.length > MAX_LINES) {
       this.list.removeChild(this.list.lastChild)
+    }
+    const length = this.list.children.length
+    const willShow = length > 0
+    if (willShow) {
+      this.chevron.classList.remove('hidden')
+      this.list.classList.remove('hidden')
+    } else {
+      this.chevron.classList.add('hidden')
+      this.list.classList.add('hidden')
     }
   }
   display (mode, game) {
@@ -149,6 +159,7 @@ export class StatusUI {
   }
 
   info (game) {
+    this.prependLine(this.game.textContent)
     this.game.textContent = game
   }
 }
