@@ -1,6 +1,6 @@
 import { fetchNavBar } from './navbar.js'
 import { fetchComponent } from './network.js'
-import { show2ndBar } from './rules.js'
+import { show2ndBar } from './headerUtils.js'
 import { setupPrint } from './setupPrint.js'
 
 fetchNavBar('print', 'Battleship', async function () {

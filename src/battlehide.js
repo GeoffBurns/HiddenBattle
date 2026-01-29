@@ -15,7 +15,7 @@ import {
 import { moveCursorBase } from './placementUI.js'
 import { enemy } from './enemy.js'
 import { setupEnemy, newGame } from './enemySetup.js'
-import { makeFriend } from './rules.js'
+import { makeFriend } from './headerUtils.js'
 
 const friend = makeFriend()
 placedShipsInstance.registerUndo(friend.UI.undoBtn)

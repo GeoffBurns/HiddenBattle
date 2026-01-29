@@ -10,8 +10,9 @@ export async function fetchComponent (insertPoint, component, callback) {
 
     // Await the promise returned by the .text() method (or .json() if applicable)
     const html = await res.text()
+    const insertableNode = document.getElementById(insertPoint)
     // Do something with the html
-    document.getElementById(insertPoint).innerHTML = html
+    insertableNode.innerHTML = html
 
     if (typeof callback === 'function') {
       try {

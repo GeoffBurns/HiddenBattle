@@ -20,7 +20,7 @@ import { setupBuildOptions } from './setupOptions.js'
 import { hasMapOfCurrentSize, setNewMapToCorrectSize } from './validSize.js'
 import { tabs, switchTo } from './setupTabs.js'
 import { trackLevelEnd } from './gtag.js'
-import { show2ndBar } from './rules.js'
+import { show2ndBar } from './headerUtils.js'
 customUI.resetBoardSize()
 
 placedShipsInstance.registerUndo(customUI.undoBtn, customUI.resetBtn)
