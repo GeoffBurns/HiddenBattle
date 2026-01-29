@@ -206,6 +206,11 @@
     background-image: var(--cross-cursor-image);
 }
 
+.tally-box-container.map-list div.tally-row.weapon div.tally-box::before {
+
+    width: 14px;
+    height: 14px;
+}
 
 div.tally-row.weapon div.tally-box::before {
     content: '';
