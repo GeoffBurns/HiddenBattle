@@ -7,10 +7,9 @@ import {
   switchToEdit,
   switchTo,
   setupMapListOptions,
-  fetchNavBar,
-  trackClick
+  fetchNavBar
 } from './navbar.js'
-
+import { trackClick } from './gtag.js'
 class MapList {
   constructor (id) {
     assembleTerrains()

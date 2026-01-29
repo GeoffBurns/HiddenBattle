@@ -58,6 +58,12 @@
      gap: 6px;
  }
 
+
+ .battleship.print-preview .tally-col {
+     align-items: flex-end;
+ }
+
+
  .tally-box {
      position: relative;
      width: 28px;

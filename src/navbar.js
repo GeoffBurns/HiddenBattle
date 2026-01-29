@@ -4,6 +4,8 @@ import { assembleTerrains } from './gameMaps.js'
 import { custom } from './custom.js'
 import { SavedCustomMap } from './map.js'
 import { toTitleCase } from './utils.js'
+import { fetchComponent } from './network.js'
+import { trackLevelEnd, trackClick, trackTab } from './gtag.js'
 
 export function removeShortcuts () {
   document.removeEventListener('keydown')
@@ -706,87 +708,17 @@ export async function fetchNavBar (tab, title, callback) {
   bh.setTheme()
   bh.setTest(urlParams)
 
-  try {
-    // The await keyword pauses the execution until the fetch() promise settles (resolves or rejects)
-    const res = await fetch('./navbars.html')
+  const component = './navbars.html'
 
-    // Check if the request was successful
-    if (!res.ok) {
-      // Create a specific error for non-successful HTTP status codes
-      throw new Error(`HTTP error! status: ${res.status}`)
+  await fetchComponent('navbar', component)
+
+  document.getElementById('print-title').textContent = title
+  setupTabs(tab)
+  if (typeof callback === 'function') {
+    try {
+      callback()
+    } catch (error) {
+      console.log(error)
     }
-
-    // Await the promise returned by the .text() method (or .json() if applicable)
-    const html = await res.text()
-    // Do something with the html
-    document.getElementById('navbar').innerHTML = html
-    document.getElementById('print-title').textContent = title
-    setupTabs(tab)
-    if (typeof callback === 'function') {
-      try {
-        callback()
-      } catch (error) {
-        console.log(error)
-      }
-    }
-  } catch (err) {
-    // The catch block handles any errors from the fetch call itself or from the processing (e.g., .text())
-    console.error('Failed to load navbars:', err)
-    if (typeof callback === 'function') callback(err)
   }
-}
-export const gtag = globalThis.gtag
-
-export function trackLevelEnd (map, success) {
-  if (typeof globalThis.gtag !== 'function') {
-    console.warn('GA not initialized')
-    return
-  }
-  map = map || bh.map
-
-  const params = {
-    level_name: map.title || 'unknown',
-    terrain: map.terrain || 'unknown',
-    height: map.rows || 0,
-    width: map.cols || 0,
-    mode: document.title,
-    success: !!success
-  }
-
-  globalThis.gtag('event', 'level_end', params)
-}
-
-export function trackClick (map, button) {
-  if (typeof globalThis.gtag !== 'function') {
-    console.warn('GA not initialized')
-    return
-  }
-  map = map || bh.map
-
-  const params = {
-    event_category: 'Engagement',
-    event_label: button,
-    level_name: map.title || 'unknown',
-    terrain: map.terrain || 'unknown',
-    height: map.rows || 0,
-    width: map.cols || 0,
-    mode: document.title
-  }
-
-  globalThis.gtag('event', 'button_click', params)
-}
-
-export function trackTab (tab) {
-  if (typeof globalThis.gtag !== 'function') {
-    console.warn('GA not initialized')
-    return
-  }
-
-  const params = {
-    event_category: 'Engagement',
-    event_label: tab,
-    mode: document.title
-  }
-
-  globalThis.gtag('event', 'tab_click', params)
 }

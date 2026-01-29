@@ -139,42 +139,58 @@
     background-image: url('../images/sea/periscopeol56.png');
 }
 
-div.tally-row.weapon.megabomb div.tally-box:not(.hit)::before {
+.battleship.print-preview div.tally-row.weapon.megabomb div.tally-box::before {
+    content: 'M';
+}
+
+.battleship.print-preview div.tally-row.weapon.flack div.tally-box::before {
+    content: 'F';
+}
+
+.battleship.print-preview div.tally-row.weapon.kinetic-strike div.tally-box::before {
+    content: 'K';
+}
+
+.battleship.print-preview div.tally-row.weapon.torpedo div.tally-box::before {
+    content: '+';
+}
+
+.battleship:not(.print-preview) div.tally-row.weapon.megabomb div.tally-box:not(.hit)::before {
     background-image: url('../images/sea/boxbomb28.png');
 }
 
-div.tally-row.weapon.megabomb div.tally-box.used::before {
+.battleship:not(.print-preview) div.tally-row.weapon.megabomb div.tally-box.used::before {
     background-image: url('../images/sea/boxbombol28.png');
     opacity: 0.6;
 }
 
-div.tally-row.weapon.flack div.tally-box:not(.hit)::before {
+.battleship:not(.print-preview) div.tally-row.weapon.flack div.tally-box:not(.hit)::before {
     background-image: var(--box-flack-image);
 
 }
 
-div.tally-row.weapon.flack div.tally-box.used::before {
+.battleship:not(.print-preview) div.tally-row.weapon.flack div.tally-box.used::before {
     background-image: url('../images/sea/boxflackol28.png');
 
 }
 
 
-div.tally-row.weapon.kinetic-strike div.tally-box:not(.hit)::before {
+.battleship:not(.print-preview) div.tally-row.weapon.kinetic-strike div.tally-box:not(.hit)::before {
     background-image: url('../images/sea/boxstrike28.png');
 
 }
 
-div.tally-row.weapon.kinetic-strike div.tally-box.used::before {
+.battleship:not(.print-preview) div.tally-row.weapon.kinetic-strike div.tally-box.used::before {
     background-image: url('../images/sea/boxstrikeol28.png');
 
 }
 
-div.tally-row.weapon.torpedo div.tally-box:not(.hit)::before {
+.battleship:not(.print-preview) div.tally-row.weapon.torpedo div.tally-box:not(.hit)::before {
     background-image: url('../images/sea/boxtorpedo28.png');
 
 }
 
-div.tally-row.weapon.torpedo div.tally-box.used::before {
+.battleship:not(.print-preview) div.tally-row.weapon.torpedo div.tally-box.used::before {
     background-image: url('../images/sea/boxtorpedool28.png');
     opacity: 0.6;
 }

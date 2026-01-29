@@ -22,9 +22,9 @@ import {
   switchTo,
   switchToEdit,
   fetchNavBar,
-  trackLevelEnd,
   tabs
 } from './navbar.js'
+import { trackLevelEnd } from './gtag.js'
 customUI.resetBoardSize()
 
 placedShipsInstance.registerUndo(customUI.undoBtn, customUI.resetBtn)

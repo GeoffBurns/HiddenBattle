@@ -206,13 +206,17 @@
     background-image: var(--cross-cursor-image);
 }
 
-.tally-box-container.map-list div.tally-row.weapon div.tally-box::before {
+.battleship.print-preview div.tally-row.weapon div.tally-box::before {
+    font-size: 80%;
+}
+
+.battleship:not(.print-preview) .tally-box-container.map-list div.tally-row.weapon div.tally-box::before {
 
     width: 14px;
     height: 14px;
 }
 
-div.tally-row.weapon div.tally-box::before {
+.battleship:not(.print-preview) div.tally-row.weapon div.tally-box::before {
     content: '';
     position: absolute;
     width: 28px;
