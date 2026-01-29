@@ -234,6 +234,7 @@ export const JaggedXL = seaMap(
   ],
   'Jagged Coast Battle XL'
 )
+
 export const seaMapList = [
   jaggedXS,
   jaggedVS,

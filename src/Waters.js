@@ -221,7 +221,7 @@ export class Waters {
 
     this.hasAttachedWeapons = this.weaponShips.length > 0
     if (bh.seekingMode && this.hasAttachedWeapons) {
-      this.weaponShips = this.createShips(map).filter(s => s.hasWeapon())
+      this.weaponShips = map.extraArmedFleetForMap
       this.loadOut = this.makeLoadOut(map)
     } else if (oppo) {
       const weaponShips = oppo.ships.filter(s => s.hasWeapon())
@@ -470,7 +470,7 @@ export class Waters {
   setMap (map) {
     map = map || bh.map
     if (!this.ships || this.ships.length === 0) {
-      this.ships = this.createShips(map)
+      this.ships = map.newFleetForMap
       this.armWeapons(map)
     }
     for (const ship of this.ships) {
@@ -523,17 +523,7 @@ export class Waters {
   shapesCanBeOn (subterrain, zone) {
     return this.shapesUnsunk().filter(s => s.canBeOn(subterrain, zone))
   }
-  createShips (map) {
-    map = map || bh.map
-    const terrain = map.terrain
-    const baseShapes = terrain.ships.baseShapes
-    const shipNum = map.shipNum
-    const repeatShapes = baseShapes.flatMap(
-      s => Array(shipNum[s.letter] || 0).fill(s) || []
-    )
-    const ships = Ship.createShipsFromShapes(repeatShapes)
-    return ships
-  }
+
   createCandidateWeapons () {
     const candidates = bh.map.terrain.weapons.weapons
 

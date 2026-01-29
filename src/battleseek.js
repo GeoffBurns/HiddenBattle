@@ -1,4 +1,5 @@
-import { setupGameOptions, fetchNavBar } from './navbar.js'
+import { fetchNavBar } from './navbar.js'
+import { setupGameOptions } from './setupOptions.js'
 import { setupEnemy, newGame } from './enemySetup.js'
 import { enemyUI } from './enemyUI.js'
 

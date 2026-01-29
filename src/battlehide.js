@@ -1,7 +1,8 @@
 import { bh } from './terrain.js'
 import { gameStatus } from './StatusUI.js'
 import { placedShipsInstance } from './selection.js'
-import { setupGameOptions, fetchNavBar } from './navbar.js'
+import { fetchNavBar } from './navbar.js'
+import { setupGameOptions } from './setupOptions.js'
 import {
   dragOverPlacingHandlerSetup,
   onClickRotate,
@@ -11,14 +12,14 @@ import {
   tabCursor,
   enterCursor
 } from './dragndrop.js'
-import { friendUI } from './friendUI.js'
 import { moveCursorBase } from './placementUI.js'
-import { Friend } from './friend.js'
 import { enemy } from './enemy.js'
 import { setupEnemy, newGame } from './enemySetup.js'
+import { makeFriend } from './rules.js'
 
-const friend = new Friend(friendUI)
-placedShipsInstance.registerUndo(friendUI.undoBtn)
+const friend = makeFriend()
+placedShipsInstance.registerUndo(friend.UI.undoBtn)
+const friendUI = friend.UI
 
 friendUI.resetBoardSize()
 
@@ -88,7 +89,7 @@ function playBH () {
   enemy.UI.resetBoardSize()
   friend.setupUntried()
 
-  newGame('hide', resetFriendBoard)
+  newGame('hide', resetFriendBoard, friendUI)
   enemy.UI.buildBoardHover(
     highlightAoE,
     enemy.UI.removeHighlightAoE,

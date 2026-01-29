@@ -39,8 +39,8 @@
   <body>
     <script type="module" src="../../../src/navbar.js"></script>
     <script type="module">
-      import { GA_ID, initGA } from '../../../src/navbar.js'
-      initGA(GA_ID)
+      import { setupTrack } from '../../../src/gtag.js'
+      setupTrack()
     </script>
     <header>
       <h1>Folder contents</h1>

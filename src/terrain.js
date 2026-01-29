@@ -36,13 +36,24 @@ export const terrains = {
       return newTerrain
     }
     return null
+  },
+  getByTag (tag) {
+    if (tag) {
+      return this.terrains.find(t => t.tag === tag)
+    }
+    return null
   }
 }
 
 export const bh = {
   terrainMaps: {},
+  widthUI: null,
+  heightUI: null,
   get terrain () {
     return terrains.current
+  },
+  get terrainTitle () {
+    return terrains.current?.title
   },
   get mapHeading () {
     return terrains.current.mapHeading
@@ -118,6 +129,8 @@ export const bh = {
   shapesByLetter (letter) {
     return this.terrainMaps?.current?.shapesByLetter[letter]
   },
+  shipBuilder: Function.prototype,
+  fleetBuilder: Function.prototype,
   setTheme () {
     const terrainTheme = document.getElementById('terrainTheme')
     const body = document.getElementsByTagName('body')[0]
@@ -160,6 +173,12 @@ export const bh = {
       this.terrainMaps.setByIndex(0)
     )
   },
+  getTerrainByTag (tag) {
+    if (tag) {
+      return terrains.getByTag(tag)
+    }
+    return null
+  },
   get spashTags () {
     return {
       0: 'destroy-vunerable',
@@ -171,6 +190,32 @@ export const bh = {
       11: 'reveal-normal',
       12: 'reveal-hardened',
       20: 'weapon-path'
+    }
+  },
+  typeDescriptions: {
+    A: 'Air',
+    G: 'Land',
+    M: 'Hybrid',
+    T: 'Transformer',
+    X: 'Special',
+    S: 'Sea',
+    W: 'Weapon'
+  },
+  unitDescriptions: {
+    A: 'Air',
+    G: 'Land',
+    X: 'Special',
+    S: 'Sea',
+    W: 'Weapon'
+  },
+  customizeUnits (elementTag, customize = Function.prototype) {
+    const descriptions = Object.entries(bh.unitDescriptions)
+    for (const [letter, description] of descriptions) {
+      const key = description.toLowerCase() + elementTag
+      const el = document.getElementById(key)
+      if (el && customize !== Function.prototype) {
+        customize(letter, description, el, key)
+      }
     }
   }
 }
@@ -267,40 +312,12 @@ export class Terrain {
     this.hasAttachedWeapons = false
   }
 
-  static typeDescriptions = {
-    A: 'Air',
-    G: 'Land',
-    M: 'Hybrid',
-    T: 'Transformer',
-    X: 'Special',
-    S: 'Sea',
-    W: 'Weapon'
-  }
-
-  static unitDescriptions = {
-    A: 'Air',
-    G: 'Land',
-    X: 'Special',
-    S: 'Sea',
-    W: 'Weapon'
-  }
-
-  static customizeUnits (elementTag, customize = Function.prototype) {
-    const desscriptions = Object.entries(Terrain.unitDescriptions)
-    for (const [letter, description] of desscriptions) {
-      const key = description.toLowerCase() + elementTag
-      const el = document.getElementById(key)
-      if (el && customize !== Function.prototype) {
-        customize(letter, description, el, key)
-      }
-    }
-  }
   static customizeUnitDescriptions (
     elementTag,
     textContent = Function.prototype,
     innerHTML = Function.prototype
   ) {
-    Terrain.customizeUnits(elementTag, (letter, description, el, key) => {
+    bh.customizeUnits(elementTag, (letter, description, el, key) => {
       if (textContent !== Function.prototype)
         el.textContent = textContent(letter, description, el, key)
       if (innerHTML !== Function.prototype)
@@ -312,7 +329,7 @@ export class Terrain {
     hasClass = Function.prototype,
     className = 'hidden'
   ) {
-    Terrain.customizeUnits(elementTag, (letter, description, el, key) => {
+    bh.customizeUnits(elementTag, (letter, description, el, key) => {
       if (hasClass !== Function.prototype)
         if (hasClass(letter, description, el, key, className)) {
           el.classList.remove(className)
@@ -322,6 +339,9 @@ export class Terrain {
     })
   }
 
+  get newFleetForTerrain () {
+    return bh.fleetBuilder(this.ships.baseShapes)
+  }
   subterrainTag (isLand) {
     return isLand ? this.landSubterrain.tag : this.defaultSubterrain.tag
   }

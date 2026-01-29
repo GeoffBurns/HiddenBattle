@@ -26,6 +26,10 @@ export class TerrainMaps {
     this.maxHeight = terrain.maxHeight
     this.weaponPreference = weaponPreference
   }
+
+  get newFleetForTerrain () {
+    return this.terrain.newFleetForTerrain
+  }
   clearBlankWith (r, c) {
     this.current = new CustomBlankMap(r, c, this.terrain)
   }

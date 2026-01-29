@@ -43,11 +43,16 @@ export class Ship {
     }
   }
   static createShipsFromShapes (shapes) {
-    const ships = []
     Ship.id = 1
     WeaponSystem.id = 1
+    return Ship.extraShipsFromShapes(shapes)
+  }
+  static extraShipsFromShapes (shapes, filter = () => true) {
+    const ships = []
     for (const shape of shapes) {
-      ships.push(Ship.createFromShape(shape))
+      if (!filter(shape)) continue
+      const newShip = Ship.createFromShape(shape)
+      ships.push(newShip)
       Ship.next()
     }
     return ships
@@ -122,6 +127,17 @@ export class Ship {
     return new Ship(Ship.id, shape.symmetry, shape.letter, shape.weaponSystem)
   }
 
+  clone () {
+    const shape = this.shape()
+    const newShip = Ship.createFromShape(shape)
+    Ship.next()
+    return newShip
+  }
+
+  placeCells (variant, r0, c0) {
+    const shape = this.shape()
+    return shape.placeCells(variant, r0, c0)
+  }
   destroy (model) {
     for (const cell of this.cells) {
       const key = `${cell[0]},${cell[1]}`
@@ -279,3 +295,7 @@ export class Ship {
     return bh.shipType(this.letter)
   }
 }
+
+bh.shipBuilder = Ship.createFromShape
+bh.fleetBuilder = Ship.createShipsFromShapes
+bh.extraFleetBuilder = Ship.extraShipsFromShapes

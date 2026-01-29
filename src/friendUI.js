@@ -2,7 +2,6 @@ import { bh } from './terrain.js'
 import { gameStatus } from './StatusUI.js'
 import { PlacementUI } from './placementUI.js'
 import { trackLevelEnd } from './gtag.js'
-import { gameMap } from './gameMaps.js'
 
 export class FriendUI extends PlacementUI {
   constructor () {
@@ -23,7 +22,7 @@ export class FriendUI extends PlacementUI {
   displayFleetSunk () {
     gameStatus.display('Your Fleet is Destroyed', '')
     this.board.classList.add('destroyed')
-    trackLevelEnd(gameMap(), false)
+    trackLevelEnd(bh.map, false)
   }
 
   cellHit (r, c) {
@@ -153,12 +152,10 @@ export class FriendUI extends PlacementUI {
   }
   gotoNextStageAfterPlacement () {
     if (bh.test) {
-      friendUI.readyMode()
+      this.readyMode()
     } else {
-      friendUI.readyMode()
-      friendUI.seekMode()
+      this.readyMode()
+      this.seekMode()
     }
   }
 }
-
-export const friendUI = new FriendUI()

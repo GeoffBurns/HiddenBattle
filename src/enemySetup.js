@@ -1,10 +1,9 @@
 import { bh } from './terrain.js'
 import { enemy } from './enemy.js'
-import { friendUI } from './friendUI.js'
 
 let otherboard = null
 const newGameBtn = document.getElementById('newGame')
-export function newGame (seek, opponentBoard) {
+export function newGame (seek, opponentBoard, friendUI) {
   bh.seekingMode = seek === 'seek'
   if (bh.seekingMode) {
     enemy.ships = []
@@ -17,7 +16,7 @@ export function newGame (seek, opponentBoard) {
 
   if (otherboard) {
     otherboard()
-  } else {
+  } else if (opponentBoard && friendUI) {
     otherboard = opponentBoard
     friendUI.clearFriendClasses()
     enemy.setupAttachedAim()

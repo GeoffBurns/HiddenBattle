@@ -7,7 +7,21 @@ import { seaWeaponsCatalogue } from './SeaWeapons.js'
 seaAndLand.ships = seaShipsCatalogue
 seaAndLand.weapons = seaWeaponsCatalogue
 
-// gameMapTypes
+const allSeaShipsAndWeapons = seaMapList
+  .at(-1)
+  .clone('All Sea Ships and Weapons')
+allSeaShipsAndWeapons.shipNum = seaShipsCatalogue.baseShapes.reduce(
+  (acc, shape) => {
+    acc[shape.letter] = 1
+    return acc
+  },
+  {}
+)
+allSeaShipsAndWeapons.name = 'All Sea Ships and Weapons Map'
+allSeaShipsAndWeapons.weapons = [
+  seaWeaponsCatalogue.defaultWeapon,
+  ...seaWeaponsCatalogue.weapons
+]
 class SeaAndLandMaps extends TerrainMaps {
   constructor () {
     super(seaAndLand, seaMapList, defaultMap, [
@@ -20,3 +34,4 @@ class SeaAndLandMaps extends TerrainMaps {
   }
 }
 export const seaAndLandMaps = new SeaAndLandMaps()
+seaAndLandMaps.allShipsAndWeaponsMap = allSeaShipsAndWeapons

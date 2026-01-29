@@ -18,9 +18,9 @@ export class Map {
     this.land = land instanceof Set ? land : new Set()
     this.terrain = mapTerrain || bh.terrain
 
-    if (!this?.terrain.subterrains) {
-      console.log('bad')
-      throw new Error('map called with bad parameter : ', this.terrain)
+    if (!this?.terrain?.subterrains) {
+      console.log('map called with bad parameter : ', this.terrain)
+      this.terrain = bh.terrain
     }
     this.subterrainTrackers = this.terrain.subterrains.map(s => {
       return {
@@ -70,6 +70,25 @@ export class Map {
     tracker.core = new Set(
       [...tracker.total].filter(x => !tracker.margin.has(x))
     )
+  }
+  get extraArmedFleetForMap () {
+    const repeatShapes = this.newShapesForMap
+    const ships = bh.extraFleetBuilder(repeatShapes, s => s.isAttachedToRack)
+    return ships
+  }
+  get newFleetForMap () {
+    const repeatShapes = this.newShapesForMap
+    const ships = bh.fleetBuilder(repeatShapes)
+    return ships
+  }
+  get newShapesForMap () {
+    const terrain = this.terrain
+    const baseShapes = terrain.ships.baseShapes
+    const shipNum = this.shipNum
+    const repeatShapes = baseShapes.flatMap(
+      s => Array(shipNum[s.letter] || 0).fill(s) || []
+    )
+    return repeatShapes
   }
 
   calcFootPrints () {
@@ -158,8 +177,11 @@ export class Map {
 
   savedMap (newTitle) {
     newTitle = newTitle || makeTitle(this.terrain, this.cols, this.rows)
+    const terrain = bh.getTerrainByTag(this.terrain.tag)
 
-    const clone = new EditedCustomMap({ ...this })
+    const data = { ...this }
+    data.terrain = terrain
+    const clone = new EditedCustomMap(data)
     for (let i = 0; i < this.rows; i++) {
       for (let j = 0; j < this.cols; j++) {
         if (this.isLand(i, j)) clone.addLand(i, j)
@@ -174,6 +196,7 @@ export class Map {
 
     const clonedMap = this.savedMap(newTitle)
     clonedMap.saveToLocalStorage(newTitle)
+    return clonedMap
   }
 
   exportName () {
@@ -310,10 +333,11 @@ export class SavedCustomMap extends CustomMap {
       [data.rows, data.cols],
       data.shipNum,
       new Set(data.land),
-      null,
+      data?.terrain?.subterrains
+        ? data.terrain
+        : bh.terrainByTitle(data.terrain),
       data.example
     )
-    this.terrain = bh.terrainByTitle(data.terrain)
 
     const weapons = data.weapons.map(w =>
       this.terrain.getNewWeapon(w.letter, w.ammo)

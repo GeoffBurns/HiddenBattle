@@ -1,18 +1,13 @@
 import { bh } from './terrain.js'
-import { assembleTerrains } from './gameMaps.js'
 import { WatersUI } from './WatersUI.js'
 import { Waters } from './Waters.js'
 import { ScoreUI } from './ScoreUI.js'
-import {
-  switchToEdit,
-  switchTo,
-  setupMapListOptions,
-  fetchNavBar
-} from './navbar.js'
+import { setupMapListOptions } from './setupOptions.js'
+import { switchTo } from './setupTabs.js'
+import { switchToEdit, fetchNavBar } from './navbar.js'
 import { trackClick } from './gtag.js'
 class MapList {
   constructor (id) {
-    assembleTerrains()
     this.listId = id || 'list-container'
     this.container = document.getElementById(this.listId)
     this.input = document.getElementById('inputField')
@@ -63,10 +58,8 @@ class MapList {
   addMiniMap (map, boardViewModel, entryContent, idx) {
     const boardWrapper = document.createElement('div')
     boardWrapper.className = 'board-wrap map-list'
-
     boardWrapper.style.maxWidth = '200px'
     const board = document.createElement('div')
-
     board.className = 'board'
     board.id = 'custom-map-board-' + idx.toString()
     board.style.maxWidth = '200px'

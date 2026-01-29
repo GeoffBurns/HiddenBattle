@@ -15,16 +15,12 @@ import {
 } from './dragndrop.js'
 import { placedShipsInstance } from './selection.js'
 import { custom } from './custom.js'
-import {
-  setupBuildOptions,
-  validateHeight,
-  validateWidth,
-  switchTo,
-  switchToEdit,
-  fetchNavBar,
-  tabs
-} from './navbar.js'
+import { switchToEdit, fetchNavBar } from './navbar.js'
+import { setupBuildOptions } from './setupOptions.js'
+import { hasMapOfCurrentSize, setNewMapToCorrectSize } from './validSize.js'
+import { tabs, switchTo } from './setupTabs.js'
 import { trackLevelEnd } from './gtag.js'
+import { show2ndBar } from './rules.js'
 customUI.resetBoardSize()
 
 placedShipsInstance.registerUndo(customUI.undoBtn, customUI.resetBtn)
@@ -61,7 +57,7 @@ function onClickAccept (editingMap) {
   )
 }
 function onClickDefault () {
-  bh.maps.setToDefaultBlank(validateHeight(), validateWidth())
+  setNewMapToCorrectSize()
   customUI.refreshAllColor()
 
   customUI.score.displayZoneInfo()
@@ -194,10 +190,7 @@ function setupBuildShortcuts () {
 }
 
 function setReuseBtn () {
-  customUI.reuseBtn.disabled = !bh.maps.hasMapSize(
-    validateHeight(),
-    validateWidth()
-  )
+  customUI.reuseBtn.disabled = !hasMapOfCurrentSize()
 }
 
 function newPlacement () {
@@ -222,7 +215,7 @@ wireupButtons()
 setupBuildShortcuts()
 
 fetchNavBar('build', 'Create Your Own Game', function () {
-  document.getElementById('second-tab-bar').classList.remove('hidden')
+  show2ndBar()
   document.getElementById('height-container').classList.remove('hidden')
   document.getElementById('width-container').classList.remove('hidden')
 

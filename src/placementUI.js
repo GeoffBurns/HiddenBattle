@@ -2,7 +2,6 @@ import { bh, Terrain } from './terrain.js'
 import { WatersUI } from './WatersUI.js'
 import { ClickedShip } from './selection.js'
 import { cursor } from './cursor.js'
-import { Ship } from './Ship.js'
 import { dragNDrop } from './dragndrop.js'
 import { setCellCoords } from './utilities.js'
 
@@ -828,10 +827,8 @@ export class PlacementUI extends WatersUI {
 
     model.ships.push(ship)
     const map = bh.map
-    const id = Ship.id
-    const shape = ship.shape()
-    const newShip = Ship.createFromShape(shape)
-    Ship.next()
+    const newShip = ship.clone()
+    const id = newShip.id
     map.addShips(model.ships)
     const index = model.candidateShips.findIndex(s => s.id === ship.id)
     model.candidateShips[index] = newShip
