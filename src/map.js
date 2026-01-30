@@ -7,7 +7,7 @@ import { Megabomb } from './SeaWeapons.js'
 export const inRange = (r, c) => element =>
   element[0] == r && element[1] <= c && element[2] >= c
 
-export class Map {
+export class BhMap {
   constructor (title, size, shipNum, landArea, name, mapTerrain, land) {
     this.title = title
     this.name = name
@@ -229,7 +229,7 @@ function makeTitle (terrain, cols, rows) {
   return `${terrain.key}-${index}-${cols}x${rows}`
 }
 
-export class CustomMap extends Map {
+export class CustomMap extends BhMap {
   constructor (title, size, shipNum, land, mapTerrain, example) {
     super(title, size, shipNum, [], title, mapTerrain || bh.terrain, land)
     this.isPreGenerated = false

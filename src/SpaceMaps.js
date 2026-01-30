@@ -1,9 +1,9 @@
-import { Map } from './map.js'
+import { BhMap } from './map.js'
 import { standardShot } from './Weapon.js'
 import { spaceAndAsteroids } from './space.js'
 
 function spaceMap (title, size, shipNum, landArea, name) {
-  const seaMap = new Map(
+  const seaMap = new BhMap(
     title,
     size,
     shipNum,
