@@ -562,7 +562,8 @@ export class WatersUI {
         'reveal-vunerable',
         'reveal-normal',
         'reveal-hardened',
-        'weapon-path'
+        'weapon-path',
+        'target'
       )
     }
   }

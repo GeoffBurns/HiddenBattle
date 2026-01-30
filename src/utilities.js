@@ -132,3 +132,14 @@ export function shuffleArray (array) {
   }
   return array
 }
+
+export function lazy (obj, prop, fn) {
+  Object.defineProperty(obj, prop, {
+    get () {
+      const value = fn.call(this)
+      Object.defineProperty(this, prop, { value })
+      return value
+    },
+    configurable: true
+  })
+}

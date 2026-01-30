@@ -67,7 +67,7 @@ function highlightAoE (model, r, c) {
     if (map.inBounds(rr, cc)) {
       const cellClass = bh.spashTags[power]
       const cell = viewModel.gridCellAt(rr, cc)
-      cell.classList.add(cellClass)
+      cell.classList.add(cellClass, 'target')
     }
   }
 }

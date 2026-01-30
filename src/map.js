@@ -2,6 +2,8 @@ import { addCellToFootPrint, makeKey, parsePair } from './utilities.js'
 import { bh, oldToken } from './terrain.js'
 import { standardShot } from './Weapon.js'
 import { Megabomb } from './SeaWeapons.js'
+import { lazy } from './utilities.js'
+import { Mask } from './mask.js'
 
 // geometry helper
 export const inRange = (r, c) => element =>
@@ -17,6 +19,26 @@ export class BhMap {
     this.landArea = landArea
     this.land = land instanceof Set ? land : new Set()
     this.terrain = mapTerrain || bh.terrain
+
+    lazy(this, 'landbits', () => {
+      const mask = this.blankMask
+      mask.setRanges(this.landArea)
+      return mask.bits
+    })
+    lazy(this, 'seabits', () => {
+      return this.landMask.invertBits
+    })
+
+    lazy(this, 'seamask', () => {
+      const mask = this.blankMask
+      mask.bits = this.seabits
+      return mask
+    })
+    lazy(this, 'landmask', () => {
+      const mask = this.blankMask
+      mask.bits = this.landbits
+      return mask
+    })
 
     if (!this?.terrain?.subterrains) {
       console.log('map called with bad parameter : ', this.terrain)
@@ -36,6 +58,9 @@ export class BhMap {
     this.calcTrackers()
     this.isPreGenerated = true
     this.weapons = [standardShot, new Megabomb(3)]
+  }
+  get blankMask () {
+    return new Mask(this.cols, this.rows)
   }
   recalcTracker (subterrain, tracker) {
     tracker.total.clear()
@@ -155,8 +180,9 @@ export class BhMap {
         throw new Error('zoneDetail not valid :', zoneDetail)
     }
   }
+
   isLand (r, c) {
-    return this.landArea.some(inRange(r, c))
+    return this.landmask.test(c, r)
   }
 
   tag (r, c) {
