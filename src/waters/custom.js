@@ -8,17 +8,7 @@ export class Custom extends Waters {
     this.candidateShips = []
     this.ships = []
     this.terrain = terrain || bh.defaultTerrain
-    this.subterrains = this.terrain.subterrains.map(s => {
-      return {
-        subterrain: s,
-        total: new Set(),
-        m_zone: s.zones.find(z => z.isMarginal),
-        margin: new Set(),
-        c_zone: s.zones.find(z => !z.isMarginal),
-        core: new Set(),
-        footprint: new Set()
-      }
-    })
+    this.subterrainTrackers = bh.newSubterrainTrackers
   }
 
   displacedArea () {

@@ -17,21 +17,7 @@ function customSplash (hasPower) {
     translate[1] = 1
     translate[31] = 1
     if (hasPower[1]) {
-      legend[1] = 'Normal Destroyed, Hardened Revealed'
-      translate[11] = 11
-      legend[11] = 'Normal Revealed'
-
-      if (hasPower[0]) {
-        translate[0] = 0
-        translate[30] = 0
-        legend[0] = 'Vunerable Destroyed'
-        translate[10] = 10
-        legend[10] = 'Vunerable Revealed'
-      } else {
-        translate[0] = -1
-        translate[30] = 20
-        translate[10] = -1
-      }
+      normalDestroyed(translate, legend, hasPower, ', Hardened Revealed')
     } else {
       if (hasPower[0]) {
         translate[1] = 0
@@ -52,21 +38,7 @@ function customSplash (hasPower) {
       translate[12] = 11
       translate[1] = 1
       translate[31] = 1
-      legend[1] = 'Normal Destroyed'
-      translate[11] = 11
-      legend[11] = 'Normal Revealed'
-
-      if (hasPower[0]) {
-        translate[0] = 0
-        translate[30] = 0
-        legend[0] = 'Vunerable Destroyed'
-        translate[10] = 10
-        legend[10] = 'Vunerable Revealed'
-      } else {
-        translate[0] = -1
-        translate[30] = 20
-        translate[10] = -1
-      }
+      normalDestroyed(translate, legend, hasPower)
     } else {
       if (hasPower[0]) {
         translate[1] = 0
@@ -80,6 +52,24 @@ function customSplash (hasPower) {
   }
   return [translate, legend]
 }
+function normalDestroyed (translate, legend, hasPower, extra = '') {
+  legend[1] = 'Normal Destroyed' + extra
+  translate[11] = 11
+  legend[11] = 'Normal Revealed'
+
+  if (hasPower[0]) {
+    translate[0] = 0
+    translate[30] = 0
+    legend[0] = 'Vunerable Destroyed'
+    translate[10] = 10
+    legend[10] = 'Vunerable Revealed'
+  } else {
+    translate[0] = -1
+    translate[30] = 20
+    translate[10] = -1
+  }
+}
+
 function showSplashInfo (weapon, vulnerable, normal, hardened, immune) {
   const splashPower = weapon.splashPower
   if (splashPower >= 0) {

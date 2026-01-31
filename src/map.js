@@ -44,17 +44,8 @@ export class BhMap {
       console.log('map called with bad parameter : ', this.terrain)
       this.terrain = bh.terrain
     }
-    this.subterrainTrackers = this.terrain.subterrains.map(s => {
-      return {
-        subterrain: s,
-        total: new Set(),
-        m_zone: s.zones.find(z => z.isMarginal),
-        margin: new Set(),
-        c_zone: s.zones.find(z => !z.isMarginal),
-        core: new Set(),
-        footprint: new Set()
-      }
-    })
+
+    this.subterrainTrackers = bh.newSubterrainTrackers
     this.calcTrackers()
     this.isPreGenerated = true
     this.weapons = [standardShot, new Megabomb(3)]

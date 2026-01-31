@@ -104,6 +104,11 @@ export class FriendUI extends PlacementUI {
     this.readyingShips = false
     this.testBtn.classList.remove('hidden')
     this.seekBtn.classList.remove('hidden')
+    this.unreadyMode()
+    gameStatus.line.classList.add('medium')
+  }
+
+  unreadyMode () {
     this.stopBtn.classList.remove('hidden')
     this.score.shotsLabel.classList.remove('hidden')
     this.score.hitsLabel.classList.remove('hidden')
@@ -116,11 +121,10 @@ export class FriendUI extends PlacementUI {
     this.undoBtn.classList.add('hidden')
     this.autoBtn.classList.add('hidden')
     this.hideShipTrays()
+    this.hideTips()
     gameStatus.game.classList.remove('hidden')
     gameStatus.mode.classList.remove('hidden')
     gameStatus.line.classList.remove('hidden')
-    gameStatus.line.classList.add('medium')
-    this.hideTips()
   }
 
   seekMode () {
@@ -128,28 +132,15 @@ export class FriendUI extends PlacementUI {
     this.testBtn.classList.add('hidden')
     this.newPlacementBtn.classList.add('hidden')
     this.seekBtn.classList.add('hidden')
-    this.stopBtn.classList.add('hidden')
-    this.score.shotsLabel.classList.remove('hidden')
-    this.score.hitsLabel.classList.remove('hidden')
-    this.score.sunkLabel.classList.remove('hidden')
-    this.score.placedLabel.classList.add('hidden')
-    this.rotateBtn.classList.add('hidden')
-    this.rotateLeftBtn.classList.add('hidden')
-    this.transformBtn.classList.add('hidden')
-    this.flipBtn.classList.add('hidden')
-    this.undoBtn.classList.add('hidden')
-    this.autoBtn.classList.add('hidden')
-    this.hideShipTrays()
+    this.unreadyMode()
+
+    gameStatus.line.classList.remove('medium')
+    gameStatus.line2.classList.remove('medium')
+    gameStatus.line2.classList.add('small')
     const panels = document.getElementsByClassName('panel')
     for (const panel of panels) {
       panel.classList.add('alt')
     }
-    this.hideTips()
-    gameStatus.game.classList.remove('hidden')
-    gameStatus.mode.classList.remove('hidden')
-    gameStatus.line.classList.remove('medium', 'hidden')
-    gameStatus.line2.classList.remove('medium')
-    gameStatus.line2.classList.add('small')
   }
   gotoNextStageAfterPlacement () {
     if (bh.test) {

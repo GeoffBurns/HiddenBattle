@@ -115,6 +115,16 @@ export class Waters {
       return
     }
 
+    const matchableShips = this.placeMatchingShips(
+      placedShips,
+      this.placeMatchingShipForEdit.bind(this)
+    )
+    if (matchableShips.length !== 0) {
+      console.log(`${matchableShips.length} ships not matched`)
+    }
+  }
+
+  placeMatchingShips (placedShips, placer) {
     const matchableShips = [...this.ships]
     for (const ship of placedShips.ships) {
       const matchingShip = popFirst(
@@ -123,24 +133,46 @@ export class Waters {
         ship
       )
       if (matchingShip) {
-        matchingShip.variant = ship.variant
-        const values = Object.values(matchingShip.weapons)
-        if (values.length > 0) {
-          const keys = Object.keys(ship.weapons)
-          if (values.length === keys.length) {
-            matchingShip.weapons = {}
-            for (const [index, key] of keys.entries()) {
-              matchingShip.weapons[key] = values[index]
-            }
-          }
-        }
-        placedShipsInstance.push(matchingShip, ship.cells)
-        matchingShip.addToGrid(this.shipCellGrid)
-        this.UI.placement(ship.cells, this, matchingShip)
+        this.applyExtraInfoToMatchingShip(matchingShip, ship)
+        placer(matchingShip, ship)
       }
     }
-    if (matchableShips.length !== 0) {
-      console.log(`${matchableShips.length} ships not matched`)
+    return matchableShips
+  }
+
+  placeMatchingShipForEdit (matchingShip, ship) {
+    placedShipsInstance.push(matchingShip, ship.cells)
+    matchingShip.addToGrid(this.shipCellGrid)
+    this.UI.placement(ship.cells, this, matchingShip)
+  }
+
+  placeMatchingShip (matchingShip, ship) {
+    matchingShip.place(ship.cells)
+    matchingShip.addToGrid(this.shipCellGrid)
+    this.UI.placement(ship.cells, this, matchingShip)
+    const dragship = this.UI.getTrayItem(ship.id)
+    if (dragship) {
+      this.UI.removeDragShip(dragship)
+    } else {
+      //    console.log('drag ship not found : ', JSON.stringify(ship))
+    }
+  }
+
+  applyExtraInfoToMatchingShip (matchingShip, ship) {
+    matchingShip.variant = ship.variant
+    const values = Object.values(matchingShip.weapons)
+    if (values.length > 0) {
+      this.applyWeaponsToMatchingShip(ship, values, matchingShip)
+    }
+  }
+
+  applyWeaponsToMatchingShip (ship, values, matchingShip) {
+    const keys = Object.keys(ship.weapons)
+    if (values.length === keys.length) {
+      matchingShip.weapons = {}
+      for (const [index, key] of keys.entries()) {
+        matchingShip.weapons[key] = values[index]
+      }
     }
   }
 
@@ -171,43 +203,17 @@ export class Waters {
       }
     }
 
-    const matchableShips = [...this.ships]
-    for (const ship of placedShips.ships) {
-      const matchingShip = popFirst(
-        matchableShips,
-        s => s.letter === ship.letter,
-        ship
-      )
-
-      if (matchingShip) {
-        matchingShip.variant = ship.variant
-        const values = Object.values(matchingShip.weapons)
-        if (values.length > 0) {
-          const keys = Object.keys(ship.weapons)
-          if (values.length === keys.length) {
-            matchingShip.weapons = {}
-            for (const [index, key] of keys.entries()) {
-              matchingShip.weapons[key] = values[index]
-            }
-          }
-        }
-        matchingShip.place(ship.cells)
-        matchingShip.addToGrid(this.shipCellGrid)
-        this.UI.placement(ship.cells, this, matchingShip)
-        const dragship = this.UI.getTrayItem(ship.id)
-        if (dragship) {
-          this.UI.removeDragShip(dragship)
-        } else {
-          //    console.log('drag ship not found : ', JSON.stringify(ship))
-        }
-      }
-    }
+    const matchableShips = this.placeMatchingShips(
+      placedShips,
+      this.placeMatchingShip.bind(this)
+    )
     if (matchableShips.length === 0) {
       this.UI.resetTrays()
     } else {
       console.log(`${matchableShips.length} ships not matched`)
     }
   }
+
   resetMap (map) {
     this.boardDestroyed = false
     this.isRevealed = false

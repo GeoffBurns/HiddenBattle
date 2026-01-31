@@ -217,6 +217,19 @@ export const bh = {
         customize(letter, description, el, key)
       }
     }
+  },
+  get newSubterrainTrackers () {
+    return this.terrain.subterrains.map(s => {
+      return {
+        subterrain: s,
+        total: new Set(),
+        m_zone: s.zones.find(z => z.isMarginal),
+        margin: new Set(),
+        c_zone: s.zones.find(z => !z.isMarginal),
+        core: new Set(),
+        footprint: new Set()
+      }
+    })
   }
 }
 export class SubTerrainBase {
