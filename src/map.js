@@ -1,7 +1,7 @@
 import { addCellToFootPrint, makeKey, parsePair } from './utilities.js'
 import { bh, oldToken } from './terrain.js'
 import { standardShot } from './Weapon.js'
-import { Megabomb } from './SeaWeapons.js'
+import { Megabomb } from './sea/SeaWeapons.js'
 import { lazy } from './utilities.js'
 import { Mask } from './mask.js'
 

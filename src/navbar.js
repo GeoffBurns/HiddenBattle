@@ -4,7 +4,7 @@ import { fetchComponent } from './network.js'
 import { setupTrack } from './gtag.js'
 import { setupTerrain } from './terrainUI.js'
 import { setupTabs } from './setupTabs.js'
-import { storeShips } from './saveCustomMap.js'
+import { storeShips } from './waters/saveCustomMap.js'
 
 export function removeShortcuts () {
   document.removeEventListener('keydown')

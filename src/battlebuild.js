@@ -1,6 +1,6 @@
 import { bh } from './terrain.js'
-import { customUI } from './customUI.js'
-import { moveCursorBase } from './placementUI.js'
+import { customUI } from './waters/customUI.js'
+import { moveCursorBase } from './waters/placementUI.js'
 import {
   dragOverAddingHandlerSetup,
   onClickRotate,
@@ -14,7 +14,7 @@ import {
   dragNDrop
 } from './dragndrop.js'
 import { placedShipsInstance } from './selection.js'
-import { custom } from './custom.js'
+import { custom } from './waters/custom.js'
 import { switchToEdit, fetchNavBar } from './navbar.js'
 import { setupBuildOptions } from './setupOptions.js'
 import { hasMapOfCurrentSize, setNewMapToCorrectSize } from './validSize.js'

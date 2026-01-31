@@ -328,4 +328,7 @@ export class WeaponCatelogue {
     this.weapons = weapons
     this.weaponsByLetter = Object.fromEntries(weapons.map(w => [w.letter, w]))
   }
+  get tags () {
+    return this.weapons.map(w => w.tag)
+  }
 }

@@ -1,6 +1,6 @@
 import { bh, terrains } from './terrain.js'
 import { ChooseFromListUI, ChooseNumberUI } from './chooseUI.js'
-import { saveCustomMap } from './saveCustomMap.js'
+import { saveCustomMap } from './waters/saveCustomMap.js'
 import { setupTabs } from './setupTabs.js'
 import { setMapTypeParams, setSizeParams } from './SetParams.js'
 import {

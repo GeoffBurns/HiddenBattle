@@ -1,5 +1,5 @@
 import { bh } from './terrain.js'
-import { gameStatus } from './StatusUI.js'
+import { gameStatus } from './waters/StatusUI.js'
 import { placedShipsInstance } from './selection.js'
 import { fetchNavBar } from './navbar.js'
 import { setupGameOptions } from './setupOptions.js'
@@ -12,8 +12,8 @@ import {
   tabCursor,
   enterCursor
 } from './dragndrop.js'
-import { moveCursorBase } from './placementUI.js'
-import { enemy } from './enemy.js'
+import { moveCursorBase } from './waters/placementUI.js'
+import { enemy } from './waters/enemy.js'
 import { setupEnemy, newGame } from './enemySetup.js'
 import { makeFriend } from './headerUtils.js'
 

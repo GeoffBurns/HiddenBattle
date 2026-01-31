@@ -5,7 +5,7 @@ import {
   PlaceableW
 } from './CellsToBePlaced.js'
 import { parsePair, shuffleArray } from './utilities.js'
-import { StandardCells, SpecialCells } from './SubShape.js'
+import { StandardCells, SpecialCells } from './ships/SubShape.js'
 class Variants {
   constructor (validator, zoneDetail, symmetry) {
     if (new.target === Variants) {
