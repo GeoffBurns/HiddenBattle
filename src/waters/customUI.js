@@ -52,12 +52,7 @@ export class CustomUI extends PlacementUI {
     this.reuseBtn.classList.remove('hidden')
     this.resetBtn.classList.add('hidden')
     this.acceptBtn.classList.remove('hidden')
-    this.rotateBtn.classList.add('hidden')
-    this.rotateLeftBtn.classList.add('hidden')
-    this.transformBtn.classList.add('hidden')
-    this.flipBtn.classList.add('hidden')
-    this.undoBtn.classList.add('hidden')
-    this.autoBtn.classList.add('hidden')
+    this.hideTransformBtns()
     this.publishBtn.classList.add('hidden')
     this.saveBtn.classList.add('hidden')
     this.testBtn.classList.add('hidden')
@@ -106,31 +101,15 @@ export class CustomUI extends PlacementUI {
     this.newPlacementBtn.disabled = false
     this.score.placedLabel.classList.remove('hidden')
     this.score.weaponsLabel.classList.remove('hidden')
-    this.rotateBtn.classList.remove('hidden')
-    this.rotateLeftBtn.classList.remove('hidden')
-    if (bh.terrain.hasTransforms) {
-      this.transformBtn.classList.remove('hidden')
-    } else {
-      this.transformBtn.classList.add('hidden')
-    }
-    this.transformBtn.classList.remove('hidden')
-    this.flipBtn.classList.remove('hidden')
-    this.undoBtn.classList.remove('hidden')
+    this.showTransformBtns()
     this.autoBtn.classList.add('hidden')
     this.publishBtn.classList.remove('hidden')
     this.saveBtn.classList.remove('hidden')
     this.buildTrays(ships)
     this.buildWeaponTray()
-    gameStatus.game.classList.remove('hidden')
-    gameStatus.mode.classList.remove('hidden')
-    gameStatus.line.classList.remove('hidden', 'small')
-    gameStatus.line.classList.add('medium')
-    const panels = document.getElementsByClassName('panel')
-    for (const panel of panels) {
-      panel.classList.remove('alt')
-    }
+    this.showStatus()
+    this.standardPanels()
 
-    gameStatus.clear()
     gameStatus.info('drag ships to the map grid to add them to your map')
     this.s = [
       'drag ships to the map grid to add them to your map',

@@ -16,7 +16,7 @@ export class Megabomb extends Weapon {
     this.nonAttached = true
     this.animateOnTarget = true
     this.explodeOnTarget = true
-
+    this.animateOffsetY = 50
     this.splashCoords = this.aoe(null, [[2, 2]])
     this.dragShape = [
       [0, 0, 0],
@@ -37,15 +37,6 @@ export class Megabomb extends Weapon {
 
   redoCoords (_map, _base, coords) {
     return [[0, coords[0][1]], coords[0]]
-  }
-  initAnimate (cellSize, target, source) {
-    cellSize = cellSize || 30
-    const container = document.getElementById('battleship-game-container')
-    const end = this.centerOf(target)
-    let start = this.centerOf(source)
-
-    start.y -= 50
-    return { container, end, start, cellSize }
   }
 
   aoe (_map, coords) {
@@ -315,6 +306,7 @@ export class Flack extends Weapon {
     this.animateOnTarget = true
     this.explodeOnTarget = true
     this.hasFlash = true
+    this.animateOffsetY = 50
     this.tag = 'flack'
     this.splashCoords = [
       [0, 0, 1],
@@ -377,15 +369,6 @@ export class Flack extends Weapon {
     if (onEnd) onEnd()
   }
 
-  initAnimate (cellSize, target, source) {
-    cellSize = cellSize || 30
-    const container = document.getElementById('battleship-game-container')
-    const end = this.centerOf(target)
-    let start = this.centerOf(source)
-
-    start.y -= 50
-    return { container, end, start, cellSize }
-  }
   aoe (map, coords) {
     const r = coords[0][0]
     const c = coords[0][1]

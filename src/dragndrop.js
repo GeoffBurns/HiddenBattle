@@ -71,77 +71,58 @@ export function setupDragBrushHandlers (viewModel) {
 
 export function dragOverPlacingHandlerSetup (model, viewModel) {
   document.addEventListener('dragover', e => {
-    e.preventDefault()
-
-    if (!selection) return
-    const allow = e.dataTransfer.effectAllowed
-
-    let changed = false
-    if (lastmodifier !== allow) {
-      lastmodifier = allow
-      if (allow === 'link') {
-        // mac chrome uses control for rotate
-        selection.rotate() // rotate clockwise
-        changed = true
-      } else if (allow === 'copy') {
-        // mac chrome uses option  for flip
-        selection.flip()
-        changed = true
-      } else if (allow === 'none') {
-        // mac chrome uses command for rotate left
-        selection.leftRotate()
-        changed = true
-      }
-    }
-
-    // position highlight under cursor
-    if (changed && selection?.isNotShown()) {
-      dragNDrop.highlight(viewModel, model.shipCellGrid)
-    }
-    // position ghost under cursor
-    if (selection?.shown) {
-      selection.move(e)
-    }
+    dragSelection(e, viewModel, model)
   })
 }
-
 export function dragOverAddingHandlerSetup (model, viewModel) {
   const handler = e => {
-    e.preventDefault()
-
-    if (!selection) return
-    //const effect = e.dataTransfer.dropEffect
-    const allow = e.dataTransfer.effectAllowed
-
-    let changed = false
-    if (lastmodifier !== allow) {
-      lastmodifier = allow
-      if (allow === 'link') {
-        // mac chrome uses control for rotate
-        selection.rotate() // rotate clockwise
-        changed = true
-      } else if (allow === 'copy') {
-        // mac chrome uses option  for flip
-        selection.flip()
-        changed = true
-      } else if (allow === 'none') {
-        // mac chrome uses command for rotate left
-        selection.leftRotate()
-        changed = true
-      }
-    }
-
-    // position highlight under cursor
-    if (changed && selection?.isNotShown()) {
-      dragNDrop.highlight(viewModel, model.shipCellGrid)
-    }
-    // position ghost under cursor
-    if (selection?.shown) {
-      selection.move(e)
-    }
+    dragSelection(e, viewModel, model)
   }
   document.addEventListener('dragover', handler)
   return () => document.removeEventListener('dragover', handler)
+}
+
+function ghostUnderCursor (e) {
+  if (selection?.shown) {
+    selection.move(e)
+  }
+}
+
+function highlightUnderCursor (changed, viewModel, model) {
+  if (changed && selection?.isNotShown()) {
+    dragNDrop.highlight(viewModel, model.shipCellGrid)
+  }
+}
+
+function allowEffectsWhileDragging (e) {
+  const allow = e.dataTransfer.effectAllowed
+  let changed = false
+  if (lastmodifier !== allow) {
+    lastmodifier = allow
+    if (allow === 'link') {
+      // mac chrome uses control for rotate
+      selection.rotate() // rotate clockwise
+      changed = true
+    } else if (allow === 'copy') {
+      // mac chrome uses option  for flip
+      selection.flip()
+      changed = true
+    } else if (allow === 'none') {
+      // mac chrome uses command for rotate left
+      selection.leftRotate()
+      changed = true
+    }
+  }
+  return changed
+}
+
+function dragSelection (e, viewModel, model) {
+  e.preventDefault()
+
+  // if (!selection) return
+  let changed = allowEffectsWhileDragging(e)
+  highlightUnderCursor(changed, viewModel, model)
+  ghostUnderCursor(e)
 }
 
 export function enterCursor (event, viewModel, model) {
@@ -502,11 +483,8 @@ class DragNDrop {
 
   dragStartWeapon (viewModel, dragShip, weapon, substract) {
     dragShip.addEventListener('dragstart', e => {
-      const shipElement = e.currentTarget
-      const shipId = Number.parseInt(shipElement.dataset.id)
-      if (e.target !== shipElement && !shipId) {
-        return
-      }
+      const { shipElement, isNotShipElement } = this.getShip(e)
+      if (isNotShipElement) return
       e.dataTransfer.setData('weapon', weapon.letter)
 
       viewModel.showNotice(weapon.tip)
@@ -521,9 +499,8 @@ class DragNDrop {
   }
   dragStart (viewModel, dragShip, ships) {
     dragShip.addEventListener('dragstart', e => {
-      const shipElement = e.currentTarget
-      const shipId = Number.parseInt(shipElement.dataset.id)
-      if (e.target !== shipElement && !shipId) {
+      const { shipId, shipElement, isNotShipElement } = this.getShip(e)
+      if (isNotShipElement) {
         return
       }
       e.dataTransfer.setData('ship', shipId.toString())
@@ -556,8 +533,16 @@ class DragNDrop {
       shipElement.style.opacity = '0.6'
     })
   }
+  getShip (e) {
+    const shipElement = e.currentTarget
+    const shipId = this.getShipIdFromElement(shipElement)
+    const isNotShipElement = e.target !== shipElement && !shipId
+
+    return { shipId, shipElement, isNotShipElement }
+  }
+
   makeUndraggable (dragShip) {
-    dragShip.classlist.remove('draggable')
+    dragShip.classList.remove('draggable')
     dragShip.setAttribute('draggable', 'false')
   }
 

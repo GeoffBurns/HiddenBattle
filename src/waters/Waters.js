@@ -66,22 +66,37 @@ export class Waters {
     )
   }
 
+  placeAttempt (
+    ships,
+    ok,
+    placer = Function.prototype,
+    resetter = Function.prototype
+  ) {
+    for (const ship of ships) {
+      const placed = randomPlaceShape(ship, this.shipCellGrid)
+      if (!placed) {
+        this.resetShipCells()
+        resetter()
+        this.UI.placeTally(ships)
+        this.UI.displayShipInfo(ships)
+        ok = false
+        break
+      }
+      placer(ship, placed)
+      this.UI.placement(placed, this, ship)
+    }
+    return ok
+  }
   autoPlace2 () {
     const ships = this.ships
     for (let attempt = 0; attempt < 100; attempt++) {
       let ok = true
-      for (const ship of ships) {
-        const placed = randomPlaceShape(ship, this.shipCellGrid)
-        if (!placed) {
-          this.resetShipCells()
-          this.UI.clearPlaceVisuals()
-          this.UI.placeTally(ships)
-          this.UI.displayShipInfo(ships)
-          ok = false
-          break
-        }
-        this.UI.placement(placed, this, ship)
-      }
+      ok = this.placeAttempt(
+        ships,
+        ok,
+        null,
+        this.UI.clearPlaceVisuals.bind(this.UI)
+      )
       if (ok) return true
     }
   }
@@ -89,21 +104,18 @@ export class Waters {
     const ships = this.ships
     for (let attempt = 0; attempt < 100; attempt++) {
       let ok = true
-      for (const ship of ships) {
-        const placed = randomPlaceShape(ship, this.shipCellGrid)
-        if (!placed) {
-          this.resetShipCells()
+      ok = this.placeAttempt(
+        ships,
+        ok,
+        ship => {
+          placedShipsInstance.push(ship, ship.cells)
+          ship.addToGrid(this.shipCellGrid)
+        },
+        () => {
           this.UI.clearVisuals()
           placedShipsInstance.reset()
-          this.UI.placeTally(ships)
-          this.UI.displayShipInfo(ships)
-          ok = false
-          break
         }
-        placedShipsInstance.push(ship, ship.cells)
-        ship.addToGrid(this.shipCellGrid)
-        this.UI.placement(placed, this, ship)
-      }
+      )
       if (ok) return true
     }
   }

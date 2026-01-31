@@ -43,27 +43,11 @@ export class FriendUI extends PlacementUI {
     this.score.hitsLabel.classList.add('hidden')
     this.score.sunkLabel.classList.add('hidden')
     this.score.placedLabel.classList.remove('hidden')
-    this.rotateBtn.classList.remove('hidden')
-    this.rotateLeftBtn.classList.remove('hidden')
-    if (bh.terrain.hasTransforms) {
-      this.transformBtn.classList.remove('hidden')
-    } else {
-      this.transformBtn.classList.add('hidden')
-    }
-    this.flipBtn.classList.remove('hidden')
-    this.undoBtn.classList.remove('hidden')
-    this.autoBtn.classList.remove('hidden')
+    this.showTransformBtns()
     this.stopBtn.classList.add('hidden')
     this.showShipTrays()
-    gameStatus.game.classList.remove('hidden')
-    gameStatus.mode.classList.remove('hidden')
-    gameStatus.line.classList.remove('hidden', 'small')
-    gameStatus.line.classList.add('medium')
-    const panels = document.getElementsByClassName('panel')
-    for (const panel of panels) {
-      panel.classList.remove('alt')
-    }
-
+    this.showStatus()
+    this.standardPanels()
     this.showTips()
   }
   readyMode () {
@@ -73,32 +57,18 @@ export class FriendUI extends PlacementUI {
     chooseControls.classList.add('hidden')
     this.testBtn.classList.remove('hidden')
     this.seekBtn.classList.remove('hidden')
-    this.rotateBtn.classList.add('hidden')
-    this.rotateLeftBtn.classList.add('hidden')
-    this.transformBtn.classList.add('hidden')
-    this.flipBtn.classList.add('hidden')
-    this.undoBtn.classList.add('hidden')
-    //this.undoBtn.classList.remove('hidden')
-    // this.undoBtn.disabled = false
-    this.autoBtn.classList.add('hidden')
+    this.hideTransformBtns()
     this.stopBtn.classList.add('hidden')
     this.hideShipTrays()
     for (const cell of this.board.children) {
       cell.classList.remove('hit', 'placed')
     }
-
-    gameStatus.game.classList.remove('hidden')
-    gameStatus.mode.classList.remove('hidden')
-    gameStatus.line.classList.remove('hidden', 'small')
-    gameStatus.line.classList.add('medium')
-    const panels = document.getElementsByClassName('panel')
-    for (const panel of panels) {
-      panel.classList.remove('alt')
-    }
+    this.showStatus()
+    this.standardPanels()
     this.hideTips()
-    gameStatus.clear()
     gameStatus.info('test your placement or play a game against the computer')
   }
+
   testMode () {
     this.placingShips = false
     this.readyingShips = false
@@ -114,12 +84,7 @@ export class FriendUI extends PlacementUI {
     this.score.hitsLabel.classList.remove('hidden')
     this.score.sunkLabel.classList.remove('hidden')
     this.score.placedLabel.classList.add('hidden')
-    this.rotateBtn.classList.add('hidden')
-    this.rotateLeftBtn.classList.add('hidden')
-    this.transformBtn.classList.add('hidden')
-    this.flipBtn.classList.add('hidden')
-    this.undoBtn.classList.add('hidden')
-    this.autoBtn.classList.add('hidden')
+    this.hideTransformBtns()
     this.hideShipTrays()
     this.hideTips()
     gameStatus.game.classList.remove('hidden')

@@ -21,14 +21,19 @@ export class Friend extends Waters {
     for (let i = 0; i < 30; i++) {
       const [r, c] = this.randomHit(hits)
       for (let j = 0; j < 15; j++) {
-        if (seeking && (!this.testContinue || this.boardDestroyed)) {
-          clearInterval(seeking)
-          return
-        }
+        if (this.isCancelled(seeking)) return
         if (this.walkShot(r, c)) return
       }
     }
   }
+  isCancelled (seeking) {
+    if (seeking && (!this.testContinue || this.boardDestroyed)) {
+      clearInterval(seeking)
+      return true
+    }
+    return false
+  }
+
   seekHit (r, c) {
     if (!bh.inBounds(r, c)) return false
 
@@ -105,12 +110,8 @@ export class Friend extends Waters {
 
     for (let impact = 9; impact > 1; impact--)
       for (let attempt = 0; attempt < 12; attempt++) {
-        if (seeking && (!this.testContinue || this.boardDestroyed)) {
-          clearInterval(seeking)
-          return
-        }
-        const r = Math.floor(Math.random() * (map.rows - 2)) + 1
-        const c = Math.floor(Math.random() * (map.cols - 2)) + 1
+        if (this.isCancelled(seeking)) return
+        const { r, c } = this.randomLocation(map)
         if (this.score.newShotKey(r, c)) {
           this.launchRandomWeapon(r, c, false)
           this.loadOut.aim(bh.map, r, c, this.loadOut.selectedWeapon)
@@ -133,10 +134,7 @@ export class Friend extends Waters {
     const map = bh.map
     this.loadOut.destroyOne = this.destroyOne.bind(this)
 
-    if (seeking && (!this.testContinue || this.boardDestroyed)) {
-      clearInterval(seeking)
-      return
-    }
+    if (this.isCancelled(seeking)) return
 
     const r = this.randomLine()
     this.launchRandomWeapon(r, 0, false)
@@ -150,10 +148,7 @@ export class Friend extends Waters {
     const map = bh.map
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      if (seeking && (!this.testContinue || this.boardDestroyed)) {
-        clearInterval(seeking)
-        return
-      }
+      if (this.isCancelled(seeking)) return
       const r = Math.floor(Math.random() * map.rows)
       const c = Math.floor(Math.random() * map.cols)
 
@@ -166,10 +161,7 @@ export class Friend extends Waters {
     const maxAttempts = 13
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      if (seeking && (!this.testContinue || this.boardDestroyed)) {
-        clearInterval(seeking)
-        return
-      }
+      if (this.isCancelled(seeking)) return
       const loc = this.randomLoc()
 
       if (!loc) {
@@ -275,9 +267,7 @@ export class Friend extends Waters {
     this.setupUntried()
 
     let seeking = setInterval(() => {
-      if (seeking && (!this.testContinue || this.boardDestroyed)) {
-        clearInterval(seeking)
-
+      if (this.isCancelled(seeking)) {
         this.UI.testBtn.disabled = false
         this.UI.seekBtn.disabled = false
         this.UI.stopBtn.classList.add('hidden')
@@ -302,18 +292,19 @@ export class Friend extends Waters {
   randomScan (seeking) {
     const map = bh.map
     this.loadOut.reveal = this.scan.bind(this)
-    if (seeking && (!this.testContinue || this.boardDestroyed)) {
-      clearInterval(seeking)
-      return
-    }
-    const r = Math.floor(Math.random() * (map.rows - 2)) + 1
-    const c = Math.floor(Math.random() * (map.cols - 2)) + 1
-    const r1 = Math.floor(Math.random() * (map.rows - 2)) + 1
-    const c1 = Math.floor(Math.random() * (map.cols - 2)) + 1
+    if (this.isCancelled(seeking)) return
+    const { r, c } = this.randomLocation(map)
+    const { r1, c1 } = this.randomLocation(map)
 
     this.loadOut.aim(map, r, c)
     this.loadOut.aim(map, r1, c1)
   }
+  randomLocation (map) {
+    const r = Math.floor(Math.random() * (map.rows - 2)) + 1
+    const c = Math.floor(Math.random() * (map.cols - 2)) + 1
+    return { r, c }
+  }
+
   randomEffect (effect, seeking) {
     switch (effect) {
       case 'DestroyOne':

@@ -29,6 +29,7 @@ export class Weapon {
     this.animateOnAoe = false
     this.splashSize = 1
     this.nonAttached = false
+    this.animateOffsetY = 0
     this.classname = this.name.toLowerCase().replaceAll(' ', '-')
   }
   getTurn () {
@@ -278,6 +279,7 @@ export class Weapon {
     const container = document.getElementById('battleship-game-container')
     const end = this.centerOf(target)
     const start = this.centerOf(source)
+    start.y -= this.animateOffsetY
     return { container, end, start, cellSize }
   }
 

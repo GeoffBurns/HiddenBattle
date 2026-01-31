@@ -24,17 +24,6 @@ export class Missile extends Megabomb {
       [2, 2]
     ])
     this.tag = 'missile'
-    this.dragShape = [
-      [0, 0, 0],
-      [0, 1, 0],
-      [0, 2, 0],
-      [1, 0, 0],
-      [1, 1, 1],
-      [1, 2, 0],
-      [2, 0, 0],
-      [2, 1, 0],
-      [2, 2, 0]
-    ]
     this.volatile = true
   }
   clone (ammo) {
@@ -187,15 +176,6 @@ export class Scan extends Sweep {
     this.isOneAndDone = false
     this.hasFlash = false
     this.tag = 'scan'
-    this.dragShape = [
-      [2, 0, 1],
-      [1, 1, 0],
-      [2, 1, 0],
-      [2, 2, 0],
-      [0, 2, 0],
-      [1, 2, 1],
-      [1, 3, 0]
-    ]
   }
   clone (ammo) {
     ammo = ammo || this.ammo

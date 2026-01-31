@@ -514,6 +514,17 @@ export class SpecialVariant extends RotatableVariant {
   constructor (symmetry) {
     super(Function.prototype, 0, symmetry)
   }
+  buildCell3 (symmetry, full) {
+    const VariantType = variantType(symmetry)
+    const cells = VariantType.cell3(
+      full,
+      this.specialGroups.map(g => g.cells)
+    )
+    this.list = cells
+    this.specialGroups.forEach(g => {
+      g.parent = this
+    })
+  }
 
   special (index, groupIndex = 1) {
     const idx = index || this.index
@@ -531,8 +542,15 @@ export class SpecialVariant extends RotatableVariant {
       )
     )
   }
-
+  static setBehaviourTo (v3, symmetry) {
+    const VariantType = variantType(symmetry || this.symmetry)
+    VariantType.setBehaviour(v3)
+  }
   placeables () {
+    return this.shuffledPlaceables()
+  }
+
+  shuffledPlaceables () {
     let shuffled
     switch (this.list.length) {
       case 8:
@@ -576,21 +594,11 @@ export class WeaponVariant extends SpecialVariant {
     this.specialGroups.faction = 0
     this.standardGroup.setCells(full, specialGroup)
     this.subGroups = [this.standardGroup, specialGroup]
-    const VariantType = variantType(symmetry)
-    const cells = VariantType.cell3(
-      full,
-      this.specialGroups.map(g => g.cells)
-    )
-    this.list = cells
-    this.specialGroups.forEach(g => {
-      g.parent = this
-    })
+    this.buildCell3(symmetry, full)
   }
 
-  static setBehaviour (v3, symmetry) {
-    const VariantType = variantType(symmetry || this.symmetry)
-    VariantType.setBehaviour(v3)
-  }
+  static setBehaviour = SpecialVariant.setBehaviourTo
+
   placeable (index) {
     const idx = index || this.index
     const grandparentPrototype = Object.getPrototypeOf(SpecialVariant.prototype)
@@ -605,25 +613,7 @@ export class WeaponVariant extends SpecialVariant {
     return result
   }
   placeables () {
-    let shuffled
-    switch (this.list.length) {
-      case 8:
-        shuffled = shuffleArray([0, 1, 2, 3, 4, 5, 6, 7])
-        break
-      case 4:
-        shuffled = shuffleArray([0, 1, 2, 3])
-        break
-      case 2:
-        shuffled = shuffleArray([0, 1])
-        break
-      case 1:
-        shuffled = [0]
-        break
-      default:
-        throw new Error('Unknown no of variants')
-    }
-
-    return shuffled.map(i => this.placeable(i))
+    return this.shuffledPlaceables()
   }
 }
 
@@ -649,21 +639,10 @@ export class Variant3 extends SpecialVariant {
     const [head, ...tail] = subGroups
     this.standardGroup = head
     this.specialGroups = tail
-    const VariantType = variantType(symmetry)
-    const cells = VariantType.cell3(
-      full,
-      this.specialGroups.map(g => g.cells)
-    )
-    this.list = cells
-    this.specialGroups.forEach(g => {
-      g.parent = this
-    })
+    this.buildCell3(symmetry, full)
   }
 
-  static setBehaviour (v3, symmetry) {
-    const VariantType = variantType(symmetry || this.symmetry)
-    VariantType.setBehaviour(v3)
-  }
+  static setBehaviour = SpecialVariant.setBehaviourTo
 }
 
 export class Blinker extends RotatableVariant {

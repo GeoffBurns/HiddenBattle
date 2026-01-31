@@ -1,7 +1,6 @@
 import { mixed } from '../terrain.js'
 import { Shape } from './Shape.js'
 import { TransformableVariants, Variant3 } from '../variants.js'
-import { WeaponSystem } from '../WeaponSystem.js'
 
 export class Transformer extends Shape {
   constructor (forms) {
@@ -49,14 +48,6 @@ export class Transformer extends Shape {
     if (!found) {
       console.warn('Attached weapons do not match any form attached weapons')
     }
-  }
-  get weaponSystem () {
-    const mapValues = w => new WeaponSystem(w)
-
-    return Object.keys(this.attachedWeapons || {}).reduce((acc, key) => {
-      acc[key] = mapValues(this.attachedWeapons[key])
-      return acc
-    }, {})
   }
 
   get descriptionText () {

@@ -4,7 +4,7 @@ import { ClickedShip } from '../selection.js'
 import { cursor } from '../cursor.js'
 import { dragNDrop } from '../dragndrop.js'
 import { setCellCoords } from '../utilities.js'
-
+import { gameStatus } from './StatusUI.js'
 export class PlacementUI extends WatersUI {
   constructor (terroritory, title) {
     super(terroritory, title)
@@ -33,6 +33,40 @@ export class PlacementUI extends WatersUI {
     this.removeText = ' removed'
     this.brushlistenCancellables = []
     this.placelistenCancellables = []
+  }
+  showStatus () {
+    gameStatus.game.classList.remove('hidden')
+    gameStatus.mode.classList.remove('hidden')
+    gameStatus.line.classList.remove('hidden', 'small')
+    gameStatus.line.classList.add('medium')
+    gameStatus.clear()
+  }
+  standardPanels () {
+    const panels = document.getElementsByClassName('panel')
+    for (const panel of panels) {
+      panel.classList.remove('alt')
+    }
+  }
+  hideTransformBtns () {
+    this.rotateBtn.classList.add('hidden')
+    this.rotateLeftBtn.classList.add('hidden')
+    this.transformBtn.classList.add('hidden')
+    this.flipBtn.classList.add('hidden')
+    this.undoBtn.classList.add('hidden')
+    this.autoBtn.classList.add('hidden')
+  }
+
+  showTransformBtns () {
+    this.rotateBtn.classList.remove('hidden')
+    this.rotateLeftBtn.classList.remove('hidden')
+    if (bh.terrain.hasTransforms) {
+      this.transformBtn.classList.remove('hidden')
+    } else {
+      this.transformBtn.classList.add('hidden')
+    }
+    this.flipBtn.classList.remove('hidden')
+    this.undoBtn.classList.remove('hidden')
+    this.autoBtn.classList.remove('hidden')
   }
 
   markPlaced (cells, ship) {
@@ -355,9 +389,13 @@ export class PlacementUI extends WatersUI {
 
     if (shipElement === null) return
 
-    const shipId = Number.parseInt(shipElement.dataset.id)
+    const shipId = this.getShipIdFromElement(shipElement)
     const ship = ships.find(s => s.id === shipId)
     if (ship && shipElement) this.assignClicked(ship, shipElement)
+  }
+
+  getShipIdFromElement (shipElement) {
+    return Number.parseInt(shipElement.dataset.id)
   }
 
   disableRotateFlip () {
