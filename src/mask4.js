@@ -17,8 +17,6 @@ export class Mask4 {
     this.width = width
     this.height = height
     this.bits = 0n
-    this.bw = 2
-    this.cm = 3n
     //    lazy(this, 'transformMaps', () => {
     //     return buildTransformMaps(this.width, this.height)
     //    })
