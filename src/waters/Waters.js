@@ -362,7 +362,7 @@ export class Waters {
     this.selectAndArmWps(rack, oppo, launchR, launchC, hintR, hintC)
   }
   launchRandomWeapon (r, c, autoSelectWarning = true) {
-    if (this.lauchedUnattachedWeapon(r, c)) return true
+    if (this.launchUnattachedWeapon(r, c)) return true
     return this.launchRandomWeaponBase(autoSelectWarning)
   }
 
@@ -423,8 +423,8 @@ export class Waters {
     return false
   }
 
-  lauchedUnattachedWeapon (r, c) {
-    const unAttached = this.loadOut.getUnattachedWeapon()
+  launchUnattachedWeapon (r, c) {
+    const unAttached = this.getUnattachedWeapon()
     if (unAttached) {
       this.loadOut.launch = (coords, onEnd) => {
         this.launchTo(coords, bh.map.rows - 1, 0, unAttached, onEnd)
@@ -434,6 +434,14 @@ export class Waters {
     }
     return false
   }
+  getUnattachedWeapon () {
+    if (bh.seekingMode) {
+      return this.loadOut.weaponSystem().getLoadedWeapon()
+    } else {
+      return this.loadOut.getUnattachedWeapon()
+    }
+  }
+
   launchTo (coords, rr, cc, currentWeapon, onEnd) {
     currentWeapon.weapon.launchTo(
       coords,

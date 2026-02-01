@@ -28,7 +28,17 @@ export class ScoreUI {
     const sunkCount = ships.filter(s => s.sunk).length
     this.sunk.textContent = `${sunkCount} / ${ships.length}`
   }
-
+  createZoneTitle (labelTxt, bag) {
+    return this.createZoneEntry(labelTxt, bag, 'b', 'line-height:1.2;')
+  }
+  createZoneItem (labelTxt, bag) {
+    return this.createZoneEntry(
+      labelTxt,
+      bag,
+      'span',
+      'font-size:75%;line-height:1.2'
+    )
+  }
   createZoneEntry (labelTxt, bag, stress, style) {
     const entry = document.createElement('div')
     entry.style = style
@@ -93,10 +103,11 @@ export class ScoreUI {
   displayZoneInfo () {
     const map = gameMap()
     for (const entry of this.zoneSync) {
-      map.recalcTracker(entry.tracker.subterrain, entry.tracker)
-      entry.counts[0].textContent = entry.tracker.total.size.toString()
-      entry.counts[1].textContent = entry.tracker.margin.size.toString()
-      entry.counts[2].textContent = entry.tracker.core.size.toString()
+      entry.tracker.recalc(map)
+      const { total, margin, core } = entry.tracker.sizes
+      entry.counts[0].textContent = total.toString()
+      entry.counts[1].textContent = margin.toString()
+      entry.counts[2].textContent = core.toString()
     }
   }
   hasZoneInfo () {
@@ -104,8 +115,8 @@ export class ScoreUI {
     const nonDefaultZones = this.zoneSync.slice(1)
     return (
       nonDefaultZones.reduce((accumulator, entry) => {
-        map.recalcTracker(entry.tracker.subterrain, entry.tracker)
-        return accumulator + entry.tracker.total.size
+        entry.tracker.recalc(map)
+        return accumulator + entry.tracker.totalSize
       }, 0) > 0
     )
   }
@@ -133,57 +144,48 @@ export class ScoreUI {
         (accumulator, shape) => accumulator + shape.displacement,
         0
       ) / 4
-    for (const tracker of map.subterrainTrackers) {
-      map.recalcTracker(tracker.subterrain, tracker)
-      map.calcFootPrint(tracker)
-      const displacedArea = (tracker.total.size + tracker.footprint.size) / 2
+    map.subterrainTrackers.displayDisplacedArea(
+      map,
+      (subterrain, displacedArea) => {
+        this.displayDisplacementEntry(
+          mixedShapes,
+          subterrain,
+          displacedArea,
+          model,
+          airAmount
+        )
+      }
+    )
+  }
 
-      const mixedAmount = mixedShapes.reduce(
-        (accumulator, shape) =>
-          accumulator + shape.displacementFor(tracker.subterrain),
-        0
-      )
+  displayDisplacementEntry (
+    mixedShapes,
+    subterrain,
+    displacedArea,
+    model,
+    airAmount
+  ) {
+    const mixedAmount = mixedShapes.reduce(
+      (accumulator, shape) => accumulator + shape.displacementFor(subterrain),
+      0
+    )
 
-      this.createAddZoneEntry(
-        tracker.subterrain.title,
-        displacedArea,
-        model.ships.filter(s => s.shape().subterrain === tracker.subterrain),
-        'span',
-        'line-height:1.2;',
-        airAmount + mixedAmount
-      )
-    }
+    this.createAddZoneEntry(
+      subterrain.title,
+      displacedArea,
+      model.ships.filter(s => s.shape().subterrain === subterrain),
+      'span',
+      'line-height:1.2;',
+      airAmount + mixedAmount
+    )
   }
 
   setupZoneInfo () {
-    const map = gameMap()
-    let display = []
     this.zone.innerHTML = ''
-    for (const tracker of map.subterrainTrackers) {
-      map.recalcTracker(tracker.subterrain, tracker)
-      let counts = [
-        this.createZoneEntry(
-          tracker.subterrain.title,
-          tracker.total,
-          'b',
-          'line-height:1.2;'
-        ),
-        this.createZoneEntry(
-          tracker.m_zone.title,
-          tracker.margin,
-          'span',
-          'font-size:75%;line-height:1.2'
-        ),
-        this.createZoneEntry(
-          tracker.c_zone.title,
-          tracker.core,
-          'span',
-          'font-size:75%;line-height:1.2'
-        )
-      ]
-      display.push({ tracker: tracker, counts: counts })
-    }
-    this.zoneSync = display
+    this.zoneSync = bh.map.subterrainTrackers.setupZoneInfo(
+      this.createZoneTitle.bind(this),
+      this.createZoneItem.bind(this)
+    )
   }
   resetTallyBox () {
     this.tallyBox.innerHTML = ''

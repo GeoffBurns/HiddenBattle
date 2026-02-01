@@ -1,5 +1,5 @@
-import { addCellToFootPrint, makeKey, parsePair } from './utilities.js'
-import { bh, oldToken } from './terrain.js'
+import { makeKey } from './utilities.js'
+import { bh, oldToken, SubTerrainTrackers } from './terrain.js'
 import { standardShot } from './Weapon.js'
 import { Megabomb } from './sea/SeaWeapons.js'
 import { lazy } from './utilities.js'
@@ -20,23 +20,25 @@ export class BhMap {
     this.land = land instanceof Set ? land : new Set()
     this.terrain = mapTerrain || bh.terrain
 
-    lazy(this, 'landbits', () => {
+    lazy(this, 'landBits', () => {
       const mask = this.blankMask
       mask.setRanges(this.landArea)
       return mask.bits
     })
-    lazy(this, 'seabits', () => {
+
+    lazy(this, 'defaultTerrainBits', () => {
       return this.landMask.invertBits
     })
 
-    lazy(this, 'seamask', () => {
+    lazy(this, 'defaultTerrainMask', () => {
       const mask = this.blankMask
-      mask.bits = this.seabits
+      mask.bits = this.defaultTerrainBits
       return mask
     })
-    lazy(this, 'landmask', () => {
+
+    lazy(this, 'landMask', () => {
       const mask = this.blankMask
-      mask.bits = this.landbits
+      mask.bits = this.landBits
       return mask
     })
 
@@ -45,47 +47,13 @@ export class BhMap {
       this.terrain = bh.terrain
     }
 
-    this.subterrainTrackers = bh.newSubterrainTrackers
-    this.calcTrackers()
+    this.subterrainTrackers = new SubTerrainTrackers(this?.terrain?.subterrains)
+    this.subterrainTrackers.calc(this)
     this.isPreGenerated = true
     this.weapons = [standardShot, new Megabomb(3)]
   }
   get blankMask () {
     return new Mask(this.cols, this.rows)
-  }
-  recalcTracker (subterrain, tracker) {
-    tracker.total.clear()
-    tracker.margin.clear()
-    tracker.core.clear()
-
-    for (let r = 0; r < this.rows; r++) {
-      for (let c = 0; c < this.cols; c++) {
-        this.setTracker(r, c, subterrain, tracker)
-      }
-    }
-  }
-  calcTrackers () {
-    for (const tracker of this.subterrainTrackers) {
-      this.recalcTracker(tracker.subterrain, tracker)
-    }
-  }
-  setTracker (r, c, subterrain, tracker) {
-    const isLand = subterrain.isTheLand
-    if (isLand !== this.isLand(r, c)) return
-    const key = makeKey(r, c)
-    tracker.total.add(key)
-    for (let i = -1; i <= 1; i++) {
-      for (let j = -1; j <= 1; j++) {
-        if (!(i === 0 && j === 0) && this.inBounds(r + i, c + j)) {
-          if (isLand !== this.isLand(r + i, c + j)) {
-            tracker.margin.add(key)
-          }
-        }
-      }
-    }
-    tracker.core = new Set(
-      [...tracker.total].filter(x => !tracker.margin.has(x))
-    )
   }
   get extraArmedFleetForMap () {
     const repeatShapes = this.newShapesForMap
@@ -107,21 +75,6 @@ export class BhMap {
     return repeatShapes
   }
 
-  calcFootPrints () {
-    for (const tracker of this.subterrainTrackers) {
-      this.calcFootPrint(tracker)
-    }
-  }
-
-  calcFootPrint (tracker) {
-    tracker.footprint.clear()
-
-    tracker.total.forEach((value, key) => {
-      const [r, c] = parsePair(key)
-      addCellToFootPrint(r, c, tracker.footprint)
-    })
-  }
-
   inBounds (r, c) {
     return r >= 0 && r < this.rows && c >= 0 && c < this.cols
   }
@@ -134,46 +87,27 @@ export class BhMap {
   }
 
   subterrain (r, c) {
-    for (const tracker of this.subterrainTrackers) {
-      if (tracker.total.has(makeKey(r, c))) return tracker.subterrain
-    }
-
-    return this.terrain.defaultSubterrain
+    return this.subterrainTrackers.subterrain(
+      r,
+      c,
+      this.terrain.defaultSubterrain
+    )
   }
 
   zoneDetail (r, c) {
-    for (const tracker of this.subterrainTrackers) {
-      if (tracker.total.has(makeKey(r, c))) {
-        if (tracker.margin.has(makeKey(r, c)))
-          return [tracker.subterrain, tracker.m_zone]
-        else if (tracker.core.has(makeKey(r, c)))
-          return [tracker.subterrain, tracker.c_zone]
-        else {
-          throw new Error('Unknown zone')
-        }
-      }
-    }
-    throw new Error('Unknown subterrain')
+    return this.subterrainTrackers.zoneDetail(r, c)
   }
+
   zone (r, c) {
-    return this.zoneDetail(r, c)[1]
+    return this.subterrainTrackers.zone(r, c)
   }
 
   zoneInfo (r, c, zoneDetail) {
-    switch (zoneDetail) {
-      case 0:
-        return []
-      case 1:
-        return [this.subterrain(r, c)]
-      case 2:
-        return this.zoneDetail(r, c)
-      default:
-        throw new Error('zoneDetail not valid :', zoneDetail)
-    }
+    return this.subterrainTrackers.zoneInfo(r, c, zoneDetail)
   }
 
   isLand (r, c) {
-    return this.landmask.test(c, r)
+    return this.landMask.test(c, r)
   }
 
   tag (r, c) {

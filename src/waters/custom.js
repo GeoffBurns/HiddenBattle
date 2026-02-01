@@ -3,12 +3,10 @@ import { Waters } from './Waters.js'
 import { customUI } from './customUI.js'
 
 export class Custom extends Waters {
-  constructor (customUI, terrain) {
+  constructor (customUI) {
     super(customUI)
     this.candidateShips = []
     this.ships = []
-    this.terrain = terrain || bh.defaultTerrain
-    this.subterrainTrackers = bh.newSubterrainTrackers
   }
 
   displacedArea () {

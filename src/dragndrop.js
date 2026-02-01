@@ -480,25 +480,29 @@ class DragNDrop {
       shipElement.style.opacity = '0.6'
     })
   }
+  dragStartWeaponHander (viewModel, weapon, substract, e) {
+    const { shipElement, isNotShipElement } = this.getShip(e)
+    if (isNotShipElement) return
+    e.dataTransfer.setData('weapon', weapon.letter)
+
+    viewModel.showNotice(weapon.tip)
+
+    viewModel.removeClicked()
+
+    e.dataTransfer.effectAllowed = 'all'
+    cursor.isDragging = true
+    selection = new DraggedWeapon(weapon, substract)
+    shipElement.style.opacity = '0.6'
+  }
 
   dragStartWeapon (viewModel, dragShip, weapon, substract) {
-    dragShip.addEventListener('dragstart', e => {
-      const { shipElement, isNotShipElement } = this.getShip(e)
-      if (isNotShipElement) return
-      e.dataTransfer.setData('weapon', weapon.letter)
-
-      viewModel.showNotice(weapon.tip)
-
-      viewModel.removeClicked()
-
-      e.dataTransfer.effectAllowed = 'all'
-      cursor.isDragging = true
-      selection = new DraggedWeapon(weapon, substract)
-      shipElement.style.opacity = '0.6'
-    })
+    dragShip.addEventListener(
+      'dragstart',
+      this.dragStartWeaponHander.bind(this, viewModel, weapon, substract)
+    )
   }
-  dragStart (viewModel, dragShip, ships) {
-    dragShip.addEventListener('dragstart', e => {
+  dragStartHander (viewModel, ships, e) {
+    {
       const { shipId, shipElement, isNotShipElement } = this.getShip(e)
       if (isNotShipElement) {
         return
@@ -531,7 +535,13 @@ class DragNDrop {
       )
       selection.moveTo(e.clientX, e.clientY)
       shipElement.style.opacity = '0.6'
-    })
+    }
+  }
+  dragStart (viewModel, dragShip, ships) {
+    dragShip.addEventListener(
+      'dragstart',
+      this.dragStartHander.bind(this, viewModel, ships)
+    )
   }
   getShip (e) {
     const shipElement = e.currentTarget

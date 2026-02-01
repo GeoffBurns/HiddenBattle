@@ -134,7 +134,7 @@ class Enemy extends Waters {
 
     if (this.lauchSelectedWeapon(r, c)) return
 
-    if (this.launchRandomWeapon(r, c)) return
+    if (this.launchRandomWeapon(r, c, bh.seekingMode)) return
     this.loadOut.launch = LoadOut.launchDefault.bind(this)
     this.loadOut.aim(bh.map, r, c)
   }

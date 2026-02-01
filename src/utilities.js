@@ -116,13 +116,6 @@ export function findClosestCoord (coordsList, refR, refC, getter) {
   return closestCoord
 }
 
-export function addCellToFootPrint (r, c, fp) {
-  for (let i = -1; i <= 1; i++) {
-    for (let j = -1; j <= 1; j++) {
-      fp.add(`${r + i},${c + j}`)
-    }
-  }
-}
 export function shuffleArray (array) {
   for (let i = array.length - 1; i > 0; i--) {
     let j = Math.floor(Math.random() * (i + 1))

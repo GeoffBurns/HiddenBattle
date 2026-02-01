@@ -1,4 +1,5 @@
 import { popcountBigInt } from './placeTools.js'
+import { lazy } from './utilities.js'
 
 function* bresenhamSteps (x0, y0, dx, dy, sx, sy, width, height) {
   let err = dx - dy
@@ -17,6 +18,42 @@ function* bresenhamSteps (x0, y0, dx, dy, sx, sy, width, height) {
       y0 += sy
     }
   }
+}
+
+function buildTransformMaps (W, H) {
+  const size = W * H
+
+  const maps = {
+    id: new Array(size),
+    r90: new Array(size),
+    r180: new Array(size),
+    r270: new Array(size),
+    fx: new Array(size),
+    fy: new Array(size),
+    fd1: new Array(size),
+    fd2: new Array(size)
+  }
+
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const i = y * W + x
+
+      // identity
+      maps.id[i] = i
+
+      // rotations
+      maps.r90[i] = x * H + (H - 1 - y)
+      maps.r180[i] = (H - 1 - y) * W + (W - 1 - x)
+      maps.r270[i] = (W - 1 - x) * H + y
+
+      // reflections
+      maps.fx[i] = y * W + (W - 1 - x) // vertical
+      maps.fy[i] = (H - 1 - y) * W + x // horizontal
+      maps.fd1[i] = x * W + y // main diagonal
+      maps.fd2[i] = (W - 1 - x) * W + (H - 1 - y) // other diagonal
+    }
+  }
+  return maps
 }
 
 export function coordsToZMasks (coords, width, height) {
@@ -42,6 +79,9 @@ export class Mask {
     this.width = width
     this.height = height
     this.bits = 0n
+    lazy(this, 'transformMaps', () => {
+      return buildTransformMaps(this.width, this.height)
+    })
   }
 
   index (x, y) {
@@ -60,6 +100,54 @@ export class Mask {
   get size () {
     return popcountBigInt(this.bits)
   }
+
+  applyMap (map) {
+    let out = 0n
+    let b = this.bits
+
+    while (b !== 0n) {
+      const lsb = b & -b
+      const i = Number(lsb.toString(2).length - 1)
+      out |= 1n << BigInt(map[i])
+      b ^= lsb
+    }
+    return out
+  }
+  orbit (maps) {
+    return [
+      this.applyMap(maps.id),
+      this.applyMap(maps.r90),
+      this.applyMap(maps.r180),
+      this.applyMap(maps.r270),
+      this.applyMap(maps.fx),
+      this.applyMap(maps.fy),
+      this.applyMap(maps.fd1),
+      this.applyMap(maps.fd2)
+    ]
+  }
+
+  classifySymmetry () {
+    const maps = this.transformMaps
+    const b = this.bits
+    const imgs = this.orbit(maps)
+    const set = new Set(imgs.map(b => b.toString()))
+    const k = set.size
+
+    if (k === 1) return 'D4'
+
+    if (k === 2) {
+      if (this.applyMap(maps.r90) === this.bits) return 'C4'
+      return 'V4 (diagonal Klein four)'
+    }
+
+    if (k === 4) {
+      if (this.applyMap(maps.r180) === b) return 'C2 (half-turn)'
+      return 'C2 (single mirror)'
+    }
+
+    return 'C1'
+  }
+
   rowMask (y, x0, x1) {
     const start = BigInt(y * this.width + x0)
     const size = BigInt(x1 - x0 + 1)

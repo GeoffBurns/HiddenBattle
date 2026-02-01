@@ -1,4 +1,4 @@
-import { bh } from '../terrain.js'
+import { bh, addCellToFootPrint } from '../terrain.js'
 import {
   Dihedral4,
   Klein4,
@@ -7,7 +7,7 @@ import {
   Invariant,
   Diagonal
 } from '../variants.js'
-import { makeKey, addCellToFootPrint } from '../utilities.js'
+import { makeKey } from '../utilities.js'
 import { WeaponSystem } from '../WeaponSystem.js'
 
 export const token = 'geoffs-hidden-battle'
