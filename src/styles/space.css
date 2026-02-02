@@ -14,43 +14,12 @@
     --launch2-cursor-image: url('../images/space/launch32_2.png');
     --launch3-cursor-image: url('../images/space/launch32_3.png');
     --launch4-cursor-image: url('../images/space/launch32_4.png');
-    --background-image-space: url('../images/space/spacefleet.png');
-    --logo-image-space: url('../images/space/space-logo.png');
 }
 
-
-
-body.space {
-    background-image: var(--background-image-space);
-    background-repeat: repeat;
-}
-
-body.space img.logo {
-    content: var(--logo-image-space);
-}
-
-
-.cell.asteroid.light {
-    background: #eed8a0;
-
-}
-
-.cell.asteroid.dark {
-    background: #d6c286;
-}
-
-.cell.space.light {
-    background: #e1d4f3;
-}
-
-.cell.space.dark {
-    background: #c2bdd2;
-}
 
 .explosion.asteroid {
     background-image: var(--asteroid-explode-image);
 }
-
 
 
 .explosion.plasma {
