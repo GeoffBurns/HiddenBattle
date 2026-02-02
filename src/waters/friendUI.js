@@ -72,10 +72,15 @@ export class FriendUI extends PlacementUI {
   testMode () {
     this.placingShips = false
     this.readyingShips = false
-    this.testBtn.classList.remove('hidden')
-    this.seekBtn.classList.remove('hidden')
+    this.showTestBtns()
     this.unreadyMode()
     gameStatus.line.classList.add('medium')
+  }
+
+  showTestBtns () {
+    this.stopBtn.classList.remove('hidden')
+    this.testBtn.classList.remove('hidden')
+    this.seekBtn.classList.remove('hidden')
   }
 
   unreadyMode () {
@@ -94,11 +99,9 @@ export class FriendUI extends PlacementUI {
 
   seekMode () {
     this.placingShips = false
-    this.testBtn.classList.add('hidden')
     this.newPlacementBtn.classList.add('hidden')
-    this.seekBtn.classList.add('hidden')
     this.unreadyMode()
-
+    this.hideTestBtns()
     gameStatus.line.classList.remove('medium')
     gameStatus.line2.classList.remove('medium')
     gameStatus.line2.classList.add('small')
@@ -107,6 +110,12 @@ export class FriendUI extends PlacementUI {
       panel.classList.add('alt')
     }
   }
+  hideTestBtns () {
+    this.testBtn.classList.add('hidden')
+    this.stopBtn.classList.add('hidden')
+    this.seekBtn.classList.add('hidden')
+  }
+
   gotoNextStageAfterPlacement () {
     if (bh.test) {
       this.readyMode()

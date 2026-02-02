@@ -76,13 +76,13 @@ export class Waters {
       const placed = randomPlaceShape(ship, this.shipCellGrid)
       if (!placed) {
         this.resetShipCells()
-        resetter()
+        resetter?.()
         this.UI.placeTally(ships)
         this.UI.displayShipInfo(ships)
         ok = false
         break
       }
-      placer(ship, placed)
+      placer?.(ship, placed)
       this.UI.placement(placed, this, ship)
     }
     return ok
