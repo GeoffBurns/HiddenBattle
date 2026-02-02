@@ -31,7 +31,11 @@ export function setSizeParams (height, width) {
 
   const mode = isEditMode(urlParams) ? 'edit' : 'create'
   let mapName = getParamMap(urlParams)
-
+  const bt = bh?.terrain?.bodyTag
+  if (!bt) {
+    console.warn('No terrain map found for terrain tag', 'setSizeParams')
+  }
+  const bodyTag = bt || 'sea'
   if (
     height &&
     width &&
@@ -42,7 +46,7 @@ export function setSizeParams (height, width) {
     urlParams.delete('mapName')
     urlParams.set('height', height)
     urlParams.set('width', width)
-    urlParams.set('terrain', terrains?.current?.tag)
+    urlParams.set('terrain', bodyTag)
     updateState(
       [
         ['mode', mode],
@@ -62,11 +66,16 @@ export function setMapParams (title) {
   const urlParams = url.searchParams
 
   const mapName = getParamMap(urlParams)
+    const bt = bh?.terrain?.bodyTag
+  if (!bt) {
+    console.warn('No terrain map found for terrain tag', 'setSizeParams')
+  }
+  const bodyTag = bt || 'sea'
   if (title && title !== mapName) {
     urlParams.delete('width')
     urlParams.delete('height')
     urlParams.set('mapName', title)
-    urlParams.set('terrain', bh.terrain?.tag)
+    urlParams.set('terrain', bodyTag)
 
     updateState(
       [
@@ -76,7 +85,7 @@ export function setMapParams (title) {
         ['width', ''],
         ['x', ''],
         ['mapType', ''],
-        ['terrain', bh.terrain?.bodyTag || '']
+        ['terrain', bodyTag]
       ],
       url
     )
@@ -96,11 +105,17 @@ export function setMapTypeParams (mapType) {
     bodyTag = newTerrainMap?.terrain?.bodyTag
   }
 
+  if (!bodyTag) {
+    console.warn('No terrain map found for terrain tag', 'setMapTypeParams')
+    bodyTag = 'sea'
+  }
+
+
   if (mapType && m !== mapType) {
     urlParams.delete('mapName')
     urlParams.delete('height')
     urlParams.delete('width')
-    urlParams.set('terrain', t?.tag)
+    urlParams.set('terrain', bodyTag)
     urlParams.set('mapType', mapType)
     updateState(
       [

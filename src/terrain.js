@@ -144,7 +144,7 @@ export const bh = {
       body.className = 'hidden-battle ' + bodyTag
       terrainTheme.href = `./styles/${bodyTag}.css`
       terrainBoot.href = `./styles/${bodyTag}-boot.css`
-      favicon.href = `./images/${bodyTag}/favicons/favicons-48x48.png`
+      favicon.href = `./images/${bodyTag}/favicons/favicon-48x48.png`
     }
   },
   setTest (urlParams) {

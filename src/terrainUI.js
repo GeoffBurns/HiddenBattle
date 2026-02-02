@@ -35,14 +35,17 @@ export function setupTerrain (urlParams) {
   const newTerrainMap = bh.setTerrainByTag(terrainTag)
   const newTerrainTag = newTerrainMap?.terrain?.tag
   if (newTerrainTag && terrainTag !== newTerrainTag) {
-    setTerrainParams(newTerrainTag, newTerrainMap)
+    setTerrainParams(newTerrainMap)
   }
 }
 export function setTerrainParams (newTerrainMap) {
   const url = new URL(globalThis.location)
   const urlParams = url.searchParams
 
-  const bodyTag = newTerrainMap?.terrain?.bodyTag
+  if (!newTerrainMap?.terrain?.bodyTag) {
+    console.warn('No terrain map found for terrain tag', 'setTerrainParams')
+  }
+  const bodyTag = newTerrainMap?.terrain?.bodyTag || 'sea'
   //const newTerrainTag = newTerrainMap?.terrain?.tag
 
   urlParams.set('terrain', bodyTag) //newTerrainTag)
