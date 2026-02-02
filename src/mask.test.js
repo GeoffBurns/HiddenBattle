@@ -1,8 +1,8 @@
 /* eslint-env jest */
 
-/* global describe, it, expect */
+/* global beforeEach, describe, it, expect */
 import { coordsToZMasks, Mask } from './mask.js'
-import { beforeEach } from '@jest/globals'
+//import { beforeEach, describe, it, expect } from '@jest/globals'
 
 // Jest test suite
 describe('Mask', () => {
@@ -96,14 +96,14 @@ describe('Mask', () => {
 
   describe('drawSegment', () => {
     it('should draw a line segment', () => {
-      mask.drawSegment(0, 0, 5, 0)
+      mask.drawSegmentTo(0, 0, 5, 0)
       for (let x = 0; x <= 5; x++) {
         expect(mask.test(x, 0)).toBe(true)
       }
     })
 
     it('should draw diagonal segment', () => {
-      mask.drawSegment(0, 0, 3, 3)
+      mask.drawSegmentTo(0, 0, 3, 3)
       expect(mask.test(0, 0)).toBe(true)
       expect(mask.test(3, 3)).toBe(true)
     })

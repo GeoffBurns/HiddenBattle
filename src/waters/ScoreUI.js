@@ -1,5 +1,4 @@
 import { all, mixed, bh } from '../terrain.js'
-import { gameMap, gameMaps } from '../gameMaps.js'
 import { dragNDrop } from '../dragndrop.js'
 
 export class ScoreUI {
@@ -101,7 +100,7 @@ export class ScoreUI {
   }
 
   displayZoneInfo () {
-    const map = gameMap()
+    const map = bh.map
     for (const entry of this.zoneSync) {
       entry.tracker.recalc(map)
       const { total, margin, core } = entry.tracker.sizes
@@ -111,7 +110,7 @@ export class ScoreUI {
     }
   }
   hasZoneInfo () {
-    const map = gameMap()
+    const map = bh.map
     const nonDefaultZones = this.zoneSync.slice(1)
     return (
       nonDefaultZones.reduce((accumulator, entry) => {
@@ -122,7 +121,7 @@ export class ScoreUI {
   }
 
   displayAddZoneInfo (model) {
-    const map = gameMap()
+    const map = bh.map
     this.zone.innerHTML = ''
     const displacedArea = model.displacedArea()
 
@@ -193,7 +192,7 @@ export class ScoreUI {
   buildShipBox (ship) {
     const box = document.createElement('div')
     const letter = ship.letter
-    const maps = gameMaps()
+    const maps = bh.maps
     box.className = 'tally-box'
     if (ship.sunk) {
       box.textContent = 'X'
@@ -238,7 +237,7 @@ export class ScoreUI {
   buildBombRow (rowList, viewModel, weaponSystem) {
     if (!weaponSystem.weapon.isLimited) return
     const row = document.createElement('div')
-    const maps = gameMaps()
+    const maps = bh.maps
     const weapon = weaponSystem.weapon
     const letter = weapon.letter
     row.className = 'tally-row weapon ' + weapon.classname

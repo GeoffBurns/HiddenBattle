@@ -133,7 +133,7 @@ export const bh = {
   fleetBuilder: Function.prototype,
   setTheme () {
     const terrainTheme = document.getElementById('terrainTheme')
-    const terrainBoot = document.getElementById('terrainBoot')
+    const terrainBoot = document.getElementById('boot-trn')
     const favicon = document.getElementById('favicon')
 
     const body = document.getElementsByTagName('body')[0]
@@ -143,7 +143,7 @@ export const bh = {
       if (body.classList.contains(bodyTag)) return
       body.className = 'hidden-battle ' + bodyTag
       terrainTheme.href = `./styles/${bodyTag}.css`
-      terrainBoot.href = `./styles/${bodyTag}boot.css`
+      terrainBoot.href = `./styles/${bodyTag}-boot.css`
       favicon.href = `./images/${bodyTag}/favicons/favicons-48x48.png`
     }
   },

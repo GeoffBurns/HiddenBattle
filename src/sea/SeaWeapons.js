@@ -1,5 +1,7 @@
 import { coordsFromCell, shuffleArray } from '../utilities.js'
 import { Weapon, WeaponCatelogue } from '../Weapon.js'
+import { ListCanvas } from '../listCanvas.js'
+import { bh } from '../terrain.js'
 
 export class Megabomb extends Weapon {
   constructor (ammo, name, letter) {
@@ -66,76 +68,15 @@ export class Megabomb extends Weapon {
     return result
   }
 }
-function getExtendedLinePoints (x1, y1, x2, y2, width, height) {
-  // Direction vector
-  const dx = x2 - x1
-  const dy = y2 - y1
-
-  // Avoid divide by zero
-  if (dx === 0 && dy === 0) return []
-
-  // Compute intersections with each border of the grid
-  const tValues = []
-
-  if (dx !== 0) {
-    tValues.push((0 - x1) / dx)
-    tValues.push((width - 1 - x1) / dx)
-  }
-  if (dy !== 0) {
-    tValues.push((0 - y1) / dy)
-    tValues.push((height - 1 - y1) / dy)
-  }
-
-  // Filter valid intersections (inside the grid)
-  const intersections = tValues
-    .map(t => [x1 + dx * t, y1 + dy * t])
-    .filter(([x, y]) => x >= 0 && x < width && y >= 0 && y < height)
-
-  // If fewer than two intersections, nothing to draw
-  if (intersections.length < 2) return []
-
-  // Pick first and last intersection
-  const [start, end] = [
-    intersections[0],
-    intersections[intersections.length - 1]
-  ]
-
-  // Use Bresenham’s algorithm between those two clipped points
-  const linePoints = getLinePoints(
-    Math.round(start[0]),
-    Math.round(start[1]),
-    Math.round(end[0]),
-    Math.round(end[1])
-  )
-
-  return linePoints
+function getExtendedLinePoints (x1, y1, x2, y2) {
+  const points = getListCanvas()
+  points.drawLineInfinite(x1, y1, x2, y2)
+  return points.list
 }
 function getLinePoints (x1, y1, x2, y2) {
-  const points = []
-
-  const dx = Math.abs(x2 - x1)
-  const dy = Math.abs(y2 - y1)
-  const sx = x1 < x2 ? 1 : -1
-  const sy = y1 < y2 ? 1 : -1
-  let err = dx - dy
-
-  while (true) {
-    points.push([x1, y1, 2])
-
-    if (x1 === x2 && y1 === y2) break
-
-    const e2 = 2 * err
-    if (e2 > -dy) {
-      err -= dy
-      x1 += sx
-    }
-    if (e2 < dx) {
-      err += dx
-      y1 += sy
-    }
-  }
-
-  return points
+  const points = getListCanvas()
+  points.drawSegmentTo(x1, y1, x2, y2)
+  return points.list
 }
 export class Kinetic extends Weapon {
   constructor (ammo, name, letter) {
@@ -189,7 +130,7 @@ export class Kinetic extends Weapon {
     const r1 = coords[1][0]
     const c1 = coords[1][1]
 
-    return getExtendedLinePoints(r, c, r1, c1, map.rows, map.cols)
+    return getExtendedLinePoints(r, c, r1, c1)
   }
 
   redoCoords (map, base, coords) {
@@ -403,45 +344,10 @@ export class Flack extends Weapon {
   }
 }
 function getPieSegmentCells (x1, y1, x2, y2, radius = 4, spreadDeg = 22.5) {
-  const cells = []
-
-  // Compute the main direction angle
-  const angle = Math.atan2(y2 - y1, x2 - x1)
-
-  const spread = (spreadDeg * Math.PI) / 180 // convert to radians
-  const halfSpread = spread // ±spreadDeg
-  const narrowSpread = (8 * Math.PI) / 180
-
-  // Bounding box to limit checks
-  const minX = Math.floor(x1 - radius)
-  const maxX = Math.ceil(x1 + radius)
-  const minY = Math.floor(y1 - radius)
-  const maxY = Math.ceil(y1 + radius)
-
-  for (let y = minY; y <= maxY; y++) {
-    for (let x = minX; x <= maxX; x++) {
-      const dx = x - x1
-      const dy = y - y1
-      const dist = Math.hypot(dx, dy)
-
-      if (dist > radius) continue // outside circle
-
-      const cellAngle = Math.atan2(dy, dx)
-      let delta = cellAngle - angle
-
-      // Normalize to [-PI, PI]
-      delta = Math.abs(((delta + Math.PI) % (2 * Math.PI)) - Math.PI)
-      if (delta <= narrowSpread) {
-        cells.push([x, y, 2])
-      } else if (delta <= halfSpread) {
-        cells.push([x, y, 1])
-      }
-    }
-  }
-
-  return cells
+  const points = getListCanvas()
+  points.drawPie2(x1, y1, x2, y2, radius, this, spreadDeg)
+  return points.list
 }
-
 export class Sweep extends Weapon {
   constructor (ammo) {
     super('Radar Sweep', 'W', true, false, 2)
@@ -489,3 +395,8 @@ export const seaWeaponsCatalogue = new WeaponCatelogue([
   new Torpedo(1)
   //  new Sweep(1)
 ])
+function getListCanvas () {
+  const map = bh.map
+  const points = new ListCanvas(map.cols, map.rows)
+  return points
+}

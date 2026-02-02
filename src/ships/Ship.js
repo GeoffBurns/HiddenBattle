@@ -5,8 +5,6 @@ import {
   parsePair,
   makeKeyAndId
 } from '../utilities.js'
-
-import { gameMap, gameMaps } from '../gameMaps.js'
 import { WeaponSystem } from '../WeaponSystem.js'
 
 function fst (arr) {
@@ -212,7 +210,7 @@ export class Ship {
   }
   isRightZone (r, c) {
     const shipType = this.type()
-    const isLand = gameMap().isLand(r, c)
+    const isLand = bh.map.isLand(r, c)
     // area rules
     if (shipType === 'G' && !isLand) return false
     if (shipType === 'S' && isLand) return false
@@ -220,7 +218,7 @@ export class Ship {
     return true
   }
   noTouchCheck (r, c, shipCellGrid) {
-    const map = gameMap()
+    const map = bh.map
     for (let nr = r - 1; nr <= r + 1; nr++)
       for (let nc = c - 1; nc <= c + 1; nc++) {
         if (map.inBounds(nr, nc) && shipCellGrid[nr][nc]) return false
@@ -234,7 +232,7 @@ export class Ship {
   }
   canPlace (variant, r0, c0, shipCellGrid) {
     const placing = this.placeCells(variant, r0, c0)
-    const map = gameMap()
+    const map = bh.map
     if (
       placing.some(([r, c]) => {
         return !map.inBounds(r, c)
@@ -275,7 +273,7 @@ export class Ship {
     }
   }
   shape () {
-    return gameMaps().shapesByLetter[this.letter]
+    return bh.shapesByLetter(this.letter)
   }
   isInTallyGroup (tallyGroup) {
     const shape = this.shape()

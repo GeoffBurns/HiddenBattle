@@ -1,24 +1,6 @@
 import { popcountBigInt } from './placeTools.js'
 import { lazy } from './utilities.js'
-
-function* bresenhamSteps (x0, y0, dx, dy, sx, sy, width, height) {
-  let err = dx - dy
-
-  while (x0 >= 0 && x0 < width && y0 >= 0 && y0 < height) {
-    yield [x0, y0]
-
-    const e2 = 2 * err
-
-    if (e2 > -dy) {
-      err -= dy
-      x0 += sx
-    }
-    if (e2 < dx) {
-      err += dx
-      y0 += sy
-    }
-  }
-}
+import { MaskBase } from './maskBase.js'
 
 function buildTransformMaps (W, H) {
   const size = W * H
@@ -70,24 +52,20 @@ export function coordsToZMasks (coords, width, height) {
 
     masks.set(z, masks.get(z) | bit)
   }
-
   return masks
 }
 
-export class Mask {
+export class Mask extends MaskBase {
   constructor (width, height) {
-    this.width = width
-    this.height = height
-    this.bits = 0n
+    super(width, height, 1)
     lazy(this, 'transformMaps', () => {
       return buildTransformMaps(this.width, this.height)
     })
   }
 
-  index (x, y) {
+  bitPos (x, y) {
     return BigInt(y * this.width + x)
   }
-
   set (x, y) {
     this.bits |= 1n << this.index(x, y)
   }
@@ -97,6 +75,7 @@ export class Mask {
   test (x, y) {
     return (this.bits & (1n << this.index(x, y))) !== 0n
   }
+
   get size () {
     return popcountBigInt(this.bits)
   }
@@ -258,48 +237,6 @@ export class Mask {
     return coords
   }
 
-  drawSegment = function (x0, y0, x1, y1) {
-    let dx = Math.abs(x1 - x0)
-    let dy = Math.abs(y1 - y0)
-
-    let sx = x0 < x1 ? 1 : -1
-    let sy = y0 < y1 ? 1 : -1
-
-    let err = dx - dy
-
-    while (true) {
-      this.set(x0, y0)
-      if (x0 === x1 && y0 === y1) break
-      const e2 = 2 * err
-      if (e2 > -dy) {
-        err -= dy
-        x0 += sx
-      }
-      if (e2 < dx) {
-        err += dx
-        y0 += sy
-      }
-    }
-  }
-  drawRay = function (x0, y0, dxDir, dyDir) {
-    const dx = Math.abs(dxDir)
-    const dy = Math.abs(dyDir)
-    const sx = Math.sign(dxDir)
-    const sy = Math.sign(dyDir)
-
-    for (const [x, y] of bresenhamSteps(
-      x0,
-      y0,
-      dx,
-      dy,
-      sx,
-      sy,
-      this.width,
-      this.height
-    )) {
-      this.set(x, y)
-    }
-  }
   get fullBits () {
     return (1n << BigInt(this.width * this.height)) - 1n
   }
@@ -339,12 +276,6 @@ export class Mask {
     }
     return { left, right, top, bottom }
   }
-
-  drawLineInfinite = function (x0, y0, dxDir, dyDir) {
-    this.drawRay(x0, y0, dxDir, dyDir)
-    this.drawRay(x0, y0, -dxDir, -dyDir)
-  }
-
   outerBorderMask = function () {
     const { left, right, top, bottom } = this.edgeMasks()
     return left | right | top | bottom
@@ -370,52 +301,5 @@ export class Mask {
   }
   innerAreaMask = function () {
     return this.bits & ~this.innerBorderMask()
-  }
-  createPieSegment (
-    sourceX,
-    sourceY,
-    directionX,
-    directionY,
-    radius,
-    spreadDeg
-  ) {
-    let mask = 0n
-
-    // Normalize direction
-    const dLen = Math.hypot(directionX, directionY)
-    if (dLen === 0) return 0n
-
-    const dxDir = directionX / dLen
-    const dyDir = directionY / dLen
-
-    const cosLimit = Math.cos((spreadDeg * Math.PI) / 180)
-    const r2 = radius * radius
-
-    // Bounding box (tight)
-    const minX = Math.max(0, sourceX - radius)
-    const maxX = Math.min(this.width - 1, sourceX + radius)
-    const minY = Math.max(0, sourceY - radius)
-    const maxY = Math.min(this.height - 1, sourceY + radius)
-
-    for (let y = minY; y <= maxY; y++) {
-      for (let x = minX; x <= maxX; x++) {
-        const dx = x - sourceX
-        const dy = y - sourceY
-
-        const dist2 = dx * dx + dy * dy
-        if (dist2 === 0 || dist2 > r2) continue
-
-        const invLen = 1 / Math.sqrt(dist2)
-        const nx = dx * invLen
-        const ny = dy * invLen
-
-        const dot = nx * dxDir + ny * dyDir
-        if (dot < cosLimit) continue
-
-        mask |= 1n << BigInt(y * this.width + x)
-      }
-    }
-
-    return mask
   }
 }

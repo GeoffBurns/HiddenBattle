@@ -21,13 +21,7 @@ function flipV (i, N) {
   const y = Math.floor(i / N)
   return (N - 1 - y) * N + x
 }
-function dot (ax, ay, bx, by) {
-  return ax * bx + ay * by
-}
 
-function len (x, y) {
-  return Math.hypot(x, y)
-}
 function transformMask (mask, N, fn) {
   let out = 0n
   for (let i = 0; i < N * N; i++) {

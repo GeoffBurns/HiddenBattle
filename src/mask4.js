@@ -4,14 +4,6 @@ const MxC = 3 // max color
 const MnC = 0 // min color
 const BS = 2n // bit shift
 
-function dot (ax, ay, bx, by) {
-  return ax * bx + ay * by
-}
-
-function len (x, y) {
-  return Math.hypot(x, y)
-}
-
 export class Mask4 {
   constructor (width, height) {
     this.width = width
@@ -148,71 +140,5 @@ export class Mask4 {
     const W = this.width
     const H = this.height
     return x >= 0 && y >= 0 && x < W && y < H
-  }
-
-  drawLine (x0, y0, x1, y1, color) {
-    let dx = Math.abs(x1 - x0)
-    let dy = Math.abs(y1 - y0)
-    let sx = x0 < x1 ? 1 : -1
-    let sy = y0 < y1 ? 1 : -1
-    let err = dx - dy
-
-    while (true) {
-      if (this.inBounds(x0, y0)) {
-        this.set(x0, y0, color)
-      }
-      if (x0 === x1 && y0 === y1) break
-
-      const e2 = err << 1
-      if (e2 > -dy) {
-        err -= dy
-        x0 += sx
-      }
-      if (e2 < dx) {
-        err += dx
-        y0 += sy
-      }
-    }
-  }
-
-  drawRay (x, y, dx, dy, color) {
-    // const board = this.bits
-    // const W = this.width
-    //  const H = this.height
-    while (this.inBounds(x, y)) {
-      this.set(x, y, color)
-      x += dx
-      y += dy
-    }
-  }
-
-  drawLineInfinite (x0, y0, dx, dy, color) {
-    this.drawRay(x0, y0, dx, dy, color)
-    this.drawRay(x0 - dx, y0 - dy, -dx, -dy, color)
-  }
-  drawPie (ox, oy, dx, dy, radius, spreadDeg, color) {
-    const dirLen = len(dx, dy)
-    const cosLimit = Math.cos((spreadDeg * Math.PI) / 180)
-
-    const r2 = radius * radius
-
-    for (let y = oy - radius; y <= oy + radius; y++) {
-      for (let x = ox - radius; x <= ox + radius; x++) {
-        if (!this.inBounds(x, y)) continue
-
-        const vx = x - ox
-        const vy = y - oy
-
-        const d2 = vx * vx + vy * vy
-        if (d2 > r2 || d2 === 0) continue
-
-        const vLen = Math.sqrt(d2)
-        const cosAngle = dot(vx, vy, dx, dy) / (vLen * dirLen)
-
-        if (cosAngle >= cosLimit) {
-          this.setCell(x, y, color)
-        }
-      }
-    }
   }
 }

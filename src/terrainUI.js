@@ -43,9 +43,9 @@ export function setTerrainParams (newTerrainMap) {
   const urlParams = url.searchParams
 
   const bodyTag = newTerrainMap?.terrain?.bodyTag
-  const newTerrainTag = newTerrainMap?.terrain?.tag
+  //const newTerrainTag = newTerrainMap?.terrain?.tag
 
-  urlParams.set('terrain', newTerrainTag)
+  urlParams.set('terrain', bodyTag) //newTerrainTag)
   const mode = isEditMode(urlParams) ? 'edit' : 'create'
   let mapName = getParamMap(urlParams)
   let [height, width] = getParamSize(urlParams)
