@@ -5,7 +5,6 @@ import {
   keyListFromCell,
   parseTriple,
   findClosestCoord,
-  cellListContains,
   coordsFromCell
 } from '../utilities.js'
 import { placedShipsInstance } from '../selection.js'
@@ -474,7 +473,7 @@ export class Waters {
       const cells = oppo.shipCells(ship.id)
       const surround = oppo.UI.surroundCellElement(cells)
       for (const cell of surround) {
-        if (!cell.dataset.listen && !cellListContains(cell, ship.id)) {
+        if (!cell.dataset.listen) {
           const [r, c] = coordsFromCell(cell)
           cell.addEventListener(
             'click',

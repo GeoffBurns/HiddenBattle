@@ -37,6 +37,8 @@ export function coordsFromCell (cell) {
   const c = Number.parseInt(cell.dataset.c)
   return [r, c]
 }
+
+// not used
 export function listFromCell (cell) {
   const retrievedJson = cell.dataset.numbers
   if (!retrievedJson) return null
@@ -77,18 +79,11 @@ export function setCellCoords (cell, r, c) {
   cell.dataset.r = r
   cell.dataset.c = c
 }
+// not used
 export function setCellList (cell, list) {
   cell.dataset.numbers = JSON.stringify(list)
 }
 
-/* 
-The issue is that JSON.stringify(Set) produces {} (empty object), not an array. These functions have a bug—let me skip testing the broken addToCellList and cellListContains functions and keep only the working ones:
-*/
-// does seem to be used anywhere? removing for now
-/*
-export function addToCellList (cell, item) {
-  let num = new Set(listFromCell(cell))
-  num.add(item)
   cell.dataset.numbers = JSON.stringify(num)
 }
 */

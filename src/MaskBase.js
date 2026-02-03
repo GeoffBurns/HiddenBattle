@@ -131,4 +131,39 @@ export class MaskBase extends GridBase {
   drawLineInfinite (x0, y0, x1, y1) {
     drawLineInfinite(x0, y0, x1, y1, this)
   }
+
+  toAscii (symbols = ['.', '1', '2', '3']) {
+    let lines = []
+
+    this.forRows(symbols, lines)
+
+    return lines.join('\n')
+  }
+
+  forRows (symbols, lines) {
+    const H = this.height
+    for (let y = 0; y < H; y++) {
+      this.asciiRow(y, symbols, lines)
+    }
+  }
+
+  asciiRow (y, symbols, lines) {
+    let row = ''
+    row = this.forRow(row, y, this.asciiCell.bind(this, symbols))
+    lines.push(row)
+  }
+
+  forRow (row, y, accCell) {
+    const W = this.width
+    for (let x = 0; x < W; x++) {
+      row = accCell(y, x, row)
+    }
+    return row
+  }
+
+  asciiCell (symbols, y, x, row) {
+    const v = this.at(x, y)
+    row += symbols[v]
+    return row
+  }
 }

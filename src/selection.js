@@ -1,4 +1,4 @@
-class Ghost {
+export class Ghost {
   constructor (variant, letter, contentBuilder, special) {
     const el = document.createElement('div')
     el.className = 'ship-ghost'

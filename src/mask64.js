@@ -1,28 +1,28 @@
-const BW = 2 // bit width
-const CM = 0b11n // color mask
+/*const BW = 2 // bit width
+const CM = 0b11 // color mask
 const MxC = 3 // max color
 const MnC = 0 // min color
-const BS = 2n // bit shift
-
-function rot90 (i, N) {
+const BS = 2 // bit shift
+*/
+export function rot90 (i, N) {
   const x = i % N
   const y = Math.floor(i / N)
   return x * N + (N - 1 - y)
 }
 
-function flipH (i, N) {
+export function flipH (i, N) {
   const x = i % N
   const y = Math.floor(i / N)
   return y * N + (N - 1 - x)
 }
 
-function flipV (i, N) {
+export function flipV (i, N) {
   const x = i % N
   const y = Math.floor(i / N)
   return (N - 1 - y) * N + x
 }
 
-function transformMask (mask, N, fn) {
+export function transformMask (mask, N, fn) {
   let out = 0n
   for (let i = 0; i < N * N; i++) {
     if ((mask >> BigInt(i)) & 1n) {
@@ -31,6 +31,138 @@ function transformMask (mask, N, fn) {
   }
   return out
 }
+/*
+hiddenbattle@1.0.0 test
+> node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --watchAll=false
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ FAIL  src/mask64.test.js
+  ● Mask64 › bitPos › should calculate bit position for 2-bit encoding
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2n
+    Received: 1n
+
+      37 |     it('should calculate bit position for 2-bit encoding', () => {
+      38 |       expect(mask.bitPos(0, 0)).toBe(0n)
+    > 39 |       expect(mask.bitPos(1, 0)).toBe(2n)
+         |                                 ^
+      40 |       expect(mask.bitPos(0, 1)).toBe(16n)
+      41 |     })
+      42 |   })
+
+      at Object.toBe (src/mask64.test.js:39:33)
+
+  ● Mask64 › at and set › should set and get color values
+
+    TypeError: Cannot mix BigInt and other types, use explicit conversions
+
+      66 |   at (x, y) {
+      67 |     const pos = this.bitPos(x, y)
+    > 68 |     return Number((this.bits >> pos) & CM)
+         |                             ^
+      69 |   }
+      70 |
+      71 |   check (color) {
+
+      at Mask64.at (src/mask64.js:68:29)
+      at Object.at (src/mask64.test.js:57:19)
+
+  ● Mask64 › at and set › should support all valid colors
+
+    TypeError: Cannot mix BigInt and other types, use explicit conversions
+
+      61 |     if (color === 1) this.layers[0] |= bit
+      62 |     else if (color === 2) this.layers[1] |= bit
+    > 63 |     else if (color === 3) this.layers[3] |= bit
+         |                                             ^
+      64 |   }
+      65 |
+      66 |   at (x, y) {
+
+      at Mask64.bit (src/mask64.js:63:45)
+      at Object.set (src/mask64.test.js:61:24)
+
+  ● Mask64 › at and set › should isolate colors in different cells
+
+    TypeError: Cannot mix BigInt and other types, use explicit conversions
+
+      53 |     const pos = this.bitPos(x, y)
+      54 |
+    > 55 |     this.bits = (this.bits & ~(CM << pos)) | (BigInt(color) << pos)
+         |                           ^
+      56 |
+      57 |     this.layers.forEach((value, i, ly) => {
+      58 |       ly[i] = value & ~bit
+
+      at Mask64.set (src/mask64.js:55:27)
+      at Object.set (src/mask64.test.js:67:24)
+
+  ● Mask64 › at and set › should overwrite previous colors
+
+    TypeError: Cannot mix BigInt and other types, use explicit conversions
+
+      66 |   at (x, y) {
+      67 |     const pos = this.bitPos(x, y)
+    > 68 |     return Number((this.bits >> pos) & CM)
+         |                             ^
+      69 |   }
+      70 |
+      71 |   check (color) {
+
+      at Mask64.at (src/mask64.js:68:29)
+      at Object.at (src/mask64.test.js:74:19)
+
+  ● Mask64 › isNonZero › should detect non-zero values
+
+    TypeError: Cannot mix BigInt and other types, use explicit conversions
+
+      77 |   isNonZero (x, y) {
+      78 |     const pos = this.bitPos(x, y)
+    > 79 |     return ((this.bits >> pos) & CM) !== 0n
+         |                       ^
+      80 |   }
+      81 |
+      82 |   testFor (x, y, color) {
+
+      at Mask64.isNonZero (src/mask64.js:79:23)
+      at Object.isNonZero (src/mask64.test.js:98:19)
+
+  ● Mask64 › isNonZero › should distinguish zero from non-zero
+
+    TypeError: Cannot mix BigInt and other types, use explicit conversions
+
+      77 |   isNonZero (x, y) {
+      78 |     const pos = this.bitPos(x, y)
+    > 79 |     return ((this.bits >> pos) & CM) !== 0n
+         |                       ^
+      80 |   }
+      81 |
+      82 |   testFor (x, y, color) {
+
+      at Mask64.isNonZero (src/mask64.js:79:23)
+      at Object.isNonZero (src/mask64.test.js:103:19)
+
+ PASS  src/maskConvert.test.js
+ PASS  src/variants.test.js
+ PASS  src/utilities.test.js
+ PASS  src/mask4.test.js
+ PASS  src/mask.test.js
+ PASS  src/listCanvas.test.js
+ PASS  src/maskShape.test.js
+ PASS  src/hello.test.js
+
+Test Suites: 1 failed, 8 passed, 9 total
+Tests:       7 failed, 127 passed, 134 total
+Snapshots:   0 total
+Time:        1.388 s, estimated 3 s
+Ran all test suites.
+
+
+with the implementation (BigInt type mismatches). Let me check the actual implementation:
+*/
+/*
 export class Mask64 {
   constructor (width, height) {
     this.width = width
@@ -162,3 +294,4 @@ export class Mask64 {
     return best
   }
 }
+*/

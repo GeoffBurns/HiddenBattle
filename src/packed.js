@@ -34,6 +34,11 @@ export class Packed extends MaskBase {
     const words = Math.ceil((width * height) / 16)
     super(width, height, 2, new Uint32Array(words))
     this.words = words
+    this.BW = 2
+    this.BS = 2
+    this.CM = (1 << this.BS) - 1
+    this.MxC = (1 << this.BW) - 1
+    this.MnC = 0
     lazy(this, 'transformMaps', () => {
       return buildTransformMaps32(this.width, this.height)
     })
@@ -126,3 +131,67 @@ export class Packed extends MaskBase {
     return ((this.bits[boardIdx] >> boardPos) & this.CM) !== 0n
   }
 }
+/*
+
+
+> hiddenbattle@1.0.0 test
+> node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --watchAll=false
+
+ FAIL  src/selection.test.js
+  ● Test suite failed to run
+
+    ● Validation Error:
+    
+      Test environment jest-environment-jsdom cannot be found. Make sure the testEnvironment configuration option points to an existing node module.
+    
+      Configuration Documentation:
+      https://jestjs.io/docs/configuration
+    
+
+    As of Jest 28 "jest-environment-jsdom" is no longer shipped by default, make sure to install it separately.
+
+      
+        Test environment jest-environment-jsdom cannot be found. Make sure the testEnvironment configuration option points to an existing node module.
+      
+        Configuration Documentation:
+        https://jestjs.io/docs/configuration
+      
+      As of Jest 28 "jest-environment-jsdom" is no longer shipped by default, make sure to install it separately.
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ FAIL  src/packed.test.js
+  ● Packed › ascii
+
+    TypeError: Cannot mix BigInt and other types, use explicit conversions
+
+      167 |     const board = this.bits
+      168 |     const pos = BigInt((y * W + x) * 2)
+    > 169 |     const v = Number((board >> pos) & this.CM)
+          |                            ^
+      170 |     row += symbols[v]
+      171 |     return row
+      172 |   }
+
+      at Packed.asciiCell (src/MaskBase.js:169:28)
+      at Packed.accCell [as forRow] (src/MaskBase.js:159:13)
+      at Packed.forRow [as asciiRow] (src/MaskBase.js:152:16)
+      at Packed.asciiRow [as forRows] (src/MaskBase.js:146:12)
+      at Packed.forRows (src/MaskBase.js:138:10)
+      at Object.toAscii (src/packed.test.js:94:14)
+
+ PASS  src/variants.test.js
+ PASS  src/utilities.test.js
+ PASS  src/mask.test.js
+ PASS  src/mask4.test.js
+ PASS  src/maskShape.test.js
+ PASS  src/maskConvert.test.js
+ PASS  src/listCanvas.test.js
+ PASS  src/hello.test.js
+
+Test Suites: 2 failed, 8 passed, 10 total
+Tests:       1 failed, 128 passed, 129 total
+Snapshots:   0 total
+Time:        1.62 s, estimated 2 s
+Ran all test suites.
+
+*/

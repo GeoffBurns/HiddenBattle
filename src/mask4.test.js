@@ -1,6 +1,6 @@
 /* eslint-env jest */
 
-/* global describe, it, expect */
+/* global describe, beforeEach,it, expect */
 import { Mask4 } from './mask4.js'
 
 describe('Mask4', () => {
