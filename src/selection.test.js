@@ -1,7 +1,8 @@
 /* eslint-env jest */
 
 /* global describe, beforeAll, jest, it, expect, beforeEach, afterEach, global */
-import { Ghost, Brush } from './selection.js'
+import { Ghost } from './Ghost.js'
+import { Brush } from './Brush.js'
 
 // Minimal DOM mock for environments without jsdom
 beforeAll(() => {

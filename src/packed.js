@@ -1,6 +1,49 @@
 import { MaskBase } from './MaskBase'
 import { lazy } from './utilities.js'
 
+export function rangeBitMask (start, end) {
+  return ((~0 >>> (31 - end)) & (~0 << start)) >>> 0
+}
+export function setBitsRange (x, start, end) {
+  const mask = rangeBitMask(start, end)
+  return (x | mask) >>> 0
+}
+export function bits (x) {
+  return x.toString(2).padStart(32, '0')
+}
+export function fillRange2BitPattern (x, start, end, pattern) {
+  const mask = fillMask2BitPattern(start, end, pattern)
+
+  return (x | mask) >>> 0
+}
+export function fillMask2BitPattern (start, e, pattern) {
+  pattern &= 3
+  const end = e + 1
+  const rangeBits = end - start + 1
+  const usableBits = rangeBits & ~1
+  if (usableBits === 0) return 0 >>> 0
+
+  let base
+  switch (pattern) {
+    case 0:
+      base = 0x00000000
+      break
+    case 1:
+      base = 0x55555555
+      break
+    case 2:
+      base = 0xaaaaaaaa
+      break
+    case 3:
+      base = 0xffffffff
+      break
+  }
+
+  const mask = (base >>> (32 - usableBits)) << start
+
+  return mask >>> 0
+}
+
 function buildTransformMaps32 (W, H) {
   const m = {
     id: [],
@@ -35,6 +78,7 @@ export class Packed extends MaskBase {
     super(width, height, 2, new Uint32Array(words))
     this.words = words
     this.BW = 2
+    this.MB = this.BW - 1
     this.BS = 2
     this.CM = (1 << this.BS) - 1
     this.MxC = (1 << this.BW) - 1
@@ -50,7 +94,7 @@ export class Packed extends MaskBase {
   // wordIndex = floor(cellIndex / 16)
   // bitOffset = (cellIndex % 16) * 2
   bitPos (x, y) {
-    return y * this.BW * this.width + x
+    return this.index(x, y) << this.MB
   }
   ref (x, y) {
     const pos = this.bitPos(x, y)
@@ -60,7 +104,35 @@ export class Packed extends MaskBase {
     const pos = this.bitPos(x, y)
     return this.readRefFromPos(pos)
   }
+  setRange (r, c0, c1, color = 1) {
+    const ref1 = this.readRef(c0, r)
+    const ref2 = this.readRef(c1, r)
+    for (let bIdx = ref1.boardIdx; bIdx <= ref2.boardIdx; bIdx++) {
+      this.setChunkRange(bIdx, ref1, ref2, color)
+    }
+  }
+  setChunkRange (bIdx, ref1, ref2, color = 1) {
+    let { startPos, endPos } = this.rangeInChunk(bIdx, ref1, ref2)
+    const mask = fillMask2BitPattern(startPos, endPos, color)
+    const full = rangeBitMask(startPos, endPos)
+    this.bits[bIdx] = this.setChunkMask(bIdx, full, mask)
+  }
 
+  rangeInChunk (bIdx, ref1, ref2) {
+    let startPos = 0
+    let endPos = 31
+    if (bIdx === ref1.boardIdx) {
+      startPos = ref1.boardPos
+    }
+    if (bIdx === ref2.boardIdx) {
+      endPos = ref2.boardPos
+    }
+    return { startPos, endPos }
+  }
+
+  clearRange (r, c0, c1) {
+    this.setRange(r, c0, c1, 0)
+  }
   setPos (pos, color) {
     const { boardIdx, mask, boardPos } = this.refFromPos(pos)
     this.bits[boardIdx] = this.setRef(boardIdx, mask, color, boardPos)
@@ -69,16 +141,28 @@ export class Packed extends MaskBase {
   setRef (boardIdx, mask, color, boardPos) {
     return this.clearBoardBits(boardIdx, mask) | this.leftShift(color, boardPos)
   }
+  setChunkMask (boardIdx, full, mask) {
+    return this.clearBoardBits(boardIdx, full) | mask
+  }
   //transformMap
   refFromPos (pos) {
     const { boardIdx, boardPos } = this.readRefFromPos(pos)
     const mask = this.bitMask(boardPos)
     return { boardIdx, mask, boardPos }
   }
-
+  refFromIdx (idx) {
+    const { boardIdx, boardPos } = this.readRefFromIdx(idx)
+    const mask = this.bitMask(boardPos)
+    return { boardIdx, mask, boardPos }
+  }
+  readRefFromIdx (idx) {
+    const boardIdx = idx >>> 4 // /16
+    const boardPos = (idx & 15) << 1 // *2
+    return { boardIdx, boardPos }
+  }
   readRefFromPos (pos) {
-    const boardIdx = pos >>> 4 // /16
-    const boardPos = (pos & 15) << 1 // *2
+    const boardIdx = pos >>> 5 // /16
+    const boardPos = pos & 30
     return { boardIdx, boardPos }
   }
   leftShift (color, boardPos) {
@@ -89,7 +173,7 @@ export class Packed extends MaskBase {
   }
 
   setMask (pos, color = 1) {
-    return BigInt(color) << pos
+    return (color & this.CM) << pos
   }
 
   clearBoardBits (idx, mask) {
@@ -131,67 +215,3 @@ export class Packed extends MaskBase {
     return ((this.bits[boardIdx] >> boardPos) & this.CM) !== 0n
   }
 }
-/*
-
-
-> hiddenbattle@1.0.0 test
-> node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --watchAll=false
-
- FAIL  src/selection.test.js
-  ● Test suite failed to run
-
-    ● Validation Error:
-    
-      Test environment jest-environment-jsdom cannot be found. Make sure the testEnvironment configuration option points to an existing node module.
-    
-      Configuration Documentation:
-      https://jestjs.io/docs/configuration
-    
-
-    As of Jest 28 "jest-environment-jsdom" is no longer shipped by default, make sure to install it separately.
-
-      
-        Test environment jest-environment-jsdom cannot be found. Make sure the testEnvironment configuration option points to an existing node module.
-      
-        Configuration Documentation:
-        https://jestjs.io/docs/configuration
-      
-      As of Jest 28 "jest-environment-jsdom" is no longer shipped by default, make sure to install it separately.
-
-[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
- FAIL  src/packed.test.js
-  ● Packed › ascii
-
-    TypeError: Cannot mix BigInt and other types, use explicit conversions
-
-      167 |     const board = this.bits
-      168 |     const pos = BigInt((y * W + x) * 2)
-    > 169 |     const v = Number((board >> pos) & this.CM)
-          |                            ^
-      170 |     row += symbols[v]
-      171 |     return row
-      172 |   }
-
-      at Packed.asciiCell (src/MaskBase.js:169:28)
-      at Packed.accCell [as forRow] (src/MaskBase.js:159:13)
-      at Packed.forRow [as asciiRow] (src/MaskBase.js:152:16)
-      at Packed.asciiRow [as forRows] (src/MaskBase.js:146:12)
-      at Packed.forRows (src/MaskBase.js:138:10)
-      at Object.toAscii (src/packed.test.js:94:14)
-
- PASS  src/variants.test.js
- PASS  src/utilities.test.js
- PASS  src/mask.test.js
- PASS  src/mask4.test.js
- PASS  src/maskShape.test.js
- PASS  src/maskConvert.test.js
- PASS  src/listCanvas.test.js
- PASS  src/hello.test.js
-
-Test Suites: 2 failed, 8 passed, 10 total
-Tests:       1 failed, 128 passed, 129 total
-Snapshots:   0 total
-Time:        1.62 s, estimated 2 s
-Ran all test suites.
-
-*/

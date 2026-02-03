@@ -3,6 +3,7 @@ const CM = 0b11n // color mask
 const MxC = 3 // max color
 const MnC = 0 // min color
 const BS = 2n // bit shift
+const MB = BS - 1n //  max bit
 
 export class Mask4 {
   constructor (width, height) {
@@ -18,7 +19,7 @@ export class Mask4 {
     return BigInt(y * this.width + x)
   }
   bitPos (x, y) {
-    return BigInt(y * BW * this.width + x)
+    return this.index(x, y) << MB
   }
 
   at (x, y) {
