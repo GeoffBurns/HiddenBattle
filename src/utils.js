@@ -1,4 +1,4 @@
-import { gameMap } from './gameMaps.js'
+import { bh } from './terrain.js'
 
 export function toTitleCase (str) {
   if (!str) {
@@ -13,7 +13,7 @@ export function toTitleCase (str) {
 export function randomPlaceShape (ship, shipCellGrid) {
   const letter = ship.letter
   const shape = ship.shape()
-  const map = gameMap()
+  const map = bh.map
   if (!shape) throw new Error('No shape for letter ' + letter)
   let placeables = shape.placeables()
 

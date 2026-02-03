@@ -51,8 +51,8 @@ function drawRayInDirection (x0, y0, dxDir, dyDir, canvas) {
 
 export function drawLineInfinite (x0, y0, x1, y1, canvas) {
   const { dxDir, dyDir } = direction(x1, x0, y1, y0)
-  this.drawRayInDirection(x0, y0, dxDir, dyDir, canvas)
-  this.drawRayInDirection(x0, y0, -dxDir, -dyDir, canvas)
+  drawRayInDirection(x0, y0, dxDir, dyDir, canvas)
+  drawRayInDirection(x0, y0, -dxDir, -dyDir, canvas)
 }
 
 export function drawSegmentTo (x0, y0, x1, y1, canvas, color) {

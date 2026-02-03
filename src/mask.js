@@ -1,6 +1,6 @@
 import { popcountBigInt } from './placeTools.js'
 import { lazy } from './utilities.js'
-import { MaskBase } from './maskBase.js'
+import { MaskBase } from './MaskBase.js'
 
 function buildTransformMaps (W, H) {
   const size = W * H
@@ -36,23 +36,6 @@ function buildTransformMaps (W, H) {
     }
   }
   return maps
-}
-
-export function coordsToZMasks (coords, width, height) {
-  const masks = new Map()
-
-  for (const [x, y, z] of coords) {
-    if (x < 0 || x >= width || y < 0 || y >= height) continue
-
-    const bit = 1n << BigInt(y * width + x)
-
-    if (!masks.has(z)) {
-      masks.set(z, 0n)
-    }
-
-    masks.set(z, masks.get(z) | bit)
-  }
-  return masks
 }
 
 export class Mask extends MaskBase {
@@ -125,29 +108,6 @@ export class Mask extends MaskBase {
     }
 
     return 'C1'
-  }
-
-  rowMask (y, x0, x1) {
-    const start = BigInt(y * this.width + x0)
-    const size = BigInt(x1 - x0 + 1)
-    return ((1n << size) - 1n) << start
-  }
-
-  setRange (r, c0, c1) {
-    this.bits |= this.rowMask(r, c0, c1)
-  }
-  setRanges (ranges) {
-    for (const [r, c0, c1] of ranges) {
-      this.setRange(r, c0, c1)
-    }
-  }
-  clearRange (r, c0, c1) {
-    this.bits &= ~this.rowMask(r, c0, c1)
-  }
-  clearRanges (ranges) {
-    for (const [r, c0, c1] of ranges) {
-      this.clearRange(r, c0, c1)
-    }
   }
 
   blit (src, srcX, srcY, width, height, dstX, dstY, mode = 'copy') {
@@ -237,12 +197,6 @@ export class Mask extends MaskBase {
     return coords
   }
 
-  get fullBits () {
-    return (1n << BigInt(this.width * this.height)) - 1n
-  }
-  get invertedBits () {
-    return this.fullBits & ~this.bits
-  }
   get fullMask () {
     const mask = this.newBlank
     mask.bits = this.fullBits

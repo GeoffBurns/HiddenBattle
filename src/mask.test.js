@@ -1,7 +1,8 @@
 /* eslint-env jest */
 
 /* global beforeEach, describe, it, expect */
-import { coordsToZMasks, Mask } from './mask.js'
+import { Mask } from './mask.js'
+import { coordsToZMasks } from './maskConvert.js'
 //import { beforeEach, describe, it, expect } from '@jest/globals'
 
 // Jest test suite

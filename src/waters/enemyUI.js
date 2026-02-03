@@ -1,4 +1,4 @@
-import { gameMap } from '../gameMaps.js'
+import { bh } from '../terrain.js'
 import { gameStatus } from './StatusUI.js'
 import { WatersUI } from './WatersUI.js'
 import { trackLevelEnd } from '../gtag.js'
@@ -11,7 +11,7 @@ class EnemyUI extends WatersUI {
   displayFleetSunk () {
     gameStatus.display('Fleet Destroyed', 'All  - Well Done!')
     this.board.classList.add('destroyed')
-    trackLevelEnd(gameMap(), true)
+    trackLevelEnd(bh.map, true)
   }
 
   revealAll (ships) {

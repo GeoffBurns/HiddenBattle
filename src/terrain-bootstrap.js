@@ -1,8 +1,7 @@
 !(function () {
   try {
     var p = new URLSearchParams(location.search).get('terrain'),
-      s = p || localStorage.terrain,
-      t = 'Space' === s.slice(0, 5) ? 'space' : 'sea',
+      t = p || localStorage.terrain,
       l = document.createElement('link'),
       f = document.getElementById('favicon')
     f.href = './images/' + t + '/favicons/favicon-48x48.png'
@@ -10,7 +9,7 @@
     l.rel = 'stylesheet'
     l.href = './styles/' + t + '-boot.css'
     document.head.appendChild(l)
-  } catch (e) {
+  } catch {
     document.head.appendChild(
       Object.assign(document.createElement('link'), {
         id: 'boot-trn',

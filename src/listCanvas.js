@@ -6,6 +6,7 @@ import {
   drawLineInfinite
 } from './maskShape.js'
 import { GridBase } from './gridBase.js'
+import { coordsToGrid } from './maskConvert.js'
 
 export class ListCanvas extends GridBase {
   constructor (width, height) {
@@ -35,5 +36,20 @@ export class ListCanvas extends GridBase {
   }
   drawLineInfinite (x0, y0, x1, y1) {
     drawLineInfinite(x0, y0, x1, y1, this)
+  }
+  get grid () {
+    this._grid = coordsToGrid(this.list, this.width, this.height)
+    return this._grid
+  }
+  get asci () {
+    const grid = this.grid
+    let out = ''
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        out += grid[y][x] || '.'
+      }
+      out += '\n'
+    }
+    return out
   }
 }

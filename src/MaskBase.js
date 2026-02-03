@@ -12,9 +12,9 @@ function bitLength32 (n) {
 }
 
 export class MaskBase extends GridBase {
-  constructor (width, height, depth = 1) {
+  constructor (width, height, depth = 1, bits = 0n) {
     super(width, height)
-    this.bits = 0n
+    this.bits = bits
     this.depth = depth
 
     this.BW = bitLength32(depth)
@@ -81,13 +81,40 @@ export class MaskBase extends GridBase {
     const pos = this.bitPos(x, y)
     return ((this.bits >> pos) & this.CM) !== 0n
   }
+  rangeSize (x0, x1) {
+    return (x1 - x0 + 1) * this.BW
+  }
+  rangeMask (x0, x1) {
+    return (1n << BigInt(this.rangeSize(x0, x1))) - 1n
+  }
+  rowRangeMask (y, x0, x1) {
+    const start = this.bitPos(x0, y)
+    return this.rangeMask(x0, x1) << start
+  }
 
+  setRange (r, c0, c1) {
+    this.bits |= this.rowRangeMask(r, c0, c1)
+  }
+  setRanges (ranges) {
+    for (const [r, c0, c1] of ranges) {
+      this.setRange(r, c0, c1)
+    }
+  }
+  clearRange (r, c0, c1) {
+    this.bits &= ~this.rowRangeMask(r, c0, c1)
+  }
+  clearRanges (ranges) {
+    for (const [r, c0, c1] of ranges) {
+      this.clearRange(r, c0, c1)
+    }
+  }
   get fullBits () {
     return (1n << BigInt(this.width * this.height)) - 1n
   }
   get invertedBits () {
     return this.fullBits & ~this.bits
   }
+
   drawSegmentTo (x0, y0, x1, y1, color) {
     drawSegmentTo(x0, y0, x1, y1, this, color)
   }
