@@ -43,7 +43,40 @@ export function fillMask2BitPattern (start, e, pattern) {
 
   return mask >>> 0
 }
+export function firstNonEmptyRow (data, widthWords) {
+  for (let i = 0; i < data.length; i += widthWords) {
+    for (let w = 0; w < widthWords; w++) {
+      if (data[i + w] !== 0) return i / widthWords
+    }
+  }
+  return -1
+}
+function firstNonEmptyColumn (data, width, height) {
+  const colBits = new Uint32Array(width)
 
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = y * width + x
+      if (data[i] !== 0) colBits[x] = 1
+    }
+  }
+
+  return colBits.findIndex(v => v !== 0)
+}
+function normalize2Bit (data, width, height) {
+  const minY = firstNonEmptyRow(data, width)
+  const minX = firstNonEmptyColumn(data, width, height)
+
+  const out = new Uint32Array(data.length)
+
+  for (let y = minY; y < height; y++) {
+    for (let x = minX; x < width; x++) {
+      out[(y - minY) * width + (x - minX)] = data[y * width + x]
+    }
+  }
+
+  return out
+}
 function buildTransformMaps32 (W, H) {
   const m = {
     id: [],
@@ -140,6 +173,12 @@ export class Packed extends MaskBase {
 
   setRef (boardIdx, mask, color, boardPos) {
     return this.clearBoardBits(boardIdx, mask) | this.leftShift(color, boardPos)
+  }
+  normalize () {
+    const data = this.bits
+    const width = this.width
+    const height = this.height
+    this.bits = normalize2Bit(data, width, height)
   }
   setChunkMask (boardIdx, full, mask) {
     return this.clearBoardBits(boardIdx, full) | mask

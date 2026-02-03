@@ -2,6 +2,43 @@ import { popcountBigInt } from './placeTools.js'
 import { lazy } from './utilities.js'
 import { MaskBase } from './MaskBase.js'
 
+function shiftBoardUp (mask, width) {
+  let rows = 0
+  while (mask !== 0n && (mask & ((1n << BigInt(width)) - 1n)) === 0n) {
+    mask >>= BigInt(width)
+    rows++
+  }
+  return { mask, rows }
+}
+
+function shiftBoardLeft (mask, width, height) {
+  let colShift = width
+
+  for (let y = 0; y < height; y++) {
+    const row = (mask >> BigInt(y * width)) & ((1n << BigInt(width)) - 1n)
+    if (row !== 0n) {
+      const tz =
+        row.toString(2).length - row.toString(2).replace(/^0+/, '').length
+      colShift = Math.min(colShift, tz)
+    }
+  }
+
+  if (colShift === 0) return mask
+
+  let out = 0n
+  for (let y = 0; y < height; y++) {
+    const row = (mask >> BigInt(y * width)) & ((1n << BigInt(width)) - 1n)
+    out |= (row >> BigInt(colShift)) << BigInt(y * width)
+  }
+
+  return out
+}
+
+function normalizeBitboard (mask, width, height) {
+  const { mask: up } = shiftBoardUp(mask, width)
+  return shiftBoardLeft(up, width, height)
+}
+
 function buildTransformMaps (W, H) {
   const size = W * H
 
@@ -62,7 +99,26 @@ export class Mask extends MaskBase {
   get size () {
     return popcountBigInt(this.bits)
   }
+  shiftedFullUp (bits) {
+    const b = bits === undefined ? this.bits : bits
 
+    return shiftBoardUp(b, this.width)
+  }
+  shiftedFullLeft (bits) {
+    const b = bits === undefined ? this.bits : bits
+
+    const out = shiftBoardLeft(b, this.width, this.height)
+    return out
+  }
+  normalized (bits) {
+    const b = bits === undefined ? this.bits : bits
+    const { mask: up } = this.shiftedFullUp(b)
+    return this.shiftedFullLeft(up)
+  }
+  normalize (bits) {
+    const b = bits === undefined ? this.bits : bits
+    this.bits = this.normalized(b)
+  }
   applyMap (map) {
     let out = 0n
     let b = this.bits
@@ -73,8 +129,9 @@ export class Mask extends MaskBase {
       out |= 1n << BigInt(map[i])
       b ^= lsb
     }
-    return out
+    return this.normalized(out)
   }
+
   orbit (maps) {
     return [
       this.applyMap(maps.id),
@@ -87,31 +144,38 @@ export class Mask extends MaskBase {
       this.applyMap(maps.fd2)
     ]
   }
-
   classifySymmetry () {
     const maps = this.transformMaps
     const b = this.bits
-    const imgs = this.orbit(maps)
-    const set = new Set(imgs.map(b => b.toString()))
-    const k = set.size
-
-    if (k === 1) return 'D4'
-
-    if (k === 2) {
+    const k = this.order
+    if (k === 8) return 'D4'
+    if (k === 4) {
       if (this.applyMap(maps.r90) === this.bits) return 'C4'
       return 'V4 (diagonal Klein four)'
     }
-
-    if (k === 4) {
+    if (k === 2) {
       if (this.applyMap(maps.r180) === b) return 'C2 (half-turn)'
       return 'C2 (single mirror)'
     }
-
     return 'C1'
+  }
+
+  get order () {
+    const ss = this.symmetries
+    const k = ss.length
+    return k
+  }
+
+  get symmetries () {
+    const maps = this.transformMaps
+    const imgs = this.orbit(maps)
+    const unique = [...new Set(imgs)]
+    return unique
   }
 
   blit (src, srcX, srcY, width, height, dstX, dstY, mode = 'copy') {
     for (let r = 0; r < height; r++) {
+      //      TypeError: src.sliceRow is not a function
       const rowBits = src.sliceRow(srcY + r, srcX, srcX + width - 1)
 
       const dstStart = BigInt((dstY + r) * this.width + dstX)
@@ -139,19 +203,19 @@ export class Mask extends MaskBase {
     while (stack.length) {
       const [x, y] = stack.pop()
       if (x < 0 || y < 0 || x >= this.width || y >= this.height) continue
-      if (this.get(x, y)) continue
+      if (this.at(x, y)) continue
 
       let left = x
       let right = x
-
-      while (left > 0 && !this.get(left - 1, y)) left--
-      while (right + 1 < this.width && !this.get(right + 1, y)) right++
+      //TypeError: this.get is not a functionJest
+      while (left > 0 && !this.at(left - 1, y)) left--
+      while (right + 1 < this.width && !this.at(right + 1, y)) right++
 
       this.setRange(y, left, right)
 
       for (let i = left; i <= right; i++) {
-        if (y > 0 && !this.get(i, y - 1)) stack.push([i, y - 1])
-        if (y + 1 < this.height && !this.get(i, y + 1)) stack.push([i, y + 1])
+        if (y > 0 && !this.at(i, y - 1)) stack.push([i, y - 1])
+        if (y + 1 < this.height && !this.at(i, y + 1)) stack.push([i, y + 1])
       }
     }
   }
@@ -159,7 +223,7 @@ export class Mask extends MaskBase {
     let out = ''
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
-        out += this.get(x, y) ? '#' : '.'
+        out += this.at(x, y) ? '#' : '.'
       }
       out += '\n'
     }
@@ -198,7 +262,7 @@ export class Mask extends MaskBase {
   }
 
   get fullMask () {
-    const mask = this.newBlank
+    const mask = this.emptyMask
     mask.bits = this.fullBits
     return mask
   }
@@ -207,7 +271,7 @@ export class Mask extends MaskBase {
     return new Mask(this.width, this.height)
   }
   get invertedMask () {
-    const mask = this.newBlank
+    const mask = this.emptyMask
     mask.bits = this.invertedBits
     return mask
   }
@@ -219,14 +283,14 @@ export class Mask extends MaskBase {
 
     // top & bottom rows
     for (let x = 0; x < this.width; x++) {
-      top |= 1n << this.idx(x, 0)
-      bottom |= 1n << this.idx(x, this.height - 1)
+      top |= 1n << this.bitPos(x, 0)
+      bottom |= 1n << this.bitPos(x, this.height - 1)
     }
 
     // left & right columns
     for (let y = 0; y < this.height; y++) {
-      left |= 1n << this.idx(0, y)
-      right |= 1n << this.idx(this.width - 1, y)
+      left |= 1n << this.bitPos(0, y)
+      right |= 1n << this.bitPos(this.width - 1, y)
     }
     return { left, right, top, bottom }
   }
@@ -242,14 +306,14 @@ export class Mask extends MaskBase {
 
     // y = 1 and y = h-2
     for (let x = 1; x < this.width - 1; x++) {
-      mask |= 1n << this.idx(x, 1)
-      mask |= 1n << this.idx(x, this.height - 2)
+      mask |= 1n << this.bitPos(x, 1)
+      mask |= 1n << this.bitPos(x, this.height - 2)
     }
 
     // x = 1 and x = w-2
     for (let y = 2; y < this.height - 2; y++) {
-      mask |= 1n << this.idx(1, y)
-      mask |= 1n << this.idx(this.width - 2, y)
+      mask |= 1n << this.bitPos(1, y)
+      mask |= 1n << this.bitPos(this.width - 2, y)
     }
     return mask
   }
