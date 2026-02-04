@@ -2,7 +2,7 @@
 
 /* global describe, jest, beforeEach, it, expect */
 
-jest.mock('../src/ships/SubShape.js', () => {
+jest.mock('../ships/SubShape.js', () => {
   return {
     StandardCells: jest
       .fn()
@@ -27,13 +27,13 @@ jest.mock('../src/ships/SubShape.js', () => {
   }
 })
 
-jest.mock('../src/utilities.js', () => {
+jest.mock('../utilities.js', () => {
   return {
     parsePair: jest.fn(p => p)
   }
 })
 
-jest.mock('../src/variants/Placeable.js', () => {
+jest.mock('./Placeable.js', () => {
   return {
     Placeable: jest
       .fn()
@@ -46,7 +46,7 @@ jest.mock('../src/variants/Placeable.js', () => {
   }
 })
 
-jest.mock('../src/variants/PlaceableW.js', () => {
+jest.mock('./PlaceableW.js', () => {
   return {
     PlaceableW: jest.fn().mockImplementation(function (parentPlaceable, arr) {
       this.parentPlaceable = parentPlaceable
@@ -61,7 +61,7 @@ Parent.prototype.placeable = function (idx) {
   return { parentPlaceableCalled: true, idxArg: idx || this.index }
 }
 
-jest.mock('../src/variants/SpecialVariant.js', () => {
+jest.mock('./SpecialVariant.js', () => {
   class SpecialVariant extends Parent {
     constructor (symmetry) {
       super()
@@ -69,7 +69,7 @@ jest.mock('../src/variants/SpecialVariant.js', () => {
       this.specialGroups = []
       this.subGroups = []
     }
-    buildCell3 (symmetry, full) {
+    buildCell3 (_symmetry, _full) {
       this.list = []
     }
     // provide special method used by WeaponVariant.placeable
@@ -81,13 +81,13 @@ jest.mock('../src/variants/SpecialVariant.js', () => {
   return { SpecialVariant }
 })
 
-import { WeaponVariant } from '../src/variants/WeaponVariant.js'
-import { StandardCells, SpecialCells } from '../src/ships/SubShape.js'
-import { parsePair } from '../src/utilities.js'
-import { Placeable } from '../src/variants/Placeable.js'
-import { PlaceableW } from '../src/variants/PlaceableW.js'
-import { SpecialVariant } from '../src/variants/SpecialVariant.js'
-import { Armed } from '../src/variants/WeaponVariant.js'
+import { WeaponVariant } from './WeaponVariant.js'
+import { StandardCells, SpecialCells } from '../ships/SubShape.js'
+import { parsePair } from '../utilities.js'
+import { Placeable } from './Placeable.js'
+import { PlaceableW } from './PlaceableW.js'
+import { SpecialVariant } from './SpecialVariant.js'
+import { Armed } from './WeaponVariant.js'
 
 describe('WeaponVariant', () => {
   const full = [['a']]

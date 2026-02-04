@@ -2,7 +2,7 @@
 
 /* global describe, jest, it, expect */
 
-jest.mock('../src/terrain/terrain.js', () => {
+jest.mock('../terrain/terrain.js', () => {
   return {
     bh: {
       seekingMode: false,
@@ -16,9 +16,9 @@ import {
   StandardShot,
   standardShot,
   WeaponCatelogue
-} from '../src/weapon/Weapon.js'
-import { bh } from '../src/terrain/terrain.js'
-import { errorMsg } from '../src/grid/errorMsg.js'
+} from './Weapon.js'
+import { bh } from '../terrain/terrain.js'
+import { errorMsg } from '../grid/errorMsg.js'
 
 describe('Weapon', () => {
   it('cannot be instantiated directly', () => {

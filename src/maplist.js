@@ -1,10 +1,10 @@
-import { bh } from './terrain.js'
+import { bh } from './terrain/terrain.js'
 import { WatersUI } from './waters/WatersUI.js'
 import { Waters } from './waters/Waters.js'
 import { ScoreUI } from './waters/ScoreUI.js'
 import { setupMapListOptions } from './setupOptions.js'
 import { switchTo } from './setupTabs.js'
-import { switchToEdit, fetchNavBar } from './navbar.js'
+import { switchToEdit, fetchNavBar } from './navbar/navbar.js'
 import { trackClick } from './gtag.js'
 class MapList {
   constructor (id) {

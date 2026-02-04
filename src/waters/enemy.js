@@ -1,4 +1,4 @@
-import { bh } from '../terrain.js'
+import { bh } from '../terrain/terrain.js'
 import { randomPlaceShape } from '../utils.js'
 import { gameStatus } from './StatusUI.js'
 import { enemyUI } from './enemyUI.js'

@@ -1,4 +1,4 @@
-import { fetchNavBar } from '../navbar.js'
+import { fetchNavBar } from '../navbar/navbar.js'
 import { fetchComponent } from '../network.js'
 import { show2ndBar } from '../navbar/headerUtils.js'
 import { setupPrint } from './setupPrint.js'

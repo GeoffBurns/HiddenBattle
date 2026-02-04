@@ -1,6 +1,6 @@
 import { bh } from '../terrain/terrain.js'
 import { trackClick, trackTab } from './gtag.js'
-import { SavedCustomMap } from './map.js'
+import { SavedCustomMap } from '../terrain/map.js'
 import { storeShips } from '../waters/saveCustomMap.js'
 
 export function switchTo (target, huntMode, mapName) {

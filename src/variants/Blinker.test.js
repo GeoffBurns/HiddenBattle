@@ -2,20 +2,20 @@
 
 /* global describe, jest, beforeEach, it, expect */
 
-jest.mock('../src/variants/normalize.js', () => {
+jest.mock('./normalize.js', () => {
   return {
     rotate: jest.fn(cells => cells.map(row => row.reverse())),
     rotate3: jest.fn(cells => cells.map(row => row.reverse()))
   }
 })
 
-jest.mock('../src/variants/makeCell3.js', () => {
+jest.mock('./makeCell3.js', () => {
   return {
-    makeCell3: jest.fn((full, subGroups) => full[0])
+    makeCell3: jest.fn((full, _subGroups) => full[0])
   }
 })
 
-jest.mock('../src/variants/Invariant.js', () => {
+jest.mock('./Invariant.js', () => {
   return {
     Invariant: {
       r: jest.fn(idx => idx)
@@ -23,7 +23,7 @@ jest.mock('../src/variants/Invariant.js', () => {
   }
 })
 
-jest.mock('../src/variants/RotatableVariant.js', () => {
+jest.mock('./RotatableVariant.js', () => {
   class RotatableVariant {
     constructor (validator, zoneDetail, symmetry) {
       this.validator = validator
@@ -42,10 +42,10 @@ jest.mock('../src/variants/RotatableVariant.js', () => {
   return { RotatableVariant }
 })
 
-import { Blinker } from '../src/variants/Blinker.js'
-import { rotate, rotate3 } from '../src/variants/normalize.js'
-import { makeCell3 } from '../src/variants/makeCell3.js'
-import { Invariant } from '../src/variants/Invariant.js'
+import { Blinker } from './Blinker.js'
+import { rotate, rotate3 } from './normalize.js'
+import { makeCell3 } from './makeCell3.js'
+import { Invariant } from './Invariant.js'
 
 describe('Blinker', () => {
   const validator = jest.fn()

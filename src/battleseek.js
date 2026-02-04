@@ -1,6 +1,6 @@
-import { fetchNavBar } from './navbar.js'
-import { setupGameOptions } from './setupOptions.js'
-import { setupEnemy, newGame } from './enemySetup.js'
+import { fetchNavBar } from './navbar/navbar.js'
+import { setupGameOptions } from './navbar/setupOptions.js'
+import { setupEnemy, newGame } from './navbar/enemySetup.js'
 import { enemyUI } from './waters/enemyUI.js'
 
 fetchNavBar('seek', "Geoff's Hidden Battle (Seek)", function () {

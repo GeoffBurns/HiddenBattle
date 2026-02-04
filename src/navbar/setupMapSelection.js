@@ -1,8 +1,8 @@
 import { bh } from '../terrain/terrain.js'
 import { terrainSelect } from '../terrain/terrainUI.js'
 import { ChooseFromListUI } from './chooseUI.js'
-import { getParamMap, getParamSize } from '../getParam.js'
-import { setMapParams } from '../SetParams.js'
+import { getParamMap, getParamSize } from '../network/getParam.js'
+import { setMapParams } from '../network/SetParams.js'
 
 export function setupMapControl (
   urlParams,

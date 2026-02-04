@@ -1,7 +1,7 @@
 import { bh, terrains } from './terrain.js'
-import { ChooseFromListUI } from '../chooseUI.js'
-import { setSizeParams, updateState } from '../SetParams.js'
-import { isEditMode, getParamMap, getParamSize } from '../getParam.js'
+import { ChooseFromListUI } from '../navbar/chooseUI.js'
+import { setSizeParams, updateState } from '../network/SetParams.js'
+import { isEditMode, getParamMap, getParamSize } from '../network/getParam.js'
 
 export function terrainSelect () {
   const terrainTitles = (() => {

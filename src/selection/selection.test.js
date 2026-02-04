@@ -1,126 +1,206 @@
+/**
+ * @jest-environment jsdom
+ */
+
 /* eslint-env jest */
 
-/* global describe, beforeAll, jest, it, expect, beforeEach, afterEach, global */
-import { Ghost } from './Ghost.js'
-import { Brush } from './Brush.js'
+/* global describe, jest, beforeEach, it, expect */
 
-// Minimal DOM mock for environments without jsdom
-beforeAll(() => {
-  if (typeof global.document === 'undefined') global.document = {}
-  if (!global.document.body) {
-    global.document.body = {
-      __children: [],
-      innerHTML: '',
-      appendChild (el) {
-        this.__children.push(el)
-      },
-      contains (el) {
-        return this.__children.includes(el)
-      },
-      removeChild (el) {
-        this.__children = this.__children.filter(e => e !== el)
-      }
-    }
-  }
-
-  if (!global.document.createElement) {
-    global.document.createElement = tag => {
-      const el = {
-        tagName: tag.toUpperCase(),
-        className: '',
-        innerHTML: '',
-        style: {},
-        remove () {
-          if (global.document.body && global.document.body.removeChild) {
-            global.document.body.removeChild(this)
-          } else if (global.document.body) {
-            global.document.body.__children =
-              global.document.body.__children.filter(e => e !== this)
-          }
+jest.mock('./SelectedShip.js', () => {
+  return {
+    SelectedShip: jest
+      .fn()
+      .mockImplementation(function (ship, variantIndex, contentBuilder) {
+        this.ship = ship
+        this.variantIndex = variantIndex
+        this.contentBuilder = contentBuilder
+        this.variants = {
+          variant: jest.fn(() => [['cell']]),
+          special: jest.fn(() => []),
+          onChange: null,
+          index: 0
         }
-      }
-      return el
-    }
+      })
   }
 })
 
-describe('selection Ghost', () => {
-  let originalBody
+import { ClickedShip } from './selection.js'
+import { placedShipsInstance } from './PlacedShips.js'
+import { SelectedShip } from './SelectedShip.js'
+
+describe('ClickedShip', () => {
+  const ship = { id: 1, letter: 'A' }
+  const source = document.createElement('div')
+  const variantIndex = 0
+  const contentBuilder = jest.fn()
 
   beforeEach(() => {
-    // ensure a clean document body
-    originalBody = document.body.innerHTML
+    jest.clearAllMocks()
   })
 
-  afterEach(() => {
-    document.body.innerHTML = originalBody
+  it('constructs with ship, source, variantIndex, and contentBuilder', () => {
+    const clicked = new ClickedShip(ship, source, variantIndex, contentBuilder)
+
+    expect(SelectedShip).toHaveBeenCalledWith(
+      ship,
+      variantIndex,
+      contentBuilder
+    )
+    expect(clicked.source).toBe(source)
   })
 
-  it('constructor should append element to document.body and set properties', () => {
-    const contentBuilder = jest.fn((el, variant, letter, special) => {
-      el.innerHTML = `${variant}-${letter}-${special}`
-    })
+  it('sets up onChange handler on variants', () => {
+    const clicked = new ClickedShip(ship, source, variantIndex, contentBuilder)
 
-    const g = new Ghost('v1', 'A', contentBuilder, 'special')
-    expect(document.body.contains(g.element)).toBe(true)
-    expect(g.letter).toBe('A')
-    expect(g.special).toBe('special')
-    expect(g.element.className).toBe('ship-ghost')
-    expect(g.element.innerHTML).toBe('v1-A-special')
-
-    // cleanup
-    g.remove()
+    expect(typeof clicked.variants.onChange).toBe('function')
   })
 
-  it('hide and show should change opacity', () => {
-    const contentBuilder = jest.fn(() => {})
-    const g = new Ghost('v', 'B', contentBuilder, null)
+  it('onChange clears source innerHTML and rebuilds content', () => {
+    const clicked = new ClickedShip(ship, source, variantIndex, contentBuilder)
+    source.innerHTML = '<span>old</span>'
 
-    g.hide()
-    expect(g.element.style.opacity).toBe(0)
+    clicked.variants.onChange()
 
-    g.show()
-    expect(g.element.style.opacity).toBe('')
-
-    g.remove()
+    expect(source.innerHTML).toBe('')
+    expect(contentBuilder).toHaveBeenCalled()
   })
 
-  it('moveTo should set left and top styles', () => {
-    const contentBuilder = jest.fn(() => {})
-    const g = new Ghost('v', 'C', contentBuilder, null)
+  it('onChange updates source dataset variant to current index', () => {
+    const clicked = new ClickedShip(ship, source, variantIndex, contentBuilder)
+    clicked.variants.index = 2
 
-    g.moveTo(10, 20)
-    expect(g.element.style.left).toBe('10px')
-    expect(g.element.style.top).toBe('20px')
+    clicked.variants.onChange()
 
-    g.remove()
+    expect(source.dataset.variant).toBe('2')
   })
 
-  it('setVariant should replace innerHTML using contentBuilder', () => {
-    const contentBuilder = jest.fn((el, variant, letter) => {
-      el.innerHTML = `variant:${variant},letter:${letter}`
-    })
-    const g = new Ghost('v1', 'D', contentBuilder, null)
-    // replace contents
-    g.setVariant('v2')
-    expect(g.element.innerHTML).toBe('variant:v2,letter:D')
+  it('onChange does nothing if source is null', () => {
+    const clicked = new ClickedShip(ship, null, variantIndex, contentBuilder)
 
-    g.remove()
-  })
-
-  it('remove should remove element and null it out', () => {
-    const contentBuilder = jest.fn(() => {})
-    const g = new Ghost('v', 'E', contentBuilder, null)
-    const el = g.element
-    g.remove()
-    expect(document.body.contains(el)).toBe(false)
-    expect(g.element).toBeNull()
+    expect(() => clicked.variants.onChange()).not.toThrow()
   })
 })
 
-describe('Brush', () => {
-  it('toObject returns size and subterrain', () => {
-    const b = new Brush(3, 'water')
-    expect(b.toObject()).toEqual({ size: 3, subterrain: 'water' })
+describe('PlacedShips', () => {
+  beforeEach(() => {
+    placedShipsInstance.reset()
+  })
+
+  it('initializes with empty ships array', () => {
+    expect(placedShipsInstance.ships.length).toBe(0)
+  })
+
+  it('push adds ship to array and calls updateUndo', () => {
+    const ship = { id: 1, place: jest.fn(() => 'placed') }
+    const placed = 'placed'
+
+    const result = placedShipsInstance.push(ship, placed)
+
+    expect(placedShipsInstance.ships.length).toBe(1)
+    expect(placedShipsInstance.ships[0]).toBe(ship)
+    expect(result).toBe('placed')
+  })
+
+  it('pop removes and returns last ship', () => {
+    const ship = { id: 1, unplace: jest.fn() }
+    placedShipsInstance.ships.push(ship)
+
+    const result = placedShipsInstance.pop()
+
+    expect(result).toBe(ship)
+    expect(placedShipsInstance.ships.length).toBe(0)
+    expect(ship.unplace).toHaveBeenCalled()
+  })
+
+  it('numPlaced returns count of ships', () => {
+    placedShipsInstance.ships.push({ id: 1 })
+    placedShipsInstance.ships.push({ id: 2 })
+
+    expect(placedShipsInstance.numPlaced()).toBe(2)
+  })
+
+  it('getAll returns copy of ships array', () => {
+    const ship1 = { id: 1 }
+    const ship2 = { id: 2 }
+    placedShipsInstance.ships.push(ship1, ship2)
+
+    const result = placedShipsInstance.getAll()
+
+    expect(result).toEqual([ship1, ship2])
+    expect(result).not.toBe(placedShipsInstance.ships)
+  })
+
+  it('reset clears ships array', () => {
+    placedShipsInstance.ships.push({ id: 1 })
+    placedShipsInstance.reset()
+
+    expect(placedShipsInstance.ships.length).toBe(0)
+  })
+
+  it('registerUndo stores undo and reset buttons', () => {
+    const undoBtn = {}
+    const resetBtn = {}
+
+    placedShipsInstance.registerUndo(undoBtn, resetBtn)
+
+    expect(placedShipsInstance.undoBtn).toBe(undoBtn)
+    expect(placedShipsInstance.resetBtn).toBe(resetBtn)
+  })
+
+  it('updateUndo disables buttons when no ships placed', () => {
+    const undoBtn = { disabled: false }
+    const resetBtn = { disabled: false }
+    placedShipsInstance.registerUndo(undoBtn, resetBtn)
+    placedShipsInstance.ships = []
+
+    placedShipsInstance.updateUndo()
+
+    expect(undoBtn.disabled).toBe(true)
+    expect(resetBtn.disabled).toBe(true)
+  })
+
+  it('updateUndo enables buttons when ships placed', () => {
+    const undoBtn = { disabled: true }
+    const resetBtn = { disabled: true }
+    placedShipsInstance.registerUndo(undoBtn, resetBtn)
+    placedShipsInstance.ships = [{ id: 1 }]
+
+    placedShipsInstance.updateUndo()
+
+    expect(undoBtn.disabled).toBe(false)
+    expect(resetBtn.disabled).toBe(false)
+  })
+
+  it('popAndRefresh removes ship, returns it, and re-adds others to grid', () => {
+    const ship1 = { id: 1, unplace: jest.fn(), addToGrid: jest.fn() }
+    const ship2 = { id: 2, unplace: jest.fn(), addToGrid: jest.fn() }
+    placedShipsInstance.ships = [ship1, ship2]
+    const returnShip = jest.fn()
+    const shipCellGrid = {}
+    const mark = jest.fn()
+
+    const result = placedShipsInstance.popAndRefresh(
+      shipCellGrid,
+      mark,
+      returnShip
+    )
+
+    expect(result).toBe(ship2)
+    expect(returnShip).toHaveBeenCalledWith(ship2)
+    expect(ship1.addToGrid).toHaveBeenCalledWith(shipCellGrid)
+    expect(mark).toHaveBeenCalledWith(ship1)
+  })
+
+  it('popAll returns all ships and clears array', () => {
+    const ship1 = { id: 1 }
+    const ship2 = { id: 2 }
+    placedShipsInstance.ships = [ship1, ship2]
+    const returnShip = jest.fn()
+
+    placedShipsInstance.popAll(returnShip)
+
+    expect(returnShip).toHaveBeenCalledWith(ship1)
+    expect(returnShip).toHaveBeenCalledWith(ship2)
+    expect(placedShipsInstance.ships.length).toBe(0)
   })
 })

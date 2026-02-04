@@ -1,8 +1,8 @@
-import { bh } from './terrain.js'
+import { bh } from './terrain/terrain.js'
 import { gameStatus } from './waters/StatusUI.js'
-import { placedShipsInstance } from './selection.js'
-import { fetchNavBar } from './navbar.js'
-import { setupGameOptions } from './setupOptions.js'
+import { placedShipsInstance } from './selection/PlacedShips.js'
+import { fetchNavBar } from './navbar/navbar.js'
+import { setupGameOptions } from './navbar/setupOptions.js'
 import {
   dragOverPlacingHandlerSetup,
   onClickRotate,
@@ -11,11 +11,11 @@ import {
   onClickTransform,
   tabCursor,
   enterCursor
-} from './dragndrop.js'
+} from './selection/dragndrop.js'
 import { moveCursorBase } from './waters/placementUI.js'
 import { enemy } from './waters/enemy.js'
-import { setupEnemy, newGame } from './enemySetup.js'
-import { makeFriend } from './headerUtils.js'
+import { setupEnemy, newGame } from './navbar/enemySetup.js'
+import { makeFriend } from './navbar/headerUtils.js'
 
 const friend = makeFriend()
 placedShipsInstance.registerUndo(friend.UI.undoBtn)

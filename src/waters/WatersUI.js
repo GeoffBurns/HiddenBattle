@@ -1,4 +1,4 @@
-import { bh } from '../terrain.js'
+import { bh } from '../terrain/terrain.js'
 import { ScoreUI } from './ScoreUI.js'
 import {
   addKeyToCell,

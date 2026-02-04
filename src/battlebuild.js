@@ -1,4 +1,4 @@
-import { bh } from './terrain.js'
+import { bh } from './terrain/terrain.js'
 import { customUI } from './waters/customUI.js'
 import { moveCursorBase } from './waters/placementUI.js'
 import {
@@ -13,14 +13,14 @@ import {
   setupDragBrushHandlers,
   dragNDrop
 } from './selection/dragndrop.js'
-import { placedShipsInstance } from './selection/selection.js'
+import { placedShipsInstance } from './selection/PlacedShips.js'
 import { custom } from './waters/custom.js'
-import { switchToEdit, fetchNavBar } from './navbar.js'
-import { setupBuildOptions } from './setupOptions.js'
+import { switchToEdit, fetchNavBar } from './navbar/navbar.js'
+import { setupBuildOptions } from './navbar/setupOptions.js'
 import { hasMapOfCurrentSize, setNewMapToCorrectSize } from './validSize.js'
-import { tabs, switchTo } from './setupTabs.js'
-import { trackLevelEnd } from './gtag.js'
-import { show2ndBar } from './headerUtils.js'
+import { tabs, switchTo } from './navbar/setupTabs.js'
+import { trackLevelEnd } from './navbar/gtag.js'
+import { show2ndBar } from './navbar/headerUtils.js'
 customUI.resetBoardSize()
 
 placedShipsInstance.registerUndo(customUI.undoBtn, customUI.resetBtn)

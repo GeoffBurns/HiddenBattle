@@ -1,7 +1,11 @@
-import { getParamSize, isEditMode, getParamMap } from './getParam.js'
-import { getParamMapType } from './getParam.js'
-import { bh, terrains } from './terrain.js'
-import { toTitleCase } from './utils.js'
+import {
+  getParamSize,
+  isEditMode,
+  getParamMap,
+  getParamMapType
+} from './getParam.js'
+import { bh, terrains } from '../terrain/terrain.js'
+import { toTitleCase } from '../utils.js'
 
 export function updateState (tokens, url) {
   const pageTitle = document.getElementById('page-title')
@@ -66,7 +70,7 @@ export function setMapParams (title) {
   const urlParams = url.searchParams
 
   const mapName = getParamMap(urlParams)
-    const bt = bh?.terrain?.bodyTag
+  const bt = bh?.terrain?.bodyTag
   if (!bt) {
     console.warn('No terrain map found for terrain tag', 'setSizeParams')
   }
@@ -109,7 +113,6 @@ export function setMapTypeParams (mapType) {
     console.warn('No terrain map found for terrain tag', 'setMapTypeParams')
     bodyTag = 'sea'
   }
-
 
   if (mapType && m !== mapType) {
     urlParams.delete('mapName')
