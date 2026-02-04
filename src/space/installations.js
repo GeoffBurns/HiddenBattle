@@ -1,7 +1,7 @@
 import { Installation, CoreInstallation } from './spaceShapes.js'
 
 // pdc light + anti-missile
-export const shelter = new Installation('Shelter', 'S', 'D', [
+export const shelter = new Installation('Shelter', 'S', 'H', [
   [0, 1],
   [0, 2],
   [1, 0],

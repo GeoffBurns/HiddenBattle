@@ -1,4 +1,4 @@
-import { CanvasGrid } from './canvasGrid'
+import { CanvasGrid } from './canvasGrid.js'
 
 export class GridBase extends CanvasGrid {
   constructor (width, height) {

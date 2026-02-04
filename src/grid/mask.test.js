@@ -3,6 +3,7 @@
 /* global beforeEach, describe, it, expect */
 import { Mask } from './mask.js'
 import { coordsToZMasks } from './maskConvert.js'
+import { expandToSquare, normalizeUpLeft } from './gridHelpers.js'
 import { bits } from './packed.js'
 //import { beforeEach, describe, it, expect } from '@jest/globals'
 
@@ -160,7 +161,23 @@ describe('Mask - additional methods and edge cases', () => {
     it('should apply identity map and return same bits', () => {
       mask.set(0, 0)
       const idMap = mask.actions.transformMaps.id
-      expect(mask.actions.applyMap(idMap)).toBe(mask.actions.template)
+      const original = mask.actions.original
+
+      expect(typeof original.bits).toBe('bigint')
+      expect(original.bits).toBe(mask.actions.template)
+      expect(typeof original.width).toBe('number')
+      expect(typeof original.height).toBe('number')
+      const expanded = expandToSquare(mask.bits, mask.height, mask.width)
+      expect(typeof expanded).toBe('bigint')
+      expect(expanded).toBe(mask.actions.template)
+      const normalized = normalizeUpLeft(expanded, mask.width, mask.height)
+      expect(typeof normalized).toBe('bigint')
+
+      const template = mask.actions.template
+      expect(typeof template).toBe('bigint')
+      const action = mask.actions.applyMap(idMap)
+      expect(typeof action).toBe('bigint')
+      expect(action).toBe(template)
     })
 
     it('should return 8 symmetries in orbit', () => {

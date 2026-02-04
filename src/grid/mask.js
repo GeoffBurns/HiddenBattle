@@ -4,11 +4,9 @@ import { MaskBase } from './MaskBase.js'
 import { Actions } from './actions.js'
 
 export class Mask extends MaskBase {
-  constructor (width, height) {
+  constructor (width, height, bits = 0n) {
     super(width, height, 1)
-    lazy(this, 'actions', () => {
-      return new Actions(this.width, this.height, this.bits)
-    })
+    this.bits = bits
   }
 
   bitPos (x, y) {
@@ -19,10 +17,10 @@ export class Mask extends MaskBase {
     return this.bits
   }
   get actions () {
-    if (this._actions && this._actions.original === this.bits) {
+    if (this._actions && this._actions?.original?.bits === this.bits) {
       return this._actions
     }
-    this._actions = new Actions(this.width, this.height, this.bits)
+    this._actions = new Actions(this.width, this.height, this)
     return this._actions
   }
   clear (x, y) {

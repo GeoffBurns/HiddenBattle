@@ -131,6 +131,127 @@ export function gridToCoords (grid, W, H) {
     for (let x = 0; x < W; x++) if (grid[y][x]) out.push([x, y, grid[y][x]])
   return out
 }
+const ONE = 1n
+
+function bit (i) {
+  return ONE << BigInt(i)
+}
+
+export function packedToOccBig_any (board, W, H) {
+  let occ = 0n
+  const n = W * H
+  for (let i = 0; i < n; i++) {
+    const c = (board[i >> 4] >> ((i & 15) << 1)) & 3
+    if (c) occ |= bit(i)
+  }
+  return occ
+}
+
+export function packedToOccBig_color (board, W, H, target) {
+  let occ = 0n
+  for (let i = 0; i < W * H; i++) {
+    const c = (board[i >> 4] >> ((i & 15) << 1)) & 3
+    if (c === target) occ |= bit(i)
+  }
+  return occ
+}
+export function packedToOccBig_filter (board, W, H, fn) {
+  let occ = 0n
+  for (let i = 0; i < W * H; i++) {
+    const c = (board[i >> 4] >> ((i & 15) << 1)) & 3
+    const x = i % W,
+      y = (i / W) | 0
+    if (fn(x, y, c, i)) occ |= bit(i)
+  }
+  return occ
+}
+
+export function coordsToOccBig (list, W) {
+  let occ = 0n
+  for (const [x, y] of list) {
+    occ |= bit(y * W + x)
+  }
+  return occ
+}
+
+export function occBigToPacked_const (occ, W, H, color) {
+  const board = new Uint32Array(Math.ceil((W * H) / 16))
+  for (let i = 0; i < W * H; i++) {
+    if (occ & bit(i)) board[i >> 4] |= (color & 3) << ((i & 15) << 1)
+  }
+  return board
+}
+
+export function occBigToPacked_fn (occ, W, H, fn) {
+  const board = new Uint32Array(Math.ceil((W * H) / 16))
+  for (let i = 0; i < W * H; i++) {
+    if (occ & bit(i)) {
+      const x = i % W,
+        y = (i / W) | 0
+      const c = fn(x, y, i) & 3
+      board[i >> 4] |= c << ((i & 15) << 1)
+    }
+  }
+  return board
+}
+
+export function occBigToCoords_const (occ, W, H, color) {
+  const out = []
+  for (let i = 0; i < W * H; i++)
+    if (occ & bit(i)) out.push([i % W, (i / W) | 0, color])
+  return out
+}
+export function occBigToCoords_fn (occ, W, H, fn) {
+  const out = []
+  for (let i = 0; i < W * H; i++)
+    if (occ & bit(i)) {
+      const x = i % W,
+        y = (i / W) | 0
+      out.push([x, y, fn(x, y, i) & 3])
+    }
+  return out
+}
+
+function occBigToColorPlanes (occ, W, H, fn) {
+  const planes = [0n, 0n, 0n, 0n]
+  for (let i = 0; i < W * H; i++) {
+    if (occ & bit(i)) {
+      const x = i % W,
+        y = (i / W) | 0
+      const c = fn(x, y, i) & 3
+      planes[c] |= bit(i)
+    }
+  }
+  return planes
+}
+
+export function coordsToOcc32 (list, W, H) {
+  const occ = new Uint32Array(Math.ceil((W * H) / 32))
+  for (const [x, y] of list) {
+    const i = y * W + x
+    occ[i >> 5] |= 1 << (i & 31)
+  }
+  return occ
+}
+
+export function coordsToOcc (list, W, H) {
+  const occ = new Uint32Array(Math.ceil((W * H) / 32))
+  for (const [x, y] of list) {
+    const i = y * W + x
+    occ[i >> 5] |= 1 << (i & 31)
+  }
+  return occ
+}
+export function occToPacked_const (occ, W, H, color) {
+  const board = new Uint32Array(Math.ceil((W * H) / 16))
+
+  for (let i = 0; i < W * H; i++) {
+    if ((occ[i >> 5] >> (i & 31)) & 1) {
+      board[i >> 4] |= color << ((i & 15) << 1)
+    }
+  }
+  return board
+}
 /*
 Benefits of Each Representation
 A) Coordinate List [x,y,color]

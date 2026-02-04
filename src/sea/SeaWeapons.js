@@ -1,6 +1,6 @@
 import { coordsFromCell, shuffleArray } from '../utilities.js'
 import { Weapon, WeaponCatelogue } from '../Weapon.js'
-import { ListCanvas } from '../listCanvas.js'
+import { ListCanvas } from '../grid/listCanvas.js'
 import { bh } from '../terrain.js'
 
 export class Megabomb extends Weapon {

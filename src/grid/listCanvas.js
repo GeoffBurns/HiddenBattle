@@ -6,19 +6,30 @@ import {
   drawLineInfinite
 } from './maskShape.js'
 import { GridBase } from './gridBase.js'
-import { coordsToGrid } from './maskConvert.js'
+import { coordsToGrid, coordsToOccBig } from './maskConvert.js'
+import { Actions } from './actions.js'
 
 export class ListCanvas extends GridBase {
-  constructor (width, height) {
+  constructor (width, height, list) {
     super(width, height)
-    this.list = []
+    this.list = list || []
   }
   set (x, y, value) {
     if (value !== undefined && value !== null) {
       this.list.push([x, y, value])
+      this._actions = null
     } else {
       this.list.push([x, y])
+      this._actions = null
     }
+  }
+  get actions () {
+    if (this._actions) {
+      return this._actions
+    }
+    const mask = coordsToOccBig(this.list, this.width)
+    this._actions = new Actions(this.width, this.height, mask)
+    return this._actions
   }
 
   drawSegmentTo (x0, y0, x1, y1, color) {

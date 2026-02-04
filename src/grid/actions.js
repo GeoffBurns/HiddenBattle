@@ -1,43 +1,8 @@
 import { lazy } from '../utilities.js'
-import { shiftBoardUp, shiftBoardLeft, expandToSquare } from './shiftBoardUp.js'
+import { buildTransformMaps } from './buildTransformMaps.js'
+import { expandToSquare, normalizeUpLeft } from './gridHelpers.js'
 
-function buildTransformMaps (W, H) {
-  const size = W * H
-
-  const maps = {
-    id: new Array(size),
-    r90: new Array(size),
-    r180: new Array(size),
-    r270: new Array(size),
-    fx: new Array(size),
-    fy: new Array(size),
-    fd1: new Array(size),
-    fd2: new Array(size)
-  }
-
-  for (let y = 0; y < H; y++) {
-    for (let x = 0; x < W; x++) {
-      const i = y * W + x
-
-      // identity
-      maps.id[i] = i
-
-      // rotations
-      maps.r90[i] = x * H + (H - 1 - y)
-      maps.r180[i] = (H - 1 - y) * W + (W - 1 - x)
-      maps.r270[i] = (W - 1 - x) * H + y
-
-      // reflections
-      maps.fx[i] = y * W + (W - 1 - x) // vertical
-      maps.fy[i] = (H - 1 - y) * W + x // horizontal
-      maps.fd1[i] = x * W + y // main diagonal
-      maps.fd2[i] = (W - 1 - x) * W + (H - 1 - y) // other diagonal
-    }
-  }
-  return maps
-}
-
-class Actions {
+export class Actions {
   constructor (width, height, mask = null) {
     this.width = Math.max(width, height)
     this.height = this.width
@@ -45,18 +10,16 @@ class Actions {
     lazy(this, 'transformMaps', () => {
       return buildTransformMaps(this.width, this.height)
     })
-
     lazy(this, 'template', () => {
       const square = expandToSquare(
         this.original.bits,
         this.original.height,
         this.original.width
       )
-
       return this.normalized(square)
     })
   }
-
+  /*
   shiftedFullUp (bits) {
     const b = bits === undefined ? this.bits : bits
 
@@ -67,16 +30,12 @@ class Actions {
 
     const out = shiftBoardLeft(b, this.width, this.height)
     return out
-  }
+  }*/
   normalized (bits) {
-    const b = bits === undefined ? this.bits : bits
-    const { mask: up } = this.shiftedFullUp(b)
-    return this.shiftedFullLeft(up)
+    const b = bits === undefined ? this.template : bits
+    return normalizeUpLeft(b, this.width, this.height)
   }
-  normalize (bits) {
-    const b = bits === undefined ? this.bits : bits
-    this.bits = this.normalized(b)
-  }
+
   applyMap (map = this.transformMaps.id) {
     let out = 0n
     let b = this.template
@@ -108,12 +67,17 @@ class Actions {
     const k = this.order
     if (k === 8) return 'D4'
     if (k === 4) {
-      if (this.applyMap(maps.r90) === this.bits) return 'C4'
-      return 'V4 (diagonal Klein four)'
+      if (this.applyMap(maps.r180) === b) return 'V4' // (diagonal Klein four)'
+      return 'C4'
     }
     if (k === 2) {
-      if (this.applyMap(maps.r180) === b) return 'C2 (half-turn)'
-      return 'C2 (single mirror)'
+      if (
+        this.applyMap(maps.r90) === this.applyMap(maps.fx) &&
+        this.applyMap(maps.r90) === this.applyMap(maps.fy)
+      )
+        return 'C2F' // (single mirror)'
+
+      return 'C2R' // (half-turn)'
     }
     return 'C1'
   }

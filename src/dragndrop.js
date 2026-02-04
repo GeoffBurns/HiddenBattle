@@ -1,6 +1,7 @@
 import { bh } from './terrain.js'
 import { coordsFromCell } from './utilities.js'
-import { DraggedShip, Brush } from './selection.js'
+import { DraggedShip } from './selection.js'
+import { Brush } from './Brush.js'
 import { cursor } from './cursor.js'
 import { CustomMap } from './map.js'
 

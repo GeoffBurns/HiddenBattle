@@ -44,6 +44,9 @@ export class WeaponSystem {
   getLoadedWeapons () {
     return this.hasAmmo() ? [this] : []
   }
+  getLoadedWeapon () {
+    return this.hasAmmo() ? this : null
+  }
   getShipById () {
     return null
   }
