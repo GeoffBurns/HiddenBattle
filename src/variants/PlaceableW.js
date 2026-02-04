@@ -1,4 +1,4 @@
-import { CellWsToBePlaced } from './CellsToBePlaced.js'
+import { CellWsToBePlaced } from './CellWsToBePlaced.js'
 import { Placeable3 } from './Placeable3.js'
 
 export class PlaceableW extends Placeable3 {

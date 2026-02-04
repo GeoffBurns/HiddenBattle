@@ -7,7 +7,7 @@ import {
   findClosestCoord,
   coordsFromCell
 } from '../utilities.js'
-import { placedShipsInstance } from '../selection.js'
+import { placedShipsInstance } from '../selection/selection.js'
 import { Score } from './Score.js'
 import { gameStatus } from './StatusUI.js'
 import { assembleTerrains } from '../gameMaps.js'

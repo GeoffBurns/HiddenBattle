@@ -1,5 +1,5 @@
 import { all, mixed, bh } from '../terrain.js'
-import { dragNDrop } from '../dragndrop.js'
+import { dragNDrop } from '../selection/dragndrop.js'
 
 export class ScoreUI {
   constructor (playerPrefix) {

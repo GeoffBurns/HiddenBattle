@@ -1,9 +1,9 @@
-import { Blinker } from './Blinker'
-import { Cyclic4 } from './Cyclic4'
-import { Dihedral4 } from './Dihedral4'
-import { Diagonal } from './Diagonal'
-import { Invariant } from './Invariant'
-import { Klein4 } from './Klein4'
+import { Blinker } from './Blinker.js'
+import { Cyclic4 } from './Cyclic4.js'
+import { Dihedral4 } from './Dihedral4.js'
+import { Diagonal } from './Diagonal.js'
+import { Invariant } from './Invariant.js'
+import { Klein4 } from './Klein4.js'
 
 export function variantType (symmetry) {
   switch (symmetry) {

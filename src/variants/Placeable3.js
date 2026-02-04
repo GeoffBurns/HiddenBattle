@@ -1,4 +1,4 @@
-import { Cell3sToBePlaced } from './CellsToBePlaced.js'
+import { Cell3sToBePlaced } from './Cell3sToBePlaced.js'
 import { dispatchCell3 } from './makeCell3.js'
 import { Placeable } from './Placeable.js'
 

@@ -1,7 +1,7 @@
 import { bh } from '../terrain.js'
 import { makeKey, shuffleArray } from '../utilities.js'
 import { gameStatus } from './StatusUI.js'
-import { setupDragHandlers } from '../dragndrop.js'
+import { setupDragHandlers } from '../selection/dragndrop.js'
 import { Waters } from './Waters.js'
 
 export class Friend extends Waters {

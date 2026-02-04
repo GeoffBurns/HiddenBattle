@@ -1,4 +1,4 @@
-import { RotatableVariant } from './RotatableVariant'
+import { RotatableVariant } from './RotatableVariant.js'
 
 export class FlippableVariant extends RotatableVariant {
   constructor (validator, zoneDetail, symmetry) {

@@ -1,8 +1,8 @@
 import { bh, Terrain } from '../terrain.js'
 import { WatersUI } from './WatersUI.js'
-import { ClickedShip } from '../selection.js'
-import { cursor } from '../cursor.js'
-import { getShipIdFromElement, dragNDrop } from '../dragndrop.js'
+import { ClickedShip } from '../selection/selection.js'
+import { cursor } from '../selection/cursor.js'
+import { getShipIdFromElement, dragNDrop } from '../selection/dragndrop.js'
 import { setCellCoords } from '../utilities.js'
 import { gameStatus } from './StatusUI.js'
 export class PlacementUI extends WatersUI {

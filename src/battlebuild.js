@@ -12,8 +12,8 @@ import {
   setupDragHandlers,
   setupDragBrushHandlers,
   dragNDrop
-} from './dragndrop.js'
-import { placedShipsInstance } from './selection.js'
+} from './selection/dragndrop.js'
+import { placedShipsInstance } from './selection/selection.js'
 import { custom } from './waters/custom.js'
 import { switchToEdit, fetchNavBar } from './navbar.js'
 import { setupBuildOptions } from './setupOptions.js'
