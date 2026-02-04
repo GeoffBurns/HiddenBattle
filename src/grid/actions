@@ -1,0 +1,133 @@
+import { lazy } from '../utilities.js'
+import { shiftBoardUp, shiftBoardLeft, expandToSquare } from './shiftBoardUp.js'
+
+function buildTransformMaps (W, H) {
+  const size = W * H
+
+  const maps = {
+    id: new Array(size),
+    r90: new Array(size),
+    r180: new Array(size),
+    r270: new Array(size),
+    fx: new Array(size),
+    fy: new Array(size),
+    fd1: new Array(size),
+    fd2: new Array(size)
+  }
+
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const i = y * W + x
+
+      // identity
+      maps.id[i] = i
+
+      // rotations
+      maps.r90[i] = x * H + (H - 1 - y)
+      maps.r180[i] = (H - 1 - y) * W + (W - 1 - x)
+      maps.r270[i] = (W - 1 - x) * H + y
+
+      // reflections
+      maps.fx[i] = y * W + (W - 1 - x) // vertical
+      maps.fy[i] = (H - 1 - y) * W + x // horizontal
+      maps.fd1[i] = x * W + y // main diagonal
+      maps.fd2[i] = (W - 1 - x) * W + (H - 1 - y) // other diagonal
+    }
+  }
+  return maps
+}
+
+class Actions {
+  constructor (width, height, mask = null) {
+    this.width = Math.max(width, height)
+    this.height = this.width
+    this.original = mask
+    lazy(this, 'transformMaps', () => {
+      return buildTransformMaps(this.width, this.height)
+    })
+
+    lazy(this, 'template', () => {
+      const square = expandToSquare(
+        this.original.bits,
+        this.original.height,
+        this.original.width
+      )
+
+      return this.normalized(square)
+    })
+  }
+
+  shiftedFullUp (bits) {
+    const b = bits === undefined ? this.bits : bits
+
+    return shiftBoardUp(b, this.width)
+  }
+  shiftedFullLeft (bits) {
+    const b = bits === undefined ? this.bits : bits
+
+    const out = shiftBoardLeft(b, this.width, this.height)
+    return out
+  }
+  normalized (bits) {
+    const b = bits === undefined ? this.bits : bits
+    const { mask: up } = this.shiftedFullUp(b)
+    return this.shiftedFullLeft(up)
+  }
+  normalize (bits) {
+    const b = bits === undefined ? this.bits : bits
+    this.bits = this.normalized(b)
+  }
+  applyMap (map = this.transformMaps.id) {
+    let out = 0n
+    let b = this.template
+
+    while (b !== 0n) {
+      const lsb = b & -b
+      const i = Number(lsb.toString(2).length - 1)
+      out |= 1n << BigInt(map[i])
+      b ^= lsb
+    }
+    return this.normalized(out)
+  }
+
+  orbit (maps = this.transformMaps) {
+    return [
+      this.applyMap(maps.id),
+      this.applyMap(maps.r90),
+      this.applyMap(maps.r180),
+      this.applyMap(maps.r270),
+      this.applyMap(maps.fx),
+      this.applyMap(maps.fy),
+      this.applyMap(maps.fd1),
+      this.applyMap(maps.fd2)
+    ]
+  }
+  classifySymmetry () {
+    const maps = this.transformMaps
+    const b = this.template
+    const k = this.order
+    if (k === 8) return 'D4'
+    if (k === 4) {
+      if (this.applyMap(maps.r90) === this.bits) return 'C4'
+      return 'V4 (diagonal Klein four)'
+    }
+    if (k === 2) {
+      if (this.applyMap(maps.r180) === b) return 'C2 (half-turn)'
+      return 'C2 (single mirror)'
+    }
+    return 'C1'
+  }
+
+  get order () {
+    const ss = this.symmetries
+    const k = ss.length
+    return k
+  }
+
+  get symmetries () {
+    const maps = this.transformMaps
+    const imgs = this.orbit(maps)
+    const unique = [...new Set(imgs)]
+    return unique
+  }
+}
