@@ -1,6 +1,7 @@
 import { mixed } from '../terrain.js'
 import { Shape } from './Shape.js'
-import { TransformableVariants, Variant3 } from '../variants.js'
+import { TransformableVariants } from '../variants/TransformableVariants.js'
+import { Variant3 } from '../variants/Variant3.js'
 
 export class Transformer extends Shape {
   constructor (forms) {

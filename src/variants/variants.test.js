@@ -1,7 +1,9 @@
 /* eslint-env jest */
 
 /* global describe, it, expect */
-import { Invariant, Dihedral4, Cyclic4 } from './variants.js' //
+import { Dihedral4 } from './Dihedral4.js'
+import { Cyclic4 } from './Cyclic4.js' //
+import { Invariant } from './Invariant.js' //
 
 function allHasLength (received, expectedLength) {
   return received.every(el => Array.isArray(el) && el.length === expectedLength)

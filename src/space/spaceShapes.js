@@ -9,7 +9,7 @@ import {
   deep,
   near
 } from './space.js'
-import { Armed } from '../variants.js'
+import { Armed } from '../variants/WeaponVariant.js'
 
 class SpaceShape extends Shape {
   constructor (description, letter, symmetry, cells, tallyGroup, tip, racks) {

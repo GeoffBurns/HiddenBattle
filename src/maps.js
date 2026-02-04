@@ -1,4 +1,4 @@
-import { placingTarget } from './CellsToBePlaced.js'
+import { placingTarget } from './variants/makeCell3.js'
 import { terrains, bh } from './terrain.js'
 
 export const terrainsMaps = {

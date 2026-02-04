@@ -95,6 +95,10 @@ function highlightUnderCursor (changed, viewModel, model) {
   }
 }
 
+export function getShipIdFromElement (shipElement) {
+  return Number.parseInt(shipElement.dataset.id)
+}
+
 function allowEffectsWhileDragging (e) {
   const allow = e.dataTransfer.effectAllowed
   let changed = false
@@ -544,9 +548,10 @@ class DragNDrop {
       this.dragStartHander.bind(this, viewModel, ships)
     )
   }
+
   getShip (e) {
     const shipElement = e.currentTarget
-    const shipId = this.getShipIdFromElement(shipElement)
+    const shipId = getShipIdFromElement(shipElement)
     const isNotShipElement = e.target !== shipElement && !shipId
 
     return { shipId, shipElement, isNotShipElement }

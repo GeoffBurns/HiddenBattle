@@ -2,7 +2,7 @@ import { bh, Terrain } from '../terrain.js'
 import { WatersUI } from './WatersUI.js'
 import { ClickedShip } from '../selection.js'
 import { cursor } from '../cursor.js'
-import { dragNDrop } from '../dragndrop.js'
+import { getShipIdFromElement, dragNDrop } from '../dragndrop.js'
 import { setCellCoords } from '../utilities.js'
 import { gameStatus } from './StatusUI.js'
 export class PlacementUI extends WatersUI {
@@ -389,13 +389,9 @@ export class PlacementUI extends WatersUI {
 
     if (shipElement === null) return
 
-    const shipId = this.getShipIdFromElement(shipElement)
+    const shipId = getShipIdFromElement(shipElement)
     const ship = ships.find(s => s.id === shipId)
     if (ship && shipElement) this.assignClicked(ship, shipElement)
-  }
-
-  getShipIdFromElement (shipElement) {
-    return Number.parseInt(shipElement.dataset.id)
   }
 
   disableRotateFlip () {
