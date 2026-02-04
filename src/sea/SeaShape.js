@@ -1,4 +1,4 @@
-import { all } from '../terrain.js'
+import { all } from '../terrain/terrain.js'
 import {
   seaAndLand,
   land,

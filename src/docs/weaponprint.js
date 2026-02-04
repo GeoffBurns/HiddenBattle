@@ -1,4 +1,4 @@
-import { bh, Terrain } from '../terrain.js'
+import { bh, Terrain } from '../terrain/terrain.js'
 import { toTitleCase } from '../utils.js'
 import { enemy } from '../waters/enemy.js'
 

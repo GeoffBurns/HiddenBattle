@@ -1,4 +1,4 @@
-import { GridBase } from './GridBase.js'
+import { GridBase } from './gridBase.js'
 
 export class AsciiGrid extends GridBase {
   constructor (width, height, ascii, fillChar = '.') {

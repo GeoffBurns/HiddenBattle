@@ -1,4 +1,4 @@
-import { bh } from './terrain.js'
+import { bh } from '../terrain/terrain.js'
 
 export class Weapon {
   constructor (name, letter, isLimited, destroys, points) {
@@ -64,8 +64,10 @@ export class Weapon {
     return bh.seekingMode ? this.cursors.length : this.totalCursors
   }
   get hasExtraSelectCursor () {
-    return this.launchCursor && this.launchCursor !== this.cursors[0]
+    // ensure a boolean is returned (previously returned '' when launchCursor was '')
+    return !!(this.launchCursor && this.launchCursor !== this.cursors[0])
   }
+
   ammoStatusOld (ammoLeft) {
     return `${this.name}  Mode (${ammoLeft} left)`
   }

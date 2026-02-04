@@ -1,5 +1,5 @@
 import { Megabomb, Kinetic, Torpedo, Sweep } from '../sea/SeaWeapons.js'
-import { WeaponCatelogue as WeaponCatalogue } from '../Weapon.js'
+import { WeaponCatelogue as WeaponCatalogue } from '../weapon/Weapon.js'
 
 export class Missile extends Megabomb {
   constructor (ammo) {

@@ -1,5 +1,5 @@
-import { BhMap } from '../map.js'
-import { standardShot } from '../Weapon.js'
+import { BhMap } from '../terrain/map.js'
+import { standardShot } from '../weapon/Weapon.js'
 import { spaceAndAsteroids } from './space.js'
 
 function spaceMap (title, size, shipNum, landArea, name) {

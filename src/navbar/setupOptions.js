@@ -1,17 +1,17 @@
-import { bh, terrains } from './terrain.js'
+import { bh, terrains } from '../terrain/terrain.js'
 import { ChooseFromListUI, ChooseNumberUI } from './chooseUI.js'
-import { saveCustomMap } from './waters/saveCustomMap.js'
+import { saveCustomMap } from '../waters/saveCustomMap.js'
 import { setupTabs } from './setupTabs.js'
-import { setMapTypeParams, setSizeParams } from './SetParams.js'
+import { setMapTypeParams, setSizeParams } from '../SetParams.js'
 import {
   getParamMap,
   getParamSize,
   getParamEditMap,
   getParamMapType
-} from './getParam.js'
+} from '../getParam.js'
 import { terrainSelect, setTerrainParams } from './terrainUI.js'
 import { setupMapSelection, setupMapControl } from './setupMapSelection.js'
-import { validateWidth, validateHeight } from './validSize.js'
+import { validateWidth, validateHeight } from '../validSize.js'
 
 function setupMapOptions (boardSetup, refresh, huntMode = 'build') {
   const urlParams = new URLSearchParams(globalThis.location.search)

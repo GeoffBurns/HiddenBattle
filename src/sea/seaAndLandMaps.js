@@ -1,6 +1,6 @@
 import { seaAndLand } from './seaAndLand.js'
 import { defaultMap, seaMapList } from './SeaMaps.js'
-import { TerrainMaps } from '../TerrainMaps.js'
+import { TerrainMaps } from '../terrain/TerrainMaps.js'
 import { seaShipsCatalogue } from './SeaShips.js'
 import { seaWeaponsCatalogue } from './SeaWeapons.js'
 

@@ -1,4 +1,4 @@
-import { all, mixed, bh } from '../terrain.js'
+import { all, mixed, bh } from '../terrain/terrain.js'
 import { dragNDrop } from '../selection/dragndrop.js'
 
 export class ScoreUI {

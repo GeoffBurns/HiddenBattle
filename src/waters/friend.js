@@ -1,4 +1,4 @@
-import { bh } from '../terrain.js'
+import { bh } from '../terrain/terrain.js'
 import { makeKey, shuffleArray } from '../utilities.js'
 import { gameStatus } from './StatusUI.js'
 import { setupDragHandlers } from '../selection/dragndrop.js'

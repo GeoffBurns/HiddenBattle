@@ -1,6 +1,6 @@
 import { CustomBlankMap, EditedCustomMap, SavedCustomMap } from './map.js'
 import { terrainsMaps } from './maps.js'
-import { token } from './ships/Shape.js'
+import { token } from '../ships/Shape.js'
 import { oldToken } from './terrain.js'
 
 // gameMapTypes

@@ -1,7 +1,7 @@
+import { bh } from '../terrain/terrain.js'
 import { coordsFromCell, shuffleArray } from '../utilities.js'
-import { Weapon, WeaponCatelogue } from '../Weapon.js'
+import { Weapon, WeaponCatelogue } from '../weapon/Weapon.js'
 import { ListCanvas } from '../grid/listCanvas.js'
-import { bh } from '../terrain.js'
 
 export class Megabomb extends Weapon {
   constructor (ammo, name, letter) {

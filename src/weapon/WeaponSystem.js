@@ -1,4 +1,4 @@
-import { randomElement } from './utilities.js'
+import { randomElement } from '../utilities.js'
 
 export class WeaponSystem {
   constructor (weapon, id) {

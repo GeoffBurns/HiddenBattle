@@ -24,7 +24,8 @@ jest.mock('../src/selection/SelectedShip.js', () => {
   }
 })
 
-import { ClickedShip, placedShipsInstance } from '../src/selection/selection.js'
+import { ClickedShip } from '../src/selection/selection.js'
+import { placedShipsInstance } from '../src/selection/PlacedShips.js'
 import { SelectedShip } from '../src/selection/SelectedShip.js'
 
 describe('ClickedShip', () => {

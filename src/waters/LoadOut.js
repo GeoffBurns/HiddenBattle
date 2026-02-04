@@ -1,5 +1,5 @@
-import { bh } from '../terrain.js'
-import { WeaponSystem, AttachedWeaponSystems } from '../WeaponSystem.js'
+import { bh } from '../terrain/terrain.js'
+import { WeaponSystem, AttachedWeaponSystems } from '../weapon/WeaponSystem.js'
 
 export class LoadOut {
   constructor (weapons, ships, viewModel) {

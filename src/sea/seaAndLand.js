@@ -1,4 +1,4 @@
-import { terrains, Terrain, SubTerrain, Zone } from '../terrain.js'
+import { terrains, Terrain, SubTerrain, Zone } from '../terrain/terrain.js'
 
 export const deep = new Zone('Depths', 'D', false)
 export const littoral = new Zone('Shallows', 'L', true)

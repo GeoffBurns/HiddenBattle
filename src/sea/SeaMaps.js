@@ -1,6 +1,6 @@
-import { BhMap } from '../map.js'
+import { BhMap } from '../terrain/map.js'
 import { seaAndLand } from './seaAndLand.js'
-import { standardShot } from '../Weapon.js'
+import { standardShot } from '../weapon/Weapon.js'
 import { Megabomb } from './SeaWeapons.js'
 
 function seaMap (title, size, shipNum, landArea, name) {

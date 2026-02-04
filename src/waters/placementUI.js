@@ -1,4 +1,4 @@
-import { bh, Terrain } from '../terrain.js'
+import { bh, Terrain } from '../terrain/terrain.js'
 import { WatersUI } from './WatersUI.js'
 import { ClickedShip } from '../selection/selection.js'
 import { cursor } from '../selection/cursor.js'

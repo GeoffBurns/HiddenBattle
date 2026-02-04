@@ -1,4 +1,4 @@
-import { bh, addCellToFootPrint } from '../terrain.js'
+import { bh, addCellToFootPrint } from '../terrain/terrain.js'
 import { Invariant } from '../variants/Invariant.js'
 import { Cyclic4 } from '../variants/Cyclic4.js'
 import { Dihedral4 } from '../variants/Dihedral4.js'
@@ -6,7 +6,7 @@ import { Diagonal } from '../variants/Diagonal.js'
 import { Klein4 } from '../variants/Klein4.js'
 import { Blinker } from '../variants/Blinker.js'
 import { makeKey } from '../utilities.js'
-import { WeaponSystem } from '../WeaponSystem.js'
+import { WeaponSystem } from '../weapon/WeaponSystem.js'
 
 export const token = 'geoffs-hidden-battle'
 

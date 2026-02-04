@@ -1,4 +1,4 @@
-import { bh } from '../terrain.js'
+import { bh } from '../terrain/terrain.js'
 import {
   randomElement,
   parsePair,
@@ -7,14 +7,14 @@ import {
   findClosestCoord,
   coordsFromCell
 } from '../utilities.js'
-import { placedShipsInstance } from '../selection/selection.js'
+import { placedShipsInstance } from '../selection/PlacedShips.js'
 import { Score } from './Score.js'
 import { gameStatus } from './StatusUI.js'
-import { assembleTerrains } from '../gameMaps.js'
+import { assembleTerrains } from '../terrain/gameMaps.js'
 import { randomPlaceShape } from '../utils.js'
 import { LoadOut } from './LoadOut.js'
 import { Ship } from '../ships/Ship.js'
-import { WeaponSystem } from '../WeaponSystem.js'
+import { WeaponSystem } from '../weapon/WeaponSystem.js'
 
 function popFirst (arr, predicate, obj) {
   // find index of first match

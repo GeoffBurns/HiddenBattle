@@ -1,9 +1,9 @@
-import { makeKey } from './utilities.js'
+import { makeKey } from '../utilities.js'
 import { bh, oldToken, SubTerrainTrackers } from './terrain.js'
-import { standardShot } from './Weapon.js'
-import { Megabomb } from './sea/SeaWeapons.js'
-import { lazy } from './utilities.js'
-import { Mask } from './grid/mask.js'
+import { standardShot } from '../weapon/Weapon.js'
+import { Megabomb } from '../sea/SeaWeapons.js'
+import { lazy } from '../utilities.js'
+import { Mask } from '../grid/mask.js'
 
 // geometry helper
 export const inRange = (r, c) => element =>

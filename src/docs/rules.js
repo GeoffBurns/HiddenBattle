@@ -1,14 +1,13 @@
-import { bh } from '../terrain.js'
-import { terrainSelect } from '../terrainUI.js'
+import { bh } from '../terrain/terrain.js'
+import { terrainSelect } from '../terrain/terrainUI.js'
 import { fetchComponent } from '../network.js'
-import { fetchNavBar } from '../navbar.js'
+import { fetchNavBar } from '../navbar/navbar.js'
 import {
   show2ndBar,
   hideMapSelector,
   makeFriend,
   showRules
-} from '../headerUtils.js'
-
+} from '../navbar/headerUtils.js'
 fetchNavBar('rules', 'Battleship', async function () {
   terrainSelect()
   show2ndBar()

@@ -1,5 +1,5 @@
-import { bh } from '../terrain.js'
-import { trackLevelEnd } from '../gtag.js'
+import { bh } from '../terrain/terrain.js'
+import { trackLevelEnd } from '../navbar/gtag.js'
 import { custom } from './custom.js'
 
 export function saveCustomMap (map) {

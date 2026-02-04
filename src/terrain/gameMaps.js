@@ -1,6 +1,6 @@
 import { TerrainMaps } from './TerrainMaps.js'
-import { seaAndLandMaps } from './sea/seaAndLandMaps.js'
-import { spaceAndAsteroidsMaps } from './space/spaceAndAsteroidsMaps.js'
+import { seaAndLandMaps } from '../sea/seaAndLandMaps.js'
+import { spaceAndAsteroidsMaps } from '../space/spaceAndAsteroidsMaps.js'
 
 export function assembleTerrains () {
   if (TerrainMaps.numTerrains > 1) return

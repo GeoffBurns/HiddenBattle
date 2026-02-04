@@ -1,5 +1,5 @@
-import { bh } from './terrain.js'
-import { enemy } from './waters/enemy.js'
+import { bh } from '../terrain/terrain.js'
+import { enemy } from '../waters/enemy.js'
 
 let otherboard = null
 const newGameBtn = document.getElementById('newGame')

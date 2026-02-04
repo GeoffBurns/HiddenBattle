@@ -1,7 +1,7 @@
-import { bh } from '../terrain.js'
+import { bh } from '../terrain/terrain.js'
 import { enemy } from '../waters/enemy.js'
-import { setupPrintOptions } from '../setupOptions.js'
-import { showRules, makeFriend } from '../headerUtils.js'
+import { setupPrintOptions } from '../navbar/setupOptions.js'
+import { showRules, makeFriend } from '../navbar/headerUtils.js'
 
 let friend = {}
 function resetBoardSize (f, e) {

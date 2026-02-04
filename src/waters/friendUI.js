@@ -1,7 +1,7 @@
-import { bh } from '../terrain.js'
+import { bh } from '../terrain/terrain.js'
 import { gameStatus } from './StatusUI.js'
 import { PlacementUI } from './placementUI.js'
-import { trackLevelEnd } from '../gtag.js'
+import { trackLevelEnd } from '../navbar/gtag.js'
 
 export class FriendUI extends PlacementUI {
   constructor () {

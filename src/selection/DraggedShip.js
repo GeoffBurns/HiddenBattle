@@ -1,6 +1,6 @@
 import { Ghost } from './Ghost.js'
 import { SelectedShip } from './SelectedShip.js'
-import { placedShipsInstance } from './selection.js'
+import { placedShipsInstance } from './PlacedShips.js'
 
 export class DraggedShip extends SelectedShip {
   constructor (

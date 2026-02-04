@@ -1,11 +1,11 @@
-import { bh } from '../terrain.js'
+import { bh } from '../terrain/terrain.js'
 import {
   makeKey,
   findClosestCoord,
   parsePair,
   makeKeyAndId
 } from '../utilities.js'
-import { WeaponSystem } from '../WeaponSystem.js'
+import { WeaponSystem } from '../weapon/WeaponSystem.js'
 
 function fst (arr) {
   if (!arr || arr.length === 0) return null

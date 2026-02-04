@@ -1,10 +1,10 @@
-import { bh } from './terrain.js'
+import { bh } from '../terrain/terrain.js'
 import { assembleTerrains } from './gameMaps.js'
-import { fetchComponent } from './network.js'
+import { fetchComponent } from '../network.js'
 import { setupTrack } from './gtag.js'
 import { setupTerrain } from './terrainUI.js'
 import { setupTabs } from './setupTabs.js'
-import { storeShips } from './waters/saveCustomMap.js'
+import { storeShips } from '../waters/saveCustomMap.js'
 
 export function removeShortcuts () {
   document.removeEventListener('keydown')

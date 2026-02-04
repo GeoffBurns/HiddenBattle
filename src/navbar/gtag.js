@@ -1,4 +1,4 @@
-import { bh } from './terrain.js'
+import { bh } from '../terrain/terrain.js'
 
 export const gtag = globalThis.gtag
 

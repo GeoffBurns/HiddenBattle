@@ -1,7 +1,7 @@
-import { Friend } from './waters/friend.js'
-import { FriendUI } from './waters/friendUI.js'
-import { showShipInfo } from './docs/shipprint.js'
-import { showWeapons } from './docs/weaponprint.js'
+import { Friend } from '../waters/friend.js'
+import { FriendUI } from '../waters/friendUI.js'
+import { showShipInfo } from '../docs/shipprint.js'
+import { showWeapons } from '../docs/weaponprint.js'
 
 export function show2ndBar () {
   document.getElementById('second-tab-bar').classList.remove('hidden')

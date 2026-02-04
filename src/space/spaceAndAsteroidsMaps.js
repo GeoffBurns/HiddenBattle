@@ -1,4 +1,4 @@
-import { TerrainMaps } from '../TerrainMaps.js'
+import { TerrainMaps } from '../terrain/TerrainMaps.js'
 import { spaceAndAsteroids } from './space.js'
 import { spaceMapList, defaultSpaceMap } from './spaceMaps.js'
 import { spaceShipsCatalogue } from './spaceShips.js'
