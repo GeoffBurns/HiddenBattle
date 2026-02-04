@@ -197,7 +197,6 @@ describe('Actions', () => {
       expect(typeof bits).toBe('bigint')
       const mask = new Mask(3, 3, bits)
       const acts = new Actions(3, 3, mask)
-      console.log('acts:', acts)
       const orbit = acts.orbit()
       try {
         const order = acts.order
@@ -231,7 +230,6 @@ describe('Actions', () => {
     expect(typeof bits).toBe('bigint')
     const mask = new Mask(3, 3, bits)
     const acts = new Actions(3, 3, mask)
-    console.log('acts:', acts)
     const orbit = acts.orbit()
     try {
       const order = acts.order
@@ -264,7 +262,6 @@ describe('Actions', () => {
     expect(typeof bits).toBe('bigint')
     const mask = new Mask(3, 3, bits)
     const acts = new Actions(3, 3, mask)
-    console.log('acts:', acts)
     const orbit = acts.orbit()
     try {
       const order = acts.order
@@ -300,7 +297,6 @@ describe('Actions', () => {
     expect(typeof bits).toBe('bigint')
     const mask = new Mask(5, 5, bits)
     const acts = new Actions(5, 5, mask)
-    console.log('acts:', acts)
     const orbit = acts.orbit()
     try {
       const order = acts.order
@@ -334,7 +330,6 @@ describe('Actions', () => {
     expect(typeof bits).toBe('bigint')
     const mask = new Mask(6, 6, bits)
     const acts = new Actions(6, 6, mask)
-    console.log('acts:', acts)
     const orbit = acts.orbit()
     try {
       const order = acts.order
@@ -367,7 +362,6 @@ describe('Actions', () => {
     expect(typeof bits).toBe('bigint')
     const mask = new Mask(3, 3, bits)
     const acts = new Actions(3, 3, mask)
-    console.log('acts:', acts)
     const orbit = acts.orbit()
     try {
       const order = acts.order
@@ -402,7 +396,6 @@ describe('Actions', () => {
     expect(typeof bits).toBe('bigint')
     const mask = new Mask(5, 5, bits)
     const acts = new Actions(5, 5, mask)
-    console.log('acts:', acts)
     const orbit = acts.orbit()
     try {
       const order = acts.order
@@ -437,7 +430,6 @@ describe('Actions', () => {
     expect(typeof bits).toBe('bigint')
     const mask = new Mask(3, 3, bits)
     const acts = new Actions(3, 3, mask)
-    console.log('acts:', acts)
     const orbit = acts.orbit()
     try {
       const order = acts.order
@@ -471,7 +463,6 @@ describe('Actions', () => {
     expect(typeof bits).toBe('bigint')
     const mask = new Mask(4, 4, bits)
     const acts = new Actions(4, 4, mask)
-    console.log('acts:', acts)
     const orbit = acts.orbit()
     try {
       const order = acts.order

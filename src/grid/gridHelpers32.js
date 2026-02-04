@@ -10,7 +10,7 @@ function set2 (bb, i, v) {
   bb[word] |= (v & 3) << shift
 }
 
-function rectToSquare2Bit (bb, h, w) {
+export function rectToSquare2Bit (bb, h, w) {
   const N = Math.max(h, w)
   const cells = N * N
   const words = Math.ceil(cells / 16)
@@ -32,21 +32,9 @@ function rectToSquare2Bit (bb, h, w) {
   return { bb: out, n: N }
 }
 
-function normalize2Bit (bb, h, w) {
-  let minRow = h
-  let minCol = w
-  let found = false
-
+export function normalize2Bit (bb, h, w) {
   // Pass 1: find topmost + leftmost non-zero cell
-  for (let r = 0; r < h; r++) {
-    for (let c = 0; c < w; c++) {
-      if (get2(bb, r * w + c) !== 0) {
-        minRow = Math.min(minRow, r)
-        minCol = Math.min(minCol, c)
-        found = true
-      }
-    }
-  }
+  const { minRow, minCol, found } = boundingBox(h, w, bb)
 
   // Empty board → nothing to normalize
   if (!found) {
@@ -54,6 +42,11 @@ function normalize2Bit (bb, h, w) {
   }
 
   // Pass 2: rebuild shifted board
+  const out = shiftBoard(bb, minRow, h, minCol, w)
+
+  return out
+}
+function shiftBoard (bb, minRow, h, minCol, w) {
   const out = new Uint32Array(bb.length)
 
   for (let r = minRow; r < h; r++) {
@@ -64,6 +57,22 @@ function normalize2Bit (bb, h, w) {
       }
     }
   }
-
   return out
+}
+
+function boundingBox (h, w, bb) {
+  let minRow = h
+  let minCol = w
+  let found = false
+
+  for (let r = 0; r < h; r++) {
+    for (let c = 0; c < w; c++) {
+      if (get2(bb, r * w + c) !== 0) {
+        minRow = Math.min(minRow, r)
+        minCol = Math.min(minCol, c)
+        found = true
+      }
+    }
+  }
+  return { minRow, minCol, found }
 }

@@ -224,6 +224,19 @@ function occBigToColorPlanes (occ, W, H, fn) {
   }
   return planes
 }
+function packedToColorPlanes (board, W, H) {
+  const planes = [
+    new Uint32Array(Math.ceil((W * H) / 32)),
+    new Uint32Array(Math.ceil((W * H) / 32)),
+    new Uint32Array(Math.ceil((W * H) / 32)),
+    new Uint32Array(Math.ceil((W * H) / 32))
+  ]
+  for (let i = 0; i < W * H; i++) {
+    const c = (board[i >> 4] >> ((i & 15) << 1)) & 3
+    if (c) planes[c][i >> 5] |= 1 << (i & 31)
+  }
+  return planes
+}
 
 export function coordsToOcc32 (list, W, H) {
   const occ = new Uint32Array(Math.ceil((W * H) / 32))
