@@ -255,6 +255,7 @@
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+
     z-index: 6;
     transform: translate(-50%, -50%) rotate(var(--angle));
     transform-origin: center center;
@@ -286,13 +287,18 @@
     }
 }
 
+.explosion.air {
+    background-image: var(--air-explode-image);
+}
+
+
 .explosion.play {
     will-change: background-position, transform, opacity;
 
     animation:
-        explode-frames 0.6s steps(1) forwards,
-        explode-scale 0.5s ease-out forwards,
-        explode-fade 0.8s ease-out forwards;
+        explode-frames 0.6s steps(8) both,
+        explode-scale 0.5s ease-out both,
+        explode-fade 0.8s ease-out both;
 }
 
 .explosion {
@@ -302,26 +308,23 @@
     background-repeat: no-repeat;
     background-size: 512px 256px;
     z-index: 7;
-    position: fixed;
-    transform: translate(-50%, -50%);
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    transform:
+        translate(var(--x), var(--y)) scale(var(--scale-start));
+
     transform-origin: center center;
 
-    left: var(--x);
-    top: var(--y);
     animation: none;
 }
 
-.explosion.air {
-    background-image: var(--air-explode-image);
-}
+
 
 
 @keyframes explode-frames {
     0% {
-        background-position: 0px 0px;
-    }
-
-    2% {
         background-position: 0px 0px;
     }
 
@@ -356,11 +359,13 @@
 
 @keyframes explode-scale {
     from {
-        transform: scale(var(--scale-start));
+        transform:
+            translate(var(--x), var(--y)) scale(var(--scale-start));
     }
 
     to {
-        transform: scale(var(--scale-end));
+        transform:
+            translate(var(--x), var(--y)) scale(var(--scale-end));
     }
 }
 

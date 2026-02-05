@@ -27,12 +27,12 @@ function len (x, y) {
 function len2 (x, y) {
   return x * x + y * y
 }
-export function drawRay (x0, y0, x1, y1, canvas) {
+export function drawRay (x0, y0, x1, y1, canvas, color) {
   const { dxDir, dyDir } = direction(x1, x0, y1, y0)
   drawRayInDirection(x0, y0, dxDir, dyDir, canvas)
 }
 
-function drawRayInDirection (x0, y0, dxDir, dyDir, canvas) {
+function drawRayInDirection (x0, y0, dxDir, dyDir, canvas, color) {
   const { dx, dy, sx, sy } = initLineDirectionParans(dxDir, dyDir)
 
   for (const [x, y] of bresenhamSteps(
@@ -45,14 +45,14 @@ function drawRayInDirection (x0, y0, dxDir, dyDir, canvas) {
     canvas.width,
     canvas.height
   )) {
-    canvas.set(x, y)
+    canvas.set(x, y, color)
   }
 }
 
-export function drawLineInfinite (x0, y0, x1, y1, canvas) {
+export function drawLineInfinite (x0, y0, x1, y1, canvas, color) {
   const { dxDir, dyDir } = direction(x1, x0, y1, y0)
-  drawRayInDirection(x0, y0, dxDir, dyDir, canvas)
-  drawRayInDirection(x0, y0, -dxDir, -dyDir, canvas)
+  drawRayInDirection(x0, y0, dxDir, dyDir, canvas, color)
+  drawRayInDirection(x0, y0, -dxDir, -dyDir, canvas, color)
 }
 
 export function drawSegmentTo (x0, y0, x1, y1, canvas, color) {
@@ -72,7 +72,24 @@ export function drawSegmentTo (x0, y0, x1, y1, canvas, color) {
     if (x === dxDir && y === dyDir) break
   }
 }
+export function drawSegmentUpTo (x0, y0, x1, y1, canvas, color) {
+  const { dx, dy, sx, sy, dxDir, dyDir } = initLineParams(x1, x0, y1, y0)
+  for (const [x, y] of bresenhamSteps(
+    x0,
+    y0,
+    dx,
+    dy,
+    sx,
+    sy,
+    canvas.width,
+    canvas.height
+  )) {
+    //if (!this.inBounds(x, y)) break
 
+    if (x === dxDir && y === dyDir) break
+    canvas.set(x, y, color)
+  }
+}
 function initLineParams (x1, x0, y1, y0) {
   const { dxDir, dyDir } = direction(x1, x0, y1, y0)
   return initLineDirectionParans(dxDir, dyDir)
@@ -93,7 +110,7 @@ function initLineDirectionParans (dxDir, dyDir) {
 }
 
 export function drawSegmentFor (x0, y0, x1, y1, distance, canvas, color) {
-  const { dx, dy, sx, sy, dxDir, dyDir } = initLineParams(x1, x0, y1, y0)
+  const { dx, dy, sx, sy } = initLineParams(x1, x0, y1, y0)
 
   for (const [x, y, steps] of bresenhamSteps(
     x0,
@@ -107,9 +124,9 @@ export function drawSegmentFor (x0, y0, x1, y1, distance, canvas, color) {
   )) {
     //if (!this.inBounds(x, y)) break
     canvas.set(x, y, color)
-    if (x === dxDir && y === dyDir) break
 
     if (steps >= distance) break
+    // if (x === dxDir && y === dyDir) break
   }
 }
 

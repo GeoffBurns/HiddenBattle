@@ -315,10 +315,15 @@ export class Waters {
         this.launchTo(coords, hintR, hintC, rack, onEnd)
       }
       this.loadOut.selectedWeapon = rack
-      oppo?.UI?.cellWeaponActive?.(launchR, launchC)
-      if (weapon.postSelectCursor > 0) {
-        this.UI.cellWeaponActive(launchR, launchC, '', weapon.tag)
+      if (oppo?.showShips) {
+        oppo?.UI?.deactivateWeapons?.()
+        oppo?.UI?.cellWeaponActive?.(launchR, launchC)
+        if (weapon.postSelectCursor > 0) {
+          this.UI.deactivateWeapons()
+          this.UI.cellWeaponActive(launchR, launchC, '', weapon.tag)
+        }
       }
+
       this.updateWeaponStatus()
     }
   }

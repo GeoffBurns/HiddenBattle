@@ -109,7 +109,7 @@
 }
 
 
-.battleship:not(.print-preview) .tally-row.weapon.missile div.tally-box:not(.hit)::before {
+.battleship:not(.print-preview) .tally-row.weapon.missile div.tally-box:not(.hit):not(.damaged)::before {
     background-image: url('../images/space/boxmissile28.png');
 }
 
@@ -118,7 +118,7 @@
     opacity: 0.6;
 }
 
-.battleship:not(.print-preview) .tally-row.weapon.rail-bolt div.tally-box:not(.hit)::before {
+.battleship:not(.print-preview) .tally-row.weapon.rail-bolt div.tally-box:not(.hit):not(.damaged)::before {
     background-image: url('../images/space/boxbolt28.png');
 }
 

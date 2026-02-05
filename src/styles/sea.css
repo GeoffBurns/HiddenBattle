@@ -155,7 +155,7 @@
     content: '+';
 }
 
-.battleship:not(.print-preview) div.tally-row.weapon.megabomb div.tally-box:not(.hit)::before {
+.battleship:not(.print-preview) div.tally-row.weapon.megabomb div.tally-box:not(.hit):not(.damaged)::before {
     background-image: url('../images/sea/boxbomb28.png');
 }
 
@@ -164,7 +164,7 @@
     opacity: 0.6;
 }
 
-.battleship:not(.print-preview) div.tally-row.weapon.flack div.tally-box:not(.hit)::before {
+.battleship:not(.print-preview) div.tally-row.weapon.flack div.tally-box:not(.hit):not(.damaged)::before {
     background-image: var(--box-flack-image);
 
 }
@@ -175,7 +175,7 @@
 }
 
 
-.battleship:not(.print-preview) div.tally-row.weapon.kinetic-strike div.tally-box:not(.hit)::before {
+.battleship:not(.print-preview) div.tally-row.weapon.kinetic-strike div.tally-box:not(.hit):not(.damaged)::before {
     background-image: url('../images/sea/boxstrike28.png');
 
 }
@@ -185,7 +185,7 @@
 
 }
 
-.battleship:not(.print-preview) div.tally-row.weapon.torpedo div.tally-box:not(.hit)::before {
+.battleship:not(.print-preview) div.tally-row.weapon.torpedo div.tally-box:not(.hit):not(.damaged)::before {
     background-image: url('../images/sea/boxtorpedo28.png');
 
 }

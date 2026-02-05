@@ -1,7 +1,13 @@
 /* eslint-env jest */
 
 /* global describe, it, expect */
-import { drawRay, drawSegmentTo, drawSegmentFor, drawPie } from './maskShape.js'
+import {
+  drawRay,
+  drawSegmentTo,
+  drawSegmentUpTo,
+  drawSegmentFor,
+  drawPie
+} from './maskShape.js'
 
 class MockCanvas {
   constructor (w, h) {
@@ -31,12 +37,25 @@ describe('maskShape basic drawing', () => {
     expect(c.count()).toBe(10)
     for (let x = 0; x < 10; x++) expect(c.test(x, 0)).toBe(true)
   })
+  it('drawRay draws across the canvas in diagonally', () => {
+    const c = new MockCanvas(5, 5)
+    drawRay(1, 1, 3, 3, c)
+    // should draw from x=0 to x=9 inclusive
+    expect(c.count()).toBe(4)
+    for (let x = 1; x < 5; x++) expect(c.test(x, x)).toBe(true)
+  })
 
   it('drawSegmentTo draws only up to the target', () => {
     const c = new MockCanvas(10, 10)
     drawSegmentTo(0, 0, 3, 0, c, 1)
     for (let x = 0; x <= 3; x++) expect(c.test(x, 0)).toBe(true)
     expect(c.test(4, 0)).toBe(false)
+  })
+  it('drawSegmentTo draws only up to the target', () => {
+    const c = new MockCanvas(10, 10)
+    drawSegmentUpTo(0, 0, 3, 0, c, 1)
+    for (let x = 0; x < 3; x++) expect(c.test(x, 0)).toBe(true)
+    expect(c.test(3, 0)).toBe(false)
   })
 
   it('drawSegmentFor respects distance parameter', () => {

@@ -1,5 +1,6 @@
 import {
   drawSegmentTo,
+  drawSegmentUpTo,
   drawPie2,
   drawRay,
   drawSegmentFor,
@@ -14,13 +15,44 @@ export class ListCanvas extends GridBase {
     super(width, height)
     this.list = list || []
   }
+  at (x, y) {
+    if (!this.inBounds(x, y)) return undefined
+    const item = this.list.find(([x1, y1]) => {
+      x === x1 && y === y1
+    })
+    if (!item) return 0
+    return item[2] || 1
+  }
   set (x, y, value) {
+    if (
+      this.list.some(([x1, y1]) => {
+        x === x1 && y === y1
+      })
+    )
+      return
     if (value !== undefined && value !== null) {
       this.list.push([x, y, value])
       this._actions = null
     } else {
       this.list.push([x, y])
       this._actions = null
+    }
+  }
+
+  *entries () {
+    for (let i = 0; i < this.list.length; i++) {
+      yield [this.list[i][0], this.list[i][1], this.list[i][2] || 1, i, this]
+    }
+  }
+
+  *values () {
+    for (let i = 0; i < this.list.length; i++) {
+      yield this.list[i][2] || 1
+    }
+  }
+  *keys () {
+    for (let i = 0; i < this.list.length; i++) {
+      yield [this.list[i][0], this.list[i][1], i]
     }
   }
   get actions () {
@@ -34,6 +66,9 @@ export class ListCanvas extends GridBase {
 
   drawSegmentTo (x0, y0, x1, y1, color) {
     drawSegmentTo(x0, y0, x1, y1, this, color)
+  }
+  drawSegmentUpTo (x0, y0, x1, y1, color) {
+    drawSegmentUpTo(x0, y0, x1, y1, this, color)
   }
 
   drawSegmentFor (x0, y0, x1, y1, distance, color) {

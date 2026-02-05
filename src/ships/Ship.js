@@ -160,7 +160,7 @@ export class Ship {
         model.loadOut.useAmmo(wps)
         const cell = viewModel.gridCellAt(...parsePair(key))
 
-        if (viewModel.showShips) viewModel.useAmmoInCell(cell)
+        viewModel.useAmmoInCell(cell)
         if (weapon.volatile) {
           info = 'Magazine Detonated '
           weapon.animateDetonation(cell, viewModel.cellSizeScreen())

@@ -1,3 +1,7 @@
+/* eslint-env jest */
+
+/* global describe, jest,  test, expect */
+
 jest.mock('./maskShape.js', () => ({
   drawSegmentTo: jest.fn(),
   drawPie2: jest.fn(),
@@ -53,11 +57,11 @@ describe('ListCanvas', () => {
 
   test('draw methods delegate to maskShape functions', () => {
     const lc = new ListCanvas(10, 10)
-    lc.drawSegmentTo(1, 2, 3, 4, 'red')
-    expect(drawSegmentTo).toHaveBeenCalledWith(1, 2, 3, 4, lc, 'red')
+    lc.drawSegmentTo(1, 2, 3, 4, 1)
+    expect(drawSegmentTo).toHaveBeenCalledWith(1, 2, 3, 4, lc, 1)
 
-    lc.drawSegmentFor(1, 2, 3, 4, 5, 'blue')
-    expect(drawSegmentFor).toHaveBeenCalledWith(1, 2, 3, 4, 5, lc, 'blue')
+    lc.drawSegmentFor(1, 2, 3, 4, 5, 2)
+    expect(drawSegmentFor).toHaveBeenCalledWith(1, 2, 3, 4, 5, lc, 2)
 
     lc.drawPie(1, 2, 3, 4, 6)
     expect(drawPie2).toHaveBeenCalledWith(1, 2, 3, 4, 6, lc, 22.5)

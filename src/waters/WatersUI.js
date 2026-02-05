@@ -336,15 +336,15 @@ export class WatersUI {
   }
   cellWeaponDeactivate (r, c) {
     const cell = this.gridCellAt(r, c)
-    cell.classList.remove('active', 'contrast')
 
-    cell.classList.remove(...bh.terrain.weapons.tags)
+    deactivateWeapon(cell)
   }
   cellUseAmmo (r, c) {
     const cell = this.gridCellAt(r, c)
     this.useAmmoInCell(cell)
   }
   useAmmoInCell (cell) {
+    if (!this.showShips) return
     const dataset = cell.dataset
     cell.classList.remove('active')
     cell.classList.add('empty')
@@ -633,4 +633,14 @@ export class WatersUI {
       tipsTimerId = null
     }
   }
+  deactivateWeapons () {
+    for (const cell of this.board.children) {
+      deactivateWeapon(cell)
+    }
+  }
+}
+
+function deactivateWeapon (cell) {
+  cell.classList.remove('active', 'contrast')
+  cell.classList.remove(...bh.terrain.weapons.tags)
 }
