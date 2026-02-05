@@ -30,12 +30,12 @@ class MockCanvas {
 }
 
 describe('maskShape basic drawing', () => {
-  it('drawRay draws across the canvas in direction', () => {
+  it('drawRay draws across the canvas horizonally', () => {
     const c = new MockCanvas(10, 10)
-    drawRay(0, 0, 3, 0, c)
+    drawRay(1, 0, 4, 0, c)
     // should draw from x=0 to x=9 inclusive
-    expect(c.count()).toBe(10)
-    for (let x = 0; x < 10; x++) expect(c.test(x, 0)).toBe(true)
+    expect(c.count()).toBe(9)
+    for (let x = 1; x < 10; x++) expect(c.test(x, 0)).toBe(true)
   })
   it('drawRay draws across the canvas in diagonally', () => {
     const c = new MockCanvas(5, 5)
@@ -44,7 +44,13 @@ describe('maskShape basic drawing', () => {
     expect(c.count()).toBe(4)
     for (let x = 1; x < 5; x++) expect(c.test(x, x)).toBe(true)
   })
-
+  it('drawRay draws across the canvas vertocally', () => {
+    const c = new MockCanvas(10, 10)
+    drawRay(0, 1, 0, 5, c)
+    // should draw from x=0 to x=9 inclusive
+    expect(c.count()).toBe(9)
+    for (let x = 1; x < 10; x++) expect(c.test(0, x)).toBe(true)
+  })
   it('drawSegmentTo draws only up to the target', () => {
     const c = new MockCanvas(10, 10)
     drawSegmentTo(0, 0, 3, 0, c, 1)

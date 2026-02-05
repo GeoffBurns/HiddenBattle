@@ -308,7 +308,7 @@
     background-repeat: no-repeat;
     background-size: 512px 256px;
     z-index: 7;
-    position: absolute;
+    position: fixed;
     left: 0;
     top: 0;
 

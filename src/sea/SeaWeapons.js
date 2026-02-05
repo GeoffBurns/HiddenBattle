@@ -68,7 +68,11 @@ export class Megabomb extends Weapon {
     return result
   }
 }
-function getExtendedLinePoints (x1, y1, x2, y2) {
+function getIntercepts (y1, x1, y2, x2) {
+  const points = getListCanvas()
+  return points.intercepts(x1, y1, x2, y2)
+}
+function getExtendedLinePoints (y1, x1, y2, x2) {
   const points = getListCanvas()
   points.drawLineInfinite(x1, y1, x2, y2)
   return points.list
@@ -134,9 +138,13 @@ export class Kinetic extends Weapon {
   }
 
   redoCoords (map, base, coords) {
-    const line = this.aoe(map, coords)
+    const r = coords[0][0]
+    const c = coords[0][1]
 
-    return [line[0], line.at(-1)]
+    const r1 = coords[1][0]
+    const c1 = coords[1][1]
+
+    return getIntercepts(r, c, r1, c1)
   }
 
   splash (map, coords) {

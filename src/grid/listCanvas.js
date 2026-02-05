@@ -4,7 +4,8 @@ import {
   drawPie2,
   drawRay,
   drawSegmentFor,
-  drawLineInfinite
+  drawLineInfinite,
+  intercepts
 } from './maskShape.js'
 import { GridBase } from './gridBase.js'
 import { coordsToGrid, coordsToOccBig } from './maskConvert.js'
@@ -24,12 +25,8 @@ export class ListCanvas extends GridBase {
     return item[2] || 1
   }
   set (x, y, value) {
-    if (
-      this.list.some(([x1, y1]) => {
-        x === x1 && y === y1
-      })
-    )
-      return
+    const isIn = this.list.some(([x1, y1]) => x === x1 && y === y1)
+    if (isIn) return
     if (value !== undefined && value !== null) {
       this.list.push([x, y, value])
       this._actions = null
@@ -38,7 +35,9 @@ export class ListCanvas extends GridBase {
       this._actions = null
     }
   }
-
+  reverse () {
+    this.list.reverse()
+  }
   *entries () {
     for (let i = 0; i < this.list.length; i++) {
       yield [this.list[i][0], this.list[i][1], this.list[i][2] || 1, i, this]
@@ -63,7 +62,9 @@ export class ListCanvas extends GridBase {
     this._actions = new Actions(this.width, this.height, mask)
     return this._actions
   }
-
+  intercepts (x0, y0, x1, y1) {
+    return intercepts(x0, y0, x1, y1, this)
+  }
   drawSegmentTo (x0, y0, x1, y1, color) {
     drawSegmentTo(x0, y0, x1, y1, this, color)
   }

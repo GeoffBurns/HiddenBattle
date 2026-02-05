@@ -31,7 +31,6 @@ export function drawRay (x0, y0, x1, y1, canvas, color) {
   const { dxDir, dyDir } = direction(x1, x0, y1, y0)
   drawRayInDirection(x0, y0, dxDir, dyDir, canvas)
 }
-
 function drawRayInDirection (x0, y0, dxDir, dyDir, canvas, color) {
   const { dx, dy, sx, sy } = initLineDirectionParans(dxDir, dyDir)
 
@@ -48,11 +47,38 @@ function drawRayInDirection (x0, y0, dxDir, dyDir, canvas, color) {
     canvas.set(x, y, color)
   }
 }
+function interceptInDirection (x0, y0, dxDir, dyDir, canvas) {
+  const { dx, dy, sx, sy } = initLineDirectionParans(dxDir, dyDir)
+  let mx = x0
+  let my = y0
 
-export function drawLineInfinite (x0, y0, x1, y1, canvas, color) {
+  for (const [x, y] of bresenhamSteps(
+    x0,
+    y0,
+    dx,
+    dy,
+    sx,
+    sy,
+    canvas.width,
+    canvas.height
+  )) {
+    mx = x
+    my = y
+  }
+  return [mx, my]
+}
+function interceptsInDirection (x, y, dxDir, dyDir, canvas) {
+  const [x1, y1] = interceptInDirection(x, y, dxDir, dyDir, canvas)
+  const [x0, y0] = interceptInDirection(x, y, -dxDir, -dyDir, canvas)
+  return { x0, y0, x1, y1 }
+}
+export function intercepts (x0, y0, x1, y1, canvas) {
   const { dxDir, dyDir } = direction(x1, x0, y1, y0)
-  drawRayInDirection(x0, y0, dxDir, dyDir, canvas, color)
-  drawRayInDirection(x0, y0, -dxDir, -dyDir, canvas, color)
+  return interceptsInDirection(x0, y0, dxDir, dyDir, canvas)
+}
+export function drawLineInfinite (sx, sy, ex, ey, canvas, color) {
+  const { x0, y0, x1, y1 } = intercepts(sx, sy, ex, ey, canvas)
+  drawSegmentTo(x0, y0, x1, y1, canvas, color)
 }
 
 export function drawSegmentTo (x0, y0, x1, y1, canvas, color) {
