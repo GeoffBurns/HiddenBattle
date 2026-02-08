@@ -1,5 +1,6 @@
 import { MaskBase } from './MaskBase'
 import { lazy } from '../utilities.js'
+import { buildTransformMaps } from './buildTransformMaps.js'
 
 export function rangeBitMask (start, end) {
   return ((~0 >>> (31 - end)) & (~0 << start)) >>> 0
@@ -77,33 +78,6 @@ function normalize2Bit (data, width, height) {
 
   return out
 }
-function buildTransformMaps32 (W, H) {
-  const m = {
-    id: [],
-    r90: [],
-    r180: [],
-    r270: [],
-    fx: [],
-    fy: [],
-    fd1: [],
-    fd2: []
-  }
-
-  for (let y = 0; y < H; y++) {
-    for (let x = 0; x < W; x++) {
-      const i = y * W + x
-      m.id[i] = i
-      m.r90[i] = x * H + (H - 1 - y)
-      m.r180[i] = (H - 1 - y) * W + (W - 1 - x)
-      m.r270[i] = (W - 1 - x) * H + y
-      m.fx[i] = y * W + (W - 1 - x)
-      m.fy[i] = (H - 1 - y) * W + x
-      m.fd1[i] = x * W + y
-      m.fd2[i] = (W - 1 - x) * W + (H - 1 - y)
-    }
-  }
-  return m
-}
 
 export class Packed extends MaskBase {
   constructor (width, height) {
@@ -117,7 +91,7 @@ export class Packed extends MaskBase {
     this.MxC = (1 << this.BW) - 1
     this.MnC = 0
     lazy(this, 'transformMaps', () => {
-      return buildTransformMaps32(this.width, this.height)
+      return buildTransformMaps(this.width, this.height)
     })
   }
   index (x, y) {
@@ -208,7 +182,7 @@ export class Packed extends MaskBase {
     return (color & this.CM) << boardPos
   }
   rightShift (color, boardPos) {
-    return (color & this.CM) << boardPos
+    return (color & this.CM) >> boardPos
   }
 
   setMask (pos, color = 1) {

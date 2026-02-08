@@ -1,7 +1,4 @@
-import { popcountBigInt } from './placeTools.js'
-import { lazy } from '../utilities.js'
 import { MaskBase } from './MaskBase.js'
-import { Actions } from './actions.js'
 
 export class Mask extends MaskBase {
   constructor (width, height, bits = 0n) {
@@ -9,31 +6,27 @@ export class Mask extends MaskBase {
     this.bits = bits
   }
 
-  bitPos (x, y) {
-    return BigInt(y * this.width + x)
+  get actions () {
+    return this.indexer?.actions(this)
   }
-  set (x, y) {
-    this.bits |= 1n << this.index(x, y)
+
+  get occupacy () {
+    return this.store.occupacy(this.bits)
+  }
+  set (x, y, color = 1) {
+    const forloc = this.for(x, y)
+    this.bits = forloc.set(color)
     return this.bits
   }
-  get actions () {
-    if (this._actions && this._actions?.original?.bits === this.bits) {
-      return this._actions
-    }
-    this._actions = new Actions(this.width, this.height, this)
-    return this._actions
+  at (x, y) {
+    return this.for(x, y).at()
+  }
+  test (x, y, color = 1) {
+    return this.for(x, y).test(color)
   }
   clear (x, y) {
-    this.bits &= ~(1n << this.index(x, y))
+    return this.set(x, y, 0)
   }
-  test (x, y) {
-    return (this.bits & (1n << this.index(x, y))) !== 0n
-  }
-
-  get size () {
-    return popcountBigInt(this.bits)
-  }
-
   blit (src, srcX, srcY, width, height, dstX, dstY, mode = 'copy') {
     for (let r = 0; r < height; r++) {
       //      TypeError: src.sliceRow is not a function
@@ -57,18 +50,18 @@ export class Mask extends MaskBase {
   }
   floodFill (sx, sy) {
     const start = this.index(sx, sy)
-    if ((this.bits >> start) & 1n) return
+    if (this.store.value(this.bits, this.store.bitPos(start))) return
 
     const stack = [[sx, sy]]
 
     while (stack.length) {
       const [x, y] = stack.pop()
-      if (x < 0 || y < 0 || x >= this.width || y >= this.height) continue
+      if (!this.indexer.isValid(x, y)) continue
       if (this.at(x, y)) continue
 
       let left = x
       let right = x
-      //TypeError: this.get is not a functionJest
+
       while (left > 0 && !this.at(left - 1, y)) left--
       while (right + 1 < this.width && !this.at(right + 1, y)) right++
 
@@ -91,34 +84,31 @@ export class Mask extends MaskBase {
     return out
   }
   fromCoords (coords) {
-    this.bits = 0n
+    this.bits = this.bitsFromCoords(coords)
+  }
 
+  bitsFromCoords (coords) {
+    let bits = this.store.empty
     for (const [x, y] of coords) {
-      if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
-        this.bits |= 1n << this.index(x, y)
+      if (this.indexer.isValid(x, y)) {
+        bits = this.store.addBit(bits, this.index(x, y))
       }
     }
+    return bits
+  }
+
+  *bitsIndices () {
+    yield* this.indexer.bitsIndices(this.bits)
+  }
+
+  *bitKeys () {
+    yield* this.indexer.bitKeys(this.bits)
   }
   get toCoords () {
     const coords = []
-    let bits = this.bits
-
-    while (bits !== 0n) {
-      // isolate lowest set bit
-      const lsb = bits & -bits
-
-      // index of that bit
-      const i = lsb.toString(2).length - 1
-
-      const x = i % this.width
-      const y = Math.floor(i / this.width)
-
+    for (const [x, y] of this.bitKeys()) {
       coords.push([x, y])
-
-      // clear lowest set bit
-      bits ^= lsb
     }
-
     return coords
   }
 

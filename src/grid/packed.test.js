@@ -49,7 +49,7 @@ describe('Packed', () => {
     const val = p.leftShift(3, 4)
     expect(val).toBe((3 & p.CM) << 4)
     const val2 = p.rightShift(2, 6)
-    expect(val2).toBe((2 & p.CM) << 6)
+    expect(val2).toBe((2 & p.CM) >> 6)
   })
 
   it('setRef and getRef roundtrip', () => {

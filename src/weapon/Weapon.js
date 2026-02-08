@@ -168,33 +168,42 @@ export class Weapon {
     type = type || wanted.find(cls => classlist.contains(cls))
 
     // CREATE wrapper
+    const explody1 = document.createElement('div')
     const explody = document.createElement('div')
     let mod = 1
     if (power !== undefined) {
       mod = 0.5 + power / 2
     }
     const scale = (cellSize * this.splashSize * mod) / 128
-    // SET CSS variables
-    explody.style.setProperty('--x', `${end.x - 64}px`)
-    explody.style.setProperty('--y', `${end.y - 64}px`)
+    explody1.className = 'explosion-wrapper'
+    explody.className = 'explosion ' + type
+    explody1.style.setProperty('--x', `${end.x - 64}px`)
+    explody1.style.setProperty('--y', `${end.y - 64}px`)
     explody.style.setProperty('--scale-start', `${scale * 0.6}`)
     explody.style.setProperty('--scale-end', `${scale * 1.6}`)
 
-    explody.className = 'explosion ' + type
-
     //console.log(explody)
     //explody.style.outline = '2px solid red'
-    container.appendChild(explody)
-    container.classList.add(shake)
+    //explody1.appendChild(explody)
     // DESTROY at end
-    explody.addEventListener('animationend', () => {
-      container.classList.remove(shake)
-      explody.className = ''
-      explody.remove()
-      if (onEnd) onEnd()
-    })
+    explody.addEventListener(
+      'animationend',
+      () => {
+        container.classList.remove(shake)
+        //  explody.className = ''
+        explody.remove()
+        // explody1.remove()
+        if (onEnd) onEnd()
+      },
+      { once: true }
+    )
+
+    container.appendChild(explody)
+    //
+    explody.getBoundingClientRect()
     requestAnimationFrame(() => {
       explody.classList.add('play')
+      //   container.classList.add(shake)
     })
   }
 

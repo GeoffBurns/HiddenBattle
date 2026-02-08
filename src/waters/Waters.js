@@ -31,7 +31,47 @@ function popFirst (arr, predicate, obj) {
 
   return found
 }
+const Warning = {
+  LowHealth: () => ({
+    type: 'LowHealth',
+    severity: 3,
+    duration: 2500
+  }),
 
+  IncomingAttack: () => ({
+    type: 'IncomingAttack',
+    severity: 4,
+    duration: 1500
+  }),
+
+  TutorialHint: text => ({
+    type: 'TutorialHint',
+    severity: 1,
+    duration: 2500,
+    text
+  })
+}
+
+const WeaponMode = Object.freeze({
+  sourceSelect: 'SELECT',
+  targetAim: 'AIM',
+  othersTurn: 'OTHERS'
+})
+class steps {
+  constructor () {
+    this.source = null
+    this.sourceHint = null
+    this.sourceShadow = null
+    this.target = null
+    this.mode = WeaponMode.othersTurn
+  }
+
+  addSource (source, hint, shadow) {
+    this.source = source
+    this.sourceHint = hint
+    this.sourceShadow = shadow
+  }
+}
 export class Waters {
   constructor (ui) {
     assembleTerrains()
@@ -43,6 +83,7 @@ export class Waters {
     this.boardDestroyed = false
     this.preamble0 = 'Your'
     this.preamble = 'You were '
+    this.steps = new steps()
     this.resetShipCells()
     this.displayInfo = gameStatus.info2.bind(gameStatus)
   }

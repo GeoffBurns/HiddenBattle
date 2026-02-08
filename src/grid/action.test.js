@@ -10,6 +10,15 @@ import { coordsToOccBig } from './maskConvert.js'
 import { normalizeUpLeft } from './gridHelpers.js'
 import { errorMsg } from './errorMsg.js'
 
+function serializedData (data) {
+  return JSON.stringify(data, (key, value) => {
+    if (typeof value === 'bigint') {
+      return value.toString() // Convert BigInt to string
+    }
+    return value // Return other values unchanged
+  })
+}
+
 describe('Actions', () => {
   let mask
   let actions
@@ -85,6 +94,7 @@ describe('Actions', () => {
   describe('applyMap', () => {
     it('should apply identity map and return normalized result', () => {
       const result = actions.applyMap(actions.transformMaps.id)
+      console.log('map:', serializedData(actions.transformMaps.id))
       expect(typeof result).toBe('bigint')
       expect(result).toBe(actions.template)
     })
@@ -203,7 +213,7 @@ describe('Actions', () => {
         expect(typeof order).toBe('number')
         expect(order).toBe(4)
       } catch (err) {
-        err.message += `\n\norbit:\n${JSON.stringify(orbit, null, 2)}`
+        err.message += `\n\norbit:\n${serializedData(orbit)}`
         throw err
       }
       try {
@@ -236,7 +246,7 @@ describe('Actions', () => {
       expect(typeof order).toBe('number')
       expect(order).toBe(4)
     } catch (err) {
-      err.message += `\n\norbit:\n${JSON.stringify(orbit, null, 2)}`
+      err.message += `\n\norbit:\n${serializedData(orbit)}`
       throw err
     }
     try {
@@ -268,7 +278,7 @@ describe('Actions', () => {
       expect(typeof order).toBe('number')
       expect(order).toBe(1)
     } catch (err) {
-      err.message += `\n\norbit:\n${JSON.stringify(orbit, null, 2)}`
+      err.message += `\n\norbit:\n${serializedData(orbit)}`
       throw err
     }
     try {
@@ -303,14 +313,14 @@ describe('Actions', () => {
       expect(typeof order).toBe('number')
       expect(order).toBe(4)
     } catch (err) {
-      err.message += `\n\norbit:\n${JSON.stringify(orbit, null, 2)}`
+      err.message += `\n\norbit:\n${serializedData(orbit)}`
       throw err
     }
     try {
       const sym = acts.classifySymmetry()
       expect(sym).toBe('V4')
     } catch (err) {
-      err.message += `\n\noactions:\n${JSON.stringify(acts, null, 2)}`
+      err.message += `\n\noactions:\n${serializedData(acts)}`
       throw err
     }
   })
@@ -336,14 +346,14 @@ describe('Actions', () => {
       expect(typeof order).toBe('number')
       expect(order).toBe(2)
     } catch (err) {
-      err.message += `\n\norbit:\n${JSON.stringify(orbit, null, 2)}`
+      err.message += `\n\norbit:\n${serializedData(orbit)}`
       throw err
     }
     try {
       const sym = acts.classifySymmetry()
       expect(sym).toBe('C2R')
     } catch (err) {
-      err.message += errorMsg('actions', acts)
+      err.message += `\n\noactions:\n${serializedData(acts)}`
       throw err
     }
   })
@@ -402,7 +412,7 @@ describe('Actions', () => {
       expect(typeof order).toBe('number')
       expect(order).toBe(8)
     } catch (err) {
-      err.message += `\n\norbit:\n${JSON.stringify(orbit, null, 2)}`
+      err.message += `\n\norbit:\n${serializedData(orbit)}`
       throw err
     }
     try {
@@ -469,14 +479,14 @@ describe('Actions', () => {
       expect(typeof order).toBe('number')
       expect(order).toBe(2)
     } catch (err) {
-      err.message += `\n\norbit:\n${JSON.stringify(orbit, null, 2)}`
+      err.message += `\n\norbit:\n${serializedData(orbit)}`
       throw err
     }
     try {
       const sym = acts.classifySymmetry()
       expect(sym).toBe('C2F')
     } catch (err) {
-      err.message += `\n\noactions:\n${JSON.stringify(acts, null, 2)}`
+      err.message += `\n\noactions:\n${serializedData(acts)}`
       throw err
     }
   })

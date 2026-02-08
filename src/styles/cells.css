@@ -100,6 +100,23 @@
     }
 }
 
+/*
+.container {
+  --shake-x: 0px;
+  --shake-y: 0px;
+
+  transform: translate(var(--shake-x), var(--shake-y));
+}
+
+@keyframes shake {
+  0%   { --shake-x:  0px; }
+  20%  { --shake-x: -6px; }
+  40%  { --shake-x:  6px; }
+  60%  { --shake-x: -4px; }
+  80%  { --shake-x:  4px; }
+  100% { --shake-x:  0px; }
+}
+  */
 .shake {
     animation: explosionShake 0.35s ease-out;
 }
@@ -202,6 +219,13 @@
     ;
 }
 
+.spinner.waiting {
+    width: 42px;
+    height: 42px;
+    background-image: url('../images/loading.gif');;
+    box-sizing: border-box;
+}   
+
 #modeIcon1.single::before {
     background-image: var(--cross-cursor-image);
 }
@@ -291,14 +315,25 @@
     background-image: var(--air-explode-image);
 }
 
+/* Keyframes */
+@keyframes flyweapon {
+    0% {
+        left: var(--start-x);
+        top: var(--start-y);
+        opacity: 1;
+    }
 
-.explosion.play {
-    will-change: background-position, transform, opacity;
+    2% {
+        left: var(--start-x);
+        top: var(--start-y);
+        opacity: 1;
+    }
 
-    animation:
-        explode-frames 0.6s steps(8) both,
-        explode-scale 0.5s ease-out both,
-        explode-fade 0.8s ease-out both;
+    100% {
+        opacity: 1;
+        left: var(--end-x);
+        top: var(--end-y);
+    }
 }
 
 .explosion {
@@ -309,19 +344,38 @@
     background-size: 512px 256px;
     z-index: 7;
     position: fixed;
-    left: 0;
-    top: 0;
-
-    transform:
-        translate(var(--x), var(--y)) scale(var(--scale-start));
-
+    transform: translate(-50%, -50%);
     transform-origin: center center;
 
-    animation: none;
+    left: var(--x);
+    top: var(--y);
+    will-change: background-position, transform, opacity;
+
+    animation:
+        explode-frames 0.6s steps(1) forwards,
+        explode-scale 0.5s ease-out forwards,
+        explode-fade 0.8s ease-out forwards;
 }
 
+.explosion.asteroid {
+    background-image: var(--asteroid-explode-image);
+}
 
+.explosion.sea {
+    background-image: var(--sea-explode-image);
+}
 
+.explosion.land {
+    background-image: var(--land-explode-image);
+}
+
+.explosion.air {
+    background-image: var(--air-explode-image);
+}
+
+.explosion.plasma {
+    background-image: var(--plasma-explode-image);
+}
 
 @keyframes explode-frames {
     0% {
@@ -359,22 +413,121 @@
 
 @keyframes explode-scale {
     from {
-        transform:
-            translate(var(--x), var(--y)) scale(var(--scale-start));
+        transform: scale(var(--scale-start));
     }
 
     to {
-        transform:
-            translate(var(--x), var(--y)) scale(var(--scale-end));
+        transform: scale(var(--scale-end));
     }
 }
 
 @keyframes explode-fade {
     0% {
-        opacity: 0;
+        opacity: 1;
     }
 
-    3% {
+    70% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+.explosion-wrapper {
+    position: fixed;
+    transform: translate(-50%, -50%);
+    transform-origin: center center;
+    contain: layout paint;
+    z-index: 6;
+    left: var(--x);
+    top: var(--y);
+
+    pointer-events: none;
+}
+
+.explosion.play {
+    will-change: background-position, transform, opacity;
+
+    animation:
+        explode-frames 0.6s steps(1) both,
+        explode-scale 0.5s ease-out both,
+        explode-fade 0.8s ease-out both;
+
+}
+
+.explosion2 {
+    width: 128px;
+    height: 128px;
+
+    background-image: var(--space-explode-image);
+    background-repeat: no-repeat;
+    background-size: 512px 256px;
+
+    transform-origin: center center;
+    z-index: 7;
+    opacity: 0;
+}
+
+@keyframes explode-frames2 {
+    0% {
+        background-position: 0px 0px;
+        opacity: 0.3;
+    }
+
+    12.5% {
+        background-position: -128px 0px;
+        opacity: 1;
+    }
+
+    25% {
+        background-position: -256px 0px;
+        opacity: 1;
+    }
+
+    37.5% {
+        background-position: -384px 0px;
+        opacity: 1;
+    }
+
+    50% {
+        background-position: 0px -128px;
+        opacity: 1;
+    }
+
+    62.5% {
+        background-position: -128px -128px;
+        opacity: 1;
+    }
+
+    75% {
+        background-position: -256px -128px;
+        opacity: 0.8;
+    }
+
+    87.5% {
+        background-position: -384px -128px;
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 0.2;
+    }
+}
+
+@keyframes explode-scale2 {
+    from {
+        transform: scale(var(--scale-start));
+    }
+
+    to {
+        transform: scale(var(--scale-end));
+    }
+}
+
+@keyframes explode-fade2 {
+    0% {
         opacity: 0;
     }
 

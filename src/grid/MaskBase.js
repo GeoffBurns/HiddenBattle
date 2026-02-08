@@ -1,99 +1,71 @@
-import {
-  drawSegmentTo,
-  drawPie,
-  drawRay,
-  drawSegmentFor,
-  drawLineInfinite
-} from './maskShape.js'
 import { CanvasGrid } from './canvasGrid.js'
+import { StoreBig } from './storeBig.js'
 
-function bitLength32 (n) {
-  return 32 - Math.clz32(n)
+class ForLocation {
+  constructor (pos, bits, store) {
+    this.pos = pos
+    this.bits = bits
+    this.store = store
+  }
+  set (color = 1) {
+    this.store.check(color)
+
+    const pos = this.pos
+    const mask = this.store.bitMaskByPos(pos)
+    this.bits =
+      this.store.clearBits(this.bits, mask) | this.store.setMask(pos, color)
+    return this.bits
+  }
+  at () {
+    const pos = this.pos
+    return this.store.numValue(this.bits, pos)
+  }
+  clearBits (mask) {
+    return this.store.clearBits(this.bits, mask)
+  }
+
+  test (color = 1) {
+    return this.at() === color
+  }
+
+  isNonZero () {
+    const pos = this.pos
+    return ((this.bits >> pos) & this.store.CM) !== 0n
+  }
 }
 
 export class MaskBase extends CanvasGrid {
-  constructor (width, height, depth = 1, bits = 0n) {
+  constructor (width, height, depth = 1, bits, store) {
     super(width, height)
-    this.bits = bits
+    this.store = store || new StoreBig(depth, width * height)
+    this.bits = bits || this.store.empty
     this.depth = depth
-
-    this.BW = bitLength32(depth)
-    this.BS = BigInt(this.BW)
-    this.CM = (1n << this.BS) - 1n
-    this.MxC = (1 << this.BW) - 1
-    this.MnC = 0
-
-    //    lazy(this, 'transformMaps', () => {
-    //     return buildTransformMaps(this.width, this.height)
-    //    })
   }
 
-  index (x, y) {
-    return BigInt(y * this.width + x)
+  index (...args) {
+    return this.indexer.index(...args)
   }
-  bitPos (x, y) {
-    return BigInt(y * this.BW * this.width + x)
-  }
-
-  at (x, y) {
-    const pos = this.bitPos(x, y)
-    return this.numValue(pos)
+  bitPos (...args) {
+    return this.store.bitPos(this.index(...args))
   }
 
-  numValue (pos) {
-    return Number((this.bits >> pos) & this.CM)
-  }
-  value (pos) {
-    return (this.bits >> pos) & this.CM
+  set (...args) {
+    this.bits = this.store.addBit(this.bits, ...args)
+    return this.bits
   }
 
-  set (x, y, color = 1) {
-    this.check(color)
-
-    const pos = this.bitPos(x, y)
-    const mask = this.bitMask(pos)
-
-    return this.clearBits(mask) | this.setMask(pos, color)
+  at (...args) {
+    const pos = this.bitPos(...args)
+    return this.store.numValue(this.bits, pos)
   }
 
-  setMask (pos, color = 1) {
-    return BigInt(color) << pos
-  }
-
-  clearBits (mask) {
-    return this.bits & ~mask
-  }
-
-  bitMask (pos) {
-    return this.CM << pos
-  }
-
-  check (color = 1) {
-    if (this.depth > 1 && (color < this.MnC || color > this.MxC)) {
-      throw new Error(`color must be ${this.MnC}..${this.MxC}`)
-    }
-  }
-  testFor (x, y, color = 1) {
-    return this.at(x, y) === color
-  }
-
-  isNonZero (x, y) {
-    const pos = this.bitPos(x, y)
-    return ((this.bits >> pos) & this.CM) !== 0n
-  }
-  rangeSize (x0, x1) {
-    return (x1 - x0 + 1) * this.BW
-  }
-  rangeMask (x0, x1) {
-    return (1n << BigInt(this.rangeSize(x0, x1))) - 1n
-  }
-  rowRangeMask (y, x0, x1) {
-    const start = this.bitPos(x0, y)
-    return this.rangeMask(x0, x1) << start
+  for (...args) {
+    const pos = this.bitPos(...args)
+    return new ForLocation(pos, this.bits, this.store)
   }
 
   setRange (r, c0, c1) {
-    this.bits |= this.rowRangeMask(r, c0, c1)
+    this.bits = this.store.setRange(this.bits, this.index(0, r), c0, c1)
   }
   setRanges (ranges) {
     for (const [r, c0, c1] of ranges) {
@@ -101,7 +73,7 @@ export class MaskBase extends CanvasGrid {
     }
   }
   clearRange (r, c0, c1) {
-    this.bits &= ~this.rowRangeMask(r, c0, c1)
+    this.bits = this.store.clearRange(this.bits, this.index(0, r), c0, c1)
   }
   clearRanges (ranges) {
     for (const [r, c0, c1] of ranges) {
@@ -109,7 +81,7 @@ export class MaskBase extends CanvasGrid {
     }
   }
   get fullBits () {
-    return (1n << BigInt(this.width * this.height)) - 1n
+    return (1n << this.store.size) - 1n
   }
   get invertedBits () {
     return this.fullBits & ~this.bits

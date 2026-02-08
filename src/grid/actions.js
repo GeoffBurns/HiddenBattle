@@ -1,12 +1,13 @@
 import { lazy } from '../utilities.js'
 import { buildTransformMaps } from './buildTransformMaps.js'
-import { expandToSquare, normalizeUpLeft } from './gridHelpers.js'
+import { expandToSquare } from './gridHelpers.js'
 
 export class Actions {
   constructor (width, height, mask = null) {
     this.width = Math.max(width, height)
     this.height = this.width
     this.original = mask
+
     lazy(this, 'transformMaps', () => {
       return buildTransformMaps(this.width, this.height)
     })
@@ -19,32 +20,22 @@ export class Actions {
       return this.normalized(square)
     })
   }
-  /*
-  shiftedFullUp (bits) {
-    const b = bits === undefined ? this.bits : bits
-
-    return shiftBoardUp(b, this.width)
+  get store () {
+    return this.original?.store
   }
-  shiftedFullLeft (bits) {
-    const b = bits === undefined ? this.bits : bits
-
-    const out = shiftBoardLeft(b, this.width, this.height)
-    return out
-  }*/
+  get indexer () {
+    return this.original?.indexer
+  }
   normalized (bits) {
     const b = bits === undefined ? this.template : bits
-    return normalizeUpLeft(b, this.width, this.height)
+    return this.store.normalizeUpLeft(b, this.width, this.height)
   }
 
   applyMap (map = this.transformMaps.id) {
-    let out = 0n
+    let out = this.store?.empty || 0n
     let b = this.template
-
-    while (b !== 0n) {
-      const lsb = b & -b
-      const i = Number(lsb.toString(2).length - 1)
-      out |= 1n << BigInt(map[i])
-      b ^= lsb
+    for (const i of this.indexer.bitsIndices(b)) {
+      out = this.store.addBit(out, map[i])
     }
     return this.normalized(out)
   }
