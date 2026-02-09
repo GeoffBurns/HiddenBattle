@@ -2,6 +2,8 @@
 
 /* global describe, jest,  test, expect */
 
+import { Shape } from './shape.js'
+
 jest.mock('./maskShape.js', () => ({
   drawSegmentTo: jest.fn(),
   drawPie2: jest.fn(),
@@ -31,7 +33,7 @@ import { coordsToGrid } from './maskConvert.js'
 
 describe('ListCanvas', () => {
   test('set adds entries to list', () => {
-    const lc = new ListCanvas(2, 2)
+    const lc = getLc()
     lc.set(0, 1, 'x')
     lc.set(1, 0)
     expect(lc.list).toEqual([
@@ -41,7 +43,7 @@ describe('ListCanvas', () => {
   })
 
   test('grid getter calls coordsToGrid and returns grid', () => {
-    const lc = new ListCanvas(2, 2)
+    const lc = getLc()
     lc.set(0, 0, 'a')
     const grid = lc.grid
     expect(coordsToGrid).toHaveBeenCalledWith(lc.list, 2, 2)
@@ -49,14 +51,14 @@ describe('ListCanvas', () => {
   })
 
   test('asci returns expected ASCII output', () => {
-    const lc = new ListCanvas(2, 2)
+    const lc = getLc()
     const ascii = lc.asci
     const expected = 'a.\n.b\n'
     expect(ascii).toBe(expected)
   })
 
   test('draw methods delegate to maskShape functions', () => {
-    const lc = new ListCanvas(10, 10)
+    const lc = getLc(10, 10)
     lc.drawSegmentTo(1, 2, 3, 4, 1)
     expect(drawSegmentTo).toHaveBeenCalledWith(1, 2, 3, 4, lc, 1)
 
@@ -73,3 +75,6 @@ describe('ListCanvas', () => {
     expect(drawLineInfinite).toHaveBeenCalledWith(1, 2, 3, 4, lc)
   })
 })
+function getLc (x = 2, y = 2) {
+  return new ListCanvas(Shape.rectangle(x, y), [])
+}

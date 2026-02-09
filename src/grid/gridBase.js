@@ -1,8 +1,8 @@
 import { CanvasGrid } from './canvasGrid.js'
 
 export class GridBase extends CanvasGrid {
-  constructor (width, height) {
-    super(width, height)
+  constructor (shape) {
+    super(shape)
     if (new.target === GridBase) {
       throw new Error(
         'base class cannot be instantiated directly. Please extend it.'

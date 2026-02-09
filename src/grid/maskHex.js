@@ -1,27 +1,16 @@
 import { popcountBigInt } from './placeTools.js'
-
-import { CubeIndex } from './CubeIndex.js'
 import { ActionsHex } from './actionHex.js'
-import { setBit } from './bitHelpers.js'
+import { MaskBase } from './MaskBase.js'
+import { Shape } from './shape.js'
 
-function coordToBit (bb, q, r, index) {
-  const i = index.get(`${q},${r}`)
-  return i === undefined ? bb : setBit(bb, i)
-}
-
-export class MaskHex {
-  constructor (radius, bits = 0n) {
-    this.bits = bits
-    this.depth = 1
-    this.indexer = CubeIndex.getInstance(radius)
-    this.radius = radius
-
-    this.BW = 1
-    this.BS = BigInt(this.BW)
-    this.CM = (1n << this.BS) - 1n
-    this.MxC = (1 << this.BW) - 1
-    this.MnC = 0
+export class MaskHex extends MaskBase {
+  constructor (radius, bits, store) {
+    super(Shape.hexagon(radius), 1, bits, store)
   }
+
+  //   get actions () {
+  //     return this.indexer?.actions(this)
+  //   }
 
   index (q, r, s) {
     const i = this.indexer.index(q, r, s)
@@ -45,10 +34,7 @@ export class MaskHex {
     return this.bitMaskByIdx(i)
   }
   bitMaskByIdx (i) {
-    if (i !== undefined) {
-      return 1n << i
-    }
-    return 0n
+    return this.store.bitMaskByPos(this.store.bitPos(i))
   }
 
   set (q, r, s) {
@@ -67,15 +53,14 @@ export class MaskHex {
     this._actions = new ActionsHex(this.radius, this)
     return this._actions
   }
+  at (q, r, s) {
+    return this.for(q, r, s).at()
+  }
+  test (q, r, s, color = 1) {
+    return this.for(q, r, s).test(color)
+  }
   clear (q, r, s) {
-    this.bits &= ~(1n << this.index(q, r, s))
-  }
-  test (q, r, s) {
-    return (this.bits & (1n << this.index(q, r, s))) !== 0n
-  }
-
-  get occupacy () {
-    return popcountBigInt(this.bits)
+    return this.set(q, r, s, 0)
   }
 
   *keys () {
@@ -102,15 +87,26 @@ export class MaskHex {
   }
 
   fromCoords (coords) {
-    this.bits = this.indexer.bitsFromCoords(coords)
+    this.bits = this.indexer.bitsFromCoords(this, coords)
   }
 
   get toCoords () {
-    const coords = []
-    for (const [q, r, s] of this.bitKeys()) {
-      coords.push([q, r, s])
-    }
-    return coords
+    return this.indexer.bitsToCoords(this.bits)
+  }
+
+  get fullMask () {
+    const mask = this.emptyMask
+    mask.bits = this.fullBits
+    return mask
+  }
+
+  get emptyMask () {
+    return new MaskHex(this.radius)
+  }
+  get invertedMask () {
+    const mask = this.emptyMask
+    mask.bits = this.invertedBits
+    return mask
   }
 
   normalized () {
@@ -128,20 +124,7 @@ export class MaskHex {
     }
     return normalizedBits
   }
-  get fullMask () {
-    const mask = this.emptyMask
-    mask.bits = this.fullBits
-    return mask
-  }
 
-  get emptyMask () {
-    return new MaskHex(this.radius)
-  }
-  get invertedMask () {
-    const mask = this.emptyMask
-    mask.bits = this.invertedBits
-    return mask
-  }
   static fromCoords (radius, coords) {
     const mask = new MaskHex(radius)
     mask.fromCoords(coords)

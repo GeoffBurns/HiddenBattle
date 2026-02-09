@@ -1,8 +1,8 @@
 import { GridBase } from './gridBase.js'
-
+import { Shape } from './shape.js'
 export class AsciiGrid extends GridBase {
   constructor (width, height, ascii, fillChar = '.') {
-    super(width, height)
+    super(Shape.rectangle(width, height))
     this.fillChar = fillChar
     this.string = ascii || fillChar.repeat(width) + '\n'.repeat(height - 1)
   }

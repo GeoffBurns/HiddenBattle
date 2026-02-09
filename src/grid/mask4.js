@@ -137,9 +137,4 @@ export class Mask4 {
     row += symbols[v]
     return row
   }
-  inBounds (x, y) {
-    const W = this.width
-    const H = this.height
-    return x >= 0 && y >= 0 && x < W && y < H
-  }
 }

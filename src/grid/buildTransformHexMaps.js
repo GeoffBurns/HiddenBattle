@@ -8,7 +8,7 @@ function rotateCube ([q, r, s]) {
   return [-s, -q, -r]
 }
 
-export function buildTransformsHexMap (coords, index, size) {
+export function buildTransformHexMaps (coords, index, size) {
   if (cache.has(size)) {
     return cache.get(size)
   }

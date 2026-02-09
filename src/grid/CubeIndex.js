@@ -1,14 +1,36 @@
-import { bitsSafe } from './bitsHelpers.js'
-import { ActionsHex } from './ActionsHex.js'
+import { ActionsHex } from './actionHex.js'
 import { lazy } from '../utilities.js'
 import { buildTransformHexMaps } from './buildTransformHexMaps.js'
+import { Indexer } from './indexer.js'
 
 const cache = new Map()
 
-export class CubeIndex {
+function buildCube (radius) {
+  const coords = []
+  const qrsToI = new Map()
+  const qrToI = new Map()
+  const iToQrs = new Map()
+  let i = 0
+
+  for (let q = -radius; q <= radius; q++) {
+    for (let r = -radius; r <= radius; r++) {
+      const s = -q - r
+      if (Math.abs(s) <= radius) {
+        coords.push([q, r, s])
+        qrsToI.set(`${q},${r},${s}`, i)
+        qrToI.set(`${q},${r}`, i)
+        iToQrs.set(i, [q, r, s])
+        i++
+      }
+    }
+  }
+  return { coords, qrsToI, qrToI, iToQrs, size: i }
+}
+export class CubeIndex extends Indexer {
   constructor (radius) {
+    const { coords, qrsToI, qrToI, iToQrs, size } = buildCube(radius)
+    super(size)
     this.radius = radius
-    const { coords, qrsToI, qrToI, iToQrs, size } = this.buildCube(radius)
 
     this.coords = coords
     this.qrsToI = qrsToI
@@ -34,56 +56,22 @@ export class CubeIndex {
     return this.iToQrs.get(i)
   }
 
-  buildCube (radius) {
-    const coords = []
-    const qrsToI = new Map()
-    const qrToI = new Map()
-    const iToQrs = new Map()
-    let i = 0
-
-    for (let q = -radius; q <= radius; q++) {
-      for (let r = -radius; r <= radius; r++) {
-        const s = -q - r
-        if (Math.abs(s) <= radius) {
-          coords.push([q, r, s])
-          qrsToI.set(`${q},${r},${s}`, i)
-          qrToI.set(`${q},${r}`, i)
-          iToQrs.set(i, [q, r, s])
-          i++
-        }
-      }
-    }
-    return { coords, qrsToI, qrToI, iToQrs, size: i }
-  }
   isValid (q, r, s) {
     return this.qrsToI.has(`${q},${r},${s}`)
   }
 
   *entries (bb) {
-    for (const [[q, r, s], i] of this.qrsToI) {
-      if (this.hasBit(bb, q, r, s)) {
-        yield [q, r, s, bb.at(q, r, s), i, bb]
-      }
+    for (const [loc, i] of this.qrsToI) {
+      yield [...loc, bb.at(...loc), i, bb]
     }
   }
 
   *values (bb) {
-    for (const [q, r, s] of this.qrsToI) {
-      yield bb.at(q, r, s)
+    for (const loc of this.qrsToI) {
+      yield bb.at(...loc)
     }
-  }
-  *bitsIndices (bb) {
-    yield* bitsSafe(bb, this.size)
   }
 
-  *bitKeys (bb) {
-    for (const i of this.bitsIndices(bb)) {
-      if (this.iToQrs.has(i)) {
-        const [q, r, s] = this.iToQrs.get(i)
-        yield [q, r, s, i]
-      }
-    }
-  }
   get actions () {
     if (this._actions && this._actions?.original?.bits === this.bits) {
       return this._actions
@@ -91,29 +79,15 @@ export class CubeIndex {
     this._actions = new ActionsHex(this.radius, this)
     return this._actions
   }
-  addCoords (q, r, s) {
-    const i = this.index(q, r, s)
-    if (i !== undefined) {
-      return 1n << BigInt(i)
-    }
-    return 0n
-  }
-  addCoordsSafe (q, r, s) {
-    const i = this.index(q, r, s)
-    if (i !== undefined) {
-      return 1n << BigInt(i)
-    }
-    throw new Error(`Invalid coordinates: ${q},${r},${s}`)
-  }
-
+  /*
   addBit (bb, q, r, s) {
-    const mask = this.bitMask(q, r, s)
+    const mask = this.bitMask(bb, q, r, s)
     return bb | mask
   }
-  bitMask (q, r, s) {
+  bitMask (bb, q, r, s) {
     const i = this.index(q, r, s)
 
-    return this.bitMaskByIdx(i)
+    return bb.bitMaskByIdx(i)
   }
   bitMaskByIdx (i) {
     if (i !== undefined) {
@@ -142,25 +116,18 @@ export class CubeIndex {
     }
     throw new Error(`Invalid coordinates: ${q},${r},${s}`)
   }
-
-  applyOffset (bb, dq, dr) {
-    let out = this.store.empty
-    for (const i of this.bits(bb)) {
+*/
+  applyOffset (bbc, dq, dr) {
+    let out = bbc.store.empty
+    for (const i of this.bitsIndices(bbc.bits)) {
       const [q, r] = this.iToQrs.get(i)
       const nq = q + dq
       const nr = r + dr
       const ns = -nq - nr
       const j = this.index(nq, nr, ns)
       if (j !== undefined) {
-        this.store.addBit(out, j)
+        bbc.store.addBit(out, j)
       }
-    }
-    return out
-  }
-  applyTransform (bb, map) {
-    let out = this.store.empty
-    for (const i of this.bits(bb)) {
-      this.store.addBit(out, map[i])
     }
     return out
   }
@@ -180,24 +147,7 @@ export class CubeIndex {
     }
     return bb
   }
-  bitsFromCoords (coords) {
-    let bits = 0n
 
-    for (const [q, r, s] of coords) {
-      if (this.isValid(q, r, s)) {
-        this.addBit(bits, q, r, s)
-      }
-    }
-    return bits
-  }
-
-  bitsToCoords (bb) {
-    const coords = []
-    for (const [q, r, s] of this.bitKeys(bb)) {
-      coords.push([q, r, s])
-    }
-    return coords
-  }
   static getInstance (radius) {
     if (cache.has(radius)) {
       return cache.get(radius)

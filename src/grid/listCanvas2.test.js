@@ -4,10 +4,15 @@
 
 import { ListCanvas } from './listCanvas.js'
 import { errorMsg } from './errorMsg.js'
+import { Shape } from './shape.js'
+
+function getLc (x = 2, y = 2) {
+  return new ListCanvas(Shape.rectangle(x, y), [])
+}
 
 describe('ListCanvas', () => {
   it('set adds entries to list', () => {
-    const lc = new ListCanvas(2, 2)
+    const lc = getLc()
     lc.set(0, 1, 'x')
     lc.set(1, 0)
     expect(lc.list).toEqual([
@@ -17,7 +22,7 @@ describe('ListCanvas', () => {
   })
 
   it('grid getter calls coordsToGrid and returns grid', () => {
-    const lc = new ListCanvas(2, 2)
+    const lc = getLc()
     lc.set(0, 0, 1)
     const grid = lc.grid
     expect(grid[0][0]).toBe(1)
@@ -26,7 +31,7 @@ describe('ListCanvas', () => {
 })
 describe('basic drawing', () => {
   it('drawRay draws across the canvas in direction', () => {
-    const c = new ListCanvas(5, 5)
+    const c = getLc(5, 5)
     c.drawRay(1, 1, 3, 3)
 
     expect(c.list.length).toBe(4)
@@ -38,7 +43,7 @@ describe('basic drawing', () => {
     ])
   })
   it('drawRay draws color across the canvas', () => {
-    const c = new ListCanvas(5, 5)
+    const c = getLc(5, 5)
     try {
       c.drawRay(1, 1, 3, 3, 2)
 
@@ -55,7 +60,7 @@ describe('basic drawing', () => {
   })
 
   it('drawSegmentTo draws only up to the target', () => {
-    const c = new ListCanvas(5, 5)
+    const c = getLc(5, 5)
     c.drawSegmentTo(1, 1, 4, 4, 1)
     expect(c.list.length).toBe(3)
     expect(c.list).toEqual([
@@ -66,9 +71,9 @@ describe('basic drawing', () => {
   })
 
   it('drawSegmentFor respects distance parameter', () => {
-    const c = new ListCanvas(5, 5)
+    const c = getLc(5, 5)
     try {
-      c.drawSegmentTo(1, 1, 4, 4, 2, 1)
+      c.drawSegmentFor(1, 1, 4, 4, 2, 1)
       expect(c.list.length).toBe(2)
       expect(c.list).toEqual([
         [1, 1, 2],
@@ -79,7 +84,7 @@ describe('basic drawing', () => {
     }
   })
   it('drawLineInfinite', () => {
-    const c = new ListCanvas(5, 5)
+    const c = getLc(5, 5)
     try {
       c.drawLineInfinite(1, 1, 3, 3, 1)
 
@@ -97,7 +102,7 @@ describe('basic drawing', () => {
   })
 
   it('drawPie produces at least one set cell within radius', () => {
-    const c = new ListCanvas(5, 5)
+    const c = getLc(5, 5)
     c.drawPie(0, 0, 2, 4, 3, c, 22.5, 1)
     expect(c.list.length).toBeGreaterThan(2)
     for (const [x, y] of c.keys()) {

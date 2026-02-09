@@ -341,21 +341,30 @@ describe('Mask - additional methods and edge cases', () => {
   describe('edgeMasks, outerBorderMask, innerBorderMask', () => {
     it('should compute edge masks correctly', () => {
       const { left, right, top, bottom } = mask.edgeMasks()
+
+      const leftb = mask.emptyMask.blit(left)
+
+      console.log('Left:\n' + typeof leftb)
+      console.log('Left:\n' + leftb.toAscii())
+      console.log('Right:\n' + mask.emptyMask.blit(right).toAscii())
+      console.log('Top:\n' + mask.emptyMask.blit(top).toAscii())
+      console.log('Bottom:\n' + mask.emptyMask.blit(bottom).toAscii())
       // left column
       for (let y = 0; y < 4; y++) {
-        expect(((left >> BigInt(mask.bitPos(0, y))) & 1n) === 1n).toBe(true)
+        const pos = mask.bitPos(0, y)
+        expect(mask.store.value(left, pos)).toBe(1n)
       }
       // right column
       for (let y = 0; y < 4; y++) {
-        expect(((right >> BigInt(mask.bitPos(3, y))) & 1n) === 1n).toBe(true)
+        expect(mask.store.value(right, mask.bitPos(3, y))).toBe(1n)
       }
       // top row
       for (let x = 0; x < 4; x++) {
-        expect(((top >> BigInt(mask.bitPos(x, 0))) & 1n) === 1n).toBe(true)
+        expect(mask.store.value(top, mask.bitPos(x, 0))).toBe(1n)
       }
       // bottom row
       for (let x = 0; x < 4; x++) {
-        expect(((bottom >> BigInt(mask.bitPos(x, 3))) & 1n) === 1n).toBe(true)
+        expect(mask.store.value(bottom, mask.bitPos(x, 3))).toBe(1n)
       }
     })
 
@@ -368,10 +377,10 @@ describe('Mask - additional methods and edge cases', () => {
     it('should compute innerBorderMask', () => {
       const inner = mask.innerBorderMask()
       // Should set bits at (1,1), (2,1), (1,2), (2,2) for 4x4
-      expect(((inner >> BigInt(mask.bitPos(1, 1))) & 1n) === 1n).toBe(true)
-      expect(((inner >> BigInt(mask.bitPos(2, 1))) & 1n) === 1n).toBe(true)
-      expect(((inner >> BigInt(mask.bitPos(1, 2))) & 1n) === 1n).toBe(true)
-      expect(((inner >> BigInt(mask.bitPos(2, 2))) & 1n) === 1n).toBe(true)
+      expect(mask.store.getIdx(inner, mask.index(1, 1))).toBe(1n)
+      expect(mask.store.getIdx(inner, mask.index(2, 1))).toBe(2n)
+      expect(mask.store.getIdx(inner, mask.index(1, 2))).toBe(3n)
+      expect(mask.store.getIdx(inner, mask.index(2, 2))).toBe(4n)
     })
   })
 

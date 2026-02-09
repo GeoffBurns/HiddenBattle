@@ -1,17 +1,15 @@
 import { MaskBase } from './MaskBase.js'
-
+import { Shape } from './shape.js'
 export class Mask extends MaskBase {
-  constructor (width, height, bits = 0n) {
-    super(width, height, 1)
-    this.bits = bits
+  constructor (width, height, bits, store) {
+    super(Shape.rectangle(width, height), 1, bits, store)
   }
 
   get actions () {
     return this.indexer?.actions(this)
   }
-
-  get occupacy () {
-    return this.store.occupacy(this.bits)
+  bitPos (x, y) {
+    return this.store.bitPos(this.index(x, y))
   }
   set (x, y, color = 1) {
     const forloc = this.for(x, y)
@@ -32,7 +30,7 @@ export class Mask extends MaskBase {
       //      TypeError: src.sliceRow is not a function
       const rowBits = src.sliceRow(srcY + r, srcX, srcX + width - 1)
 
-      const dstStart = BigInt((dstY + r) * this.width + dstX)
+      const dstStart = this.store.bitPos((dstY + r) * this.width + dstX)
 
       const shifted = rowBits << dstStart
       const mask = ((1n << BigInt(width)) - 1n) << dstStart
@@ -126,22 +124,24 @@ export class Mask extends MaskBase {
     mask.bits = this.invertedBits
     return mask
   }
+
   edgeMasks = function () {
-    let left = 0n,
-      right = 0n,
-      top = 0n,
-      bottom = 0n
+    const e = this.store.empty
+    let left = e,
+      right = e,
+      top = e,
+      bottom = e
 
     // top & bottom rows
     for (let x = 0; x < this.width; x++) {
-      top |= 1n << this.bitPos(x, 0)
-      bottom |= 1n << this.bitPos(x, this.height - 1)
+      this.store.addBit(top, this.index(x, 0))
+      this.store.addBit(bottom, this.index(x, this.height - 1))
     }
 
     // left & right columns
     for (let y = 0; y < this.height; y++) {
-      left |= 1n << this.bitPos(0, y)
-      right |= 1n << this.bitPos(this.width - 1, y)
+      this.store.addBit(left, this.index(0, y))
+      this.store.addBit(right, this.index(this.width - 1, y))
     }
     return { left, right, top, bottom }
   }
@@ -157,14 +157,14 @@ export class Mask extends MaskBase {
 
     // y = 1 and y = h-2
     for (let x = 1; x < this.width - 1; x++) {
-      mask |= 1n << this.bitPos(x, 1)
-      mask |= 1n << this.bitPos(x, this.height - 2)
+      this.store.addBit(mask, this.index(x, 1))
+      this.store.addBit(mask, this.index(x, this.height - 2))
     }
 
     // x = 1 and x = w-2
     for (let y = 2; y < this.height - 2; y++) {
-      mask |= 1n << this.bitPos(1, y)
-      mask |= 1n << this.bitPos(this.width - 2, y)
+      this.store.addBit(mask, this.index(1, y))
+      this.store.addBit(mask, this.index(this.width - 2, y))
     }
     return mask
   }

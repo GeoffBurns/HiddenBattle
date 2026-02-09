@@ -1,9 +1,14 @@
 function bitLength32 (n) {
   return 32 - Math.clz32(n)
 }
-const setBit = (bb, i) => bb | (1n << i)
-const clearBit = (bb, i) => bb & ~(1n << i)
-const testBit = (bb, i) => (bb >> i) & 1n
+
+//rowMask (1n << w) - 1n
+//. bitmask  (1n << i)
+// addBit
+//const setBit = (bb, i) => bb | (1n << i)
+// clearBit
+//const clearBit = (bb, i) => bb & ~(1n << i)
+//const testBit = (bb, i) => (bb >> i) & 1n
 export class StoreBase {
   constructor (one, empty, storeType, depth = 1, size = 0, bitLength) {
     this.depth = depth
@@ -57,9 +62,9 @@ export class StoreBase {
   }
   hasBit (bb, pos) {
     if (pos !== undefined) {
-      return (bb >> pos) & this.CM
+      return this.value(bb, pos) !== this.empty
     }
-    return 0
+    return false
   }
 
   rowMask (w) {
@@ -89,7 +94,7 @@ export class StoreBase {
   get fullBits () {
     return (this.one << this.size) - this.one
   }
-  get invertedBits () {
-    return this.fullBits & ~this.bits
+  invertedBits (bb) {
+    return this.fullBits & ~bb
   }
 }

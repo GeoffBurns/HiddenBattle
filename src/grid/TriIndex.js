@@ -1,10 +1,10 @@
 import { Actions } from './actions.js'
-import { bitsSafe } from './bitHelpers.js'
-
-export class TriIndex {
+import { Indexer } from './indexer.js'
+export class TriIndex extends Indexer {
   constructor (side) {
+    const size = (side * (side + 1)) / 2
+    super(size)
     this.side = side
-    this.size = (side * (side + 1)) / 2
   }
   index (r, c) {
     return (r * (r + 1)) / 2 + c
@@ -25,33 +25,5 @@ export class TriIndex {
     }
     this._actions = new Actions(this.width, this.height, bb)
     return this._actions
-  }
-  *keys () {
-    const n = this.size
-    for (let i = 0; i < n; i++) {
-      const lc = this.location(i)
-      yield [lc[0], lc[1], i]
-    }
-  }
-  *entries (bb) {
-    for (const [x, y, i] of this.keys()) {
-      yield [x, y, i, bb.at(x, y), i, bb]
-    }
-  }
-
-  *values (bb) {
-    for (const [x, y] of this.keys()) {
-      yield bb.at(x, y)
-    }
-  }
-  *bitsIndices (bb) {
-    yield* bitsSafe(bb, this.size)
-  }
-
-  *bitKeys (bb) {
-    for (const i of this.bitsIndices(bb)) {
-      const [x, y] = this.location(i)
-      yield [x, y, i]
-    }
   }
 }

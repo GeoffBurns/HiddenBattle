@@ -1,16 +1,18 @@
 /* eslint-env jest */
 
-/* global beforeEach, describe, it, expect */
+/* global describe, it, expect */
 
 //import { beforeEach, describe, it, expect } from '@jest/globals'
 
-// Jest test suiteimport { AsciiGrid } from '../src/grid/asciiGrid.js'
-
 import { AsciiGrid } from './asciiGrid.js'
 
+// Jest test suite
 describe('AsciiGrid', () => {
   it('uses provided ascii string and indexes including newlines', () => {
     const g = new AsciiGrid(3, 2, 'abc\ndef')
+
+    expect(g.width).toBe(3)
+    expect(g.height).toBe(2)
     expect(g.index(0, 0)).toBe(0)
     expect(g.index(2, 0)).toBe(2)
     expect(g.index(0, 1)).toBe(4) // accounts for '\n' at pos 3

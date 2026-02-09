@@ -405,6 +405,6 @@ export const seaWeaponsCatalogue = new WeaponCatelogue([
 ])
 function getListCanvas () {
   const map = bh.map
-  const points = new ListCanvas(map.cols, map.rows)
+  const points = ListCanvas.Rect(map.cols, map.rows)
   return points
 }

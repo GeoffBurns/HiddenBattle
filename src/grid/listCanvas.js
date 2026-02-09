@@ -10,14 +10,15 @@ import {
 import { GridBase } from './gridBase.js'
 import { coordsToGrid, coordsToOccBig } from './maskConvert.js'
 import { Actions } from './actions.js'
+import { Shape } from './shape.js'
 
 export class ListCanvas extends GridBase {
-  constructor (width, height, list) {
-    super(width, height)
+  constructor (shape, list) {
+    super(shape)
     this.list = list || []
   }
   at (x, y) {
-    if (!this.inBounds(x, y)) return undefined
+    if (!this.isValid(x, y)) return undefined
     const item = this.list.find(([x1, y1]) => {
       x === x1 && y === y1
     })
@@ -25,8 +26,8 @@ export class ListCanvas extends GridBase {
     return item[2] || 1
   }
   set (x, y, value) {
-    const isIn = this.list.some(([x1, y1]) => x === x1 && y === y1)
-    if (isIn) return
+    const isDuplicate = this.isDuplicate(x, y)
+    if (isDuplicate) return
     if (value !== undefined && value !== null) {
       this.list.push([x, y, value])
       this._actions = null
@@ -34,6 +35,9 @@ export class ListCanvas extends GridBase {
       this.list.push([x, y])
       this._actions = null
     }
+  }
+  isDuplicate (x, y) {
+    return this.list.some(([x1, y1]) => x === x1 && y === y1)
   }
   reverse () {
     this.list.reverse()
@@ -43,7 +47,15 @@ export class ListCanvas extends GridBase {
       yield [this.list[i][0], this.list[i][1], this.list[i][2] || 1, i, this]
     }
   }
-
+  static Rect (x, y, list) {
+    return new ListCanvas(Shape.rectangle(x, y), list || [])
+  }
+  static Tri (s, list) {
+    return new ListCanvas(Shape.triangle(s), list || [])
+  }
+  static Hex (r, list) {
+    return new ListCanvas(Shape.hexagon(r), list || [])
+  }
   *values () {
     for (let i = 0; i < this.list.length; i++) {
       yield this.list[i][2] || 1

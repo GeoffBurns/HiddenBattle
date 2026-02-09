@@ -1,43 +1,11 @@
 import { CanvasGrid } from './canvasGrid.js'
+import { ForLocation } from './ForLocation.js'
 import { StoreBig } from './storeBig.js'
 
-class ForLocation {
-  constructor (pos, bits, store) {
-    this.pos = pos
-    this.bits = bits
-    this.store = store
-  }
-  set (color = 1) {
-    this.store.check(color)
-
-    const pos = this.pos
-    const mask = this.store.bitMaskByPos(pos)
-    this.bits =
-      this.store.clearBits(this.bits, mask) | this.store.setMask(pos, color)
-    return this.bits
-  }
-  at () {
-    const pos = this.pos
-    return this.store.numValue(this.bits, pos)
-  }
-  clearBits (mask) {
-    return this.store.clearBits(this.bits, mask)
-  }
-
-  test (color = 1) {
-    return this.at() === color
-  }
-
-  isNonZero () {
-    const pos = this.pos
-    return ((this.bits >> pos) & this.store.CM) !== 0n
-  }
-}
-
 export class MaskBase extends CanvasGrid {
-  constructor (width, height, depth = 1, bits, store) {
-    super(width, height)
-    this.store = store || new StoreBig(depth, width * height)
+  constructor (shape, depth = 1, bits, store) {
+    super(shape)
+    this.store = store || new StoreBig(depth, this.indexer.size)
     this.bits = bits || this.store.empty
     this.depth = depth
   }
@@ -63,7 +31,9 @@ export class MaskBase extends CanvasGrid {
     const pos = this.bitPos(...args)
     return new ForLocation(pos, this.bits, this.store)
   }
-
+  get occupacy () {
+    return this.store.occupacy(this.bits)
+  }
   setRange (r, c0, c1) {
     this.bits = this.store.setRange(this.bits, this.index(0, r), c0, c1)
   }
@@ -81,10 +51,18 @@ export class MaskBase extends CanvasGrid {
     }
   }
   get fullBits () {
-    return (1n << this.store.size) - 1n
+    return this.store.fullBits
   }
   get invertedBits () {
-    return this.fullBits & ~this.bits
+    return this.store.invertedBits(this.bits)
+  }
+
+  applyTransform (bbc, map) {
+    let out = bbc.store.empty
+    for (const i of this.bitsIndices(bbc.bits)) {
+      bbc.store.addBit(out, map[i])
+    }
+    return out
   }
 
   toAscii (symbols = ['.', '1', '2', '3']) {

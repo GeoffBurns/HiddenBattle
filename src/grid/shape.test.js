@@ -1,0 +1,65 @@
+// src/grid/Shape.test.js
+/* eslint-env jest */
+import { Shape } from './Shape.js'
+import { TriIndex } from './TriIndex.js'
+import { RectIndex } from './RectIndex.js'
+import { CubeIndex } from './CubeIndex.js'
+/* global describe, it, expect */
+
+// Jest test suite
+describe('Shape factories', () => {
+  describe('triangle', () => {
+    it('creates triangle shape with correct props and indexer instances', () => {
+      const side = 5
+      const s = Shape.triangle(side)
+      expect(s.type).toBe('triangle')
+      expect(s.side).toBe(side)
+
+      const idx1 = s.indexer
+      const idx2 = s.indexer
+      expect(idx1).toBeInstanceOf(TriIndex)
+      // indexer for triangle should produce new instance each access
+      expect(idx1).not.toBe(idx2)
+    })
+  })
+
+  describe('rectangle', () => {
+    it('creates rectangle shape with correct props and indexer instances', () => {
+      const width = 4
+      const height = 7
+      const r = Shape.rectangle(width, height)
+      expect(r.type).toBe('rectangle')
+      expect(r.width).toBe(width)
+      expect(r.height).toBe(height)
+
+      const idx1 = r.indexer
+      const idx2 = r.indexer
+      expect(idx1).toBeInstanceOf(RectIndex)
+      // indexer for rectangle should produce new instance each access
+      expect(idx1).not.toBe(idx2)
+    })
+  })
+
+  describe('hexagon', () => {
+    it('creates hexagon shape with correct props and cached indexer', () => {
+      const radius = 3
+      const h = Shape.hexagon(radius)
+      expect(h.type).toBe('hexagon')
+      expect(h.radius).toBe(radius)
+
+      const idx1 = h.indexer
+      const idx2 = h.indexer
+      expect(idx1).toBeInstanceOf(CubeIndex)
+      // CubeIndex.getInstance is expected to return a cached/singleton instance for the radius
+      expect(idx1).toBe(idx2)
+    })
+
+    it('hexagon indexer instances for same radius are equal (shared instance)', () => {
+      const r = 2
+      const h1 = Shape.hexagon(r)
+      const h2 = Shape.hexagon(r)
+      // If CubeIndex caches per radius, these should be the same instance
+      expect(h1.indexer).toBe(h2.indexer)
+    })
+  })
+})
