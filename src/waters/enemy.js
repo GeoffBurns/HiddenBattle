@@ -24,6 +24,7 @@ class Enemy extends Waters {
       this.timeoutId = setTimeout(() => {
         this.timeoutId = null
         this.opponent.seekStep()
+        this.steps.beginTurn()
       }, 1700)
     }
   }
