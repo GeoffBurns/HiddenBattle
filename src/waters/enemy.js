@@ -18,14 +18,36 @@ class Enemy extends Waters {
     this.enemyWaters = true
     this.steps.player = Player.enemy
     this.steps.onEndTurn = this.onEndTurn.bind(this)
+    this.steps.onBeginTurn = this.onBeginTurn.bind(this)
   }
   onEndTurn () {
     if (this?.opponent && !this.opponent.boardDestroyed) {
+      const spinner = document.getElementById('spinner')
+      if (spinner) {
+        //
+        spinner.classList.add('waiting')
+        spinner.classList.remove('hidden')
+        spinner.src = ''
+        spinner.src = './images/loading.gif'
+      }
+    }
+
+    this.timeoutId = setTimeout(() => {
+      this.timeoutId = null
+      this.opponent.seekStep()
       this.timeoutId = setTimeout(() => {
         this.timeoutId = null
-        this.opponent.seekStep()
         this.steps.beginTurn()
-      }, 1700)
+      }, 500)
+    }, 1700)
+  }
+
+  onBeginTurn () {
+    const spinner = document.getElementById('spinner')
+    if (spinner) {
+      //
+      spinner.classList.remove('waiting')
+      spinner.classList.add('hidden')
     }
   }
   cursorChange (oldCursor, newCursor) {

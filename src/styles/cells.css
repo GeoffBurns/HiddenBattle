@@ -219,12 +219,28 @@
     ;
 }
 
-.spinner.waiting {
+.spinner {
+    width: 56px;
+    height: 56px;
+
+
+    box-sizing: border-box;
+    opacity: 1;
+    transition: opacity 200ms ease;
+}
+
+.spinner.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/*
+.spinner.waiting::before {
     width: 42px;
     height: 42px;
-    background-image: url('../images/loading.gif');;
+
     box-sizing: border-box;
-}   
+}*/
 
 #modeIcon1.single::before {
     background-image: var(--cross-cursor-image);
