@@ -10,39 +10,66 @@ function bitLength32 (n) {
 //const clearBit = (bb, i) => bb & ~(1n << i)
 //const testBit = (bb, i) => (bb >> i) & 1n
 export class StoreBase {
-  constructor (one, empty, storeType, depth = 1, size = 0, bitLength) {
+  constructor (
+    one,
+    empty,
+    storeType,
+    depth = 1,
+    size = 0,
+    bitLength,
+    width,
+    height
+  ) {
     this.depth = depth
     this.empty = empty
     this.one = one
-    this.BW = bitLength || bitLength32(depth)
-    this.BS = storeType(this.BW)
-    this.CM = (one << this.BS) - one
-    this.MB = this.BS - one
-    this.MxC = (1 << this.BW) - 1
+    const bitsPerCell = bitLength || bitLength32(depth)
+    const cellMask = (1 << bitsPerCell) - 1
+    const bShift = Math.log2(bitsPerCell)
+
+    this.bitsPerCell = bitsPerCell
+    this.width = width
+    this.height = height
+
+    this.cellMask = storeType(cellMask)
+
+    this.bShift = storeType(bShift)
+    this.bitWidth = storeType(bitsPerCell)
+    this.maxBitInCell = storeType(bitsPerCell - 1)
+    this.MxC = (1 << bitsPerCell) - 1
     this.MnC = 0
     this.size = storeType(size)
     this.storeType = storeType
   }
 
   index (pos) {
-    return Number(pos >> this.MB)
+    return Number(pos >> this.maxBitInCell)
   }
   bitPos (i) {
-    return this.storeType(i) << this.MB
+    return this.storeType(i) << this.maxBitInCell
   }
 
   bitMask (i) {
     return this.bitMaskByPos(this.bitPos(i))
   }
   bitMaskByPos (pos) {
-    return this.CM << pos
+    return this.cellMask << pos
   }
 
   numValue (bb, pos) {
-    return Number(this.value(bb, pos))
+    return Number(this.rightShift(bb, pos))
   }
   value (bb, pos) {
-    return (bb >> pos) & this.CM
+    return this.rightShift(bb, pos)
+  }
+  setMask (pos, color = 1) {
+    return this.leftShift(color, pos)
+  }
+  leftShift (color, shift) {
+    return (this.storeType(color) & this.cellMask) << shift
+  }
+  rightShift (color, shift) {
+    return (color >> shift) & this.cellMask
   }
   addBit (bb, i) {
     const mask = this.bitMask(i)
@@ -54,9 +81,7 @@ export class StoreBase {
       throw new Error(`color must be ${this.MnC}..${this.MxC}`)
     }
   }
-  setMask (pos, color = 1) {
-    return (this.storeType(color) & this.CM) << pos
-  }
+
   clearBits (bb, mask) {
     return bb & ~mask
   }
@@ -68,7 +93,7 @@ export class StoreBase {
   }
 
   rowMask (w) {
-    return (this.one << this.bitPos(w)) - this.one
+    return this.rangeMaskRaw(this.bitPos(w))
   }
   setRow (bb, r, w, rowMask) {
     return (bb >> this.storeType(r * w)) & rowMask
@@ -92,8 +117,15 @@ export class StoreBase {
     return n
   }
   get fullBits () {
-    return (this.one << this.size) - this.one
+    return this.rangeMaskRaw(this.size)
   }
+  rangeMaskRaw (n) {
+    return (this.one << n) - this.one
+  }
+  rangeMask (n) {
+    return this.rangeMaskRaw(this.storeType(n))
+  }
+
   invertedBits (bb) {
     return this.fullBits & ~bb
   }

@@ -1,7 +1,9 @@
 /* eslint-env jest */
 
 /* global describe, it, expect, beforeEach */
+
 import { Packed } from './packed.js'
+import { Store32 } from './store32.js'
 
 describe('Packed', () => {
   let p
@@ -11,20 +13,88 @@ describe('Packed', () => {
   })
 
   it('constructs with expected properties', () => {
+    expect(p).toBeInstanceOf(Packed)
+    expect(p.store).toBeInstanceOf(Store32)
+    expect(p.depth).toBe(4)
+    expect(p.store.size).toBe(64)
+    expect(p.store.bitsPerCell).toBe(2)
+    expect(p.store.cellsPerWord).toBe(16)
+    expect(p.store.empty).toBeInstanceOf(Uint32Array)
+    expect(p.store.empty.length).toBe(4)
+    expect(p.store.empty.every(b => b === 0)).toBe(true)
+    expect(p.store.one).toBe(1)
+    expect(p.store.storeType).toBeInstanceOf(Function)
+    expect(p.store.storeType(3)).toBe(3)
+    expect(p.store.cellMask).toBe(3)
+    expect(p.store.bShift).toBe(1)
+    expect(p.store.maxBitInCell).toBe(1)
     expect(p.width).toBe(8)
     expect(p.height).toBe(8)
-    expect(p.words).toBe(4)
-    expect(p.store.BW).toBe(2)
-    expect(p.store.BS).toBe(2)
-    expect(p.store.CM).toBe((1 << 2) - 1)
+    expect(p.store.words).toBe(4)
+    expect(p.store.bitWidth).toBe(2)
     expect(p.bits.length).toBe(4)
 
     expect(p.bits).toBeInstanceOf(Uint32Array)
     expect(p.bits[0]).toBe(0)
-    expect(p.bits[p.words - 1]).toBe(0)
+    expect(p.bits[p.store.words - 1]).toBe(0)
     expect(p.bits.every(b => b === 0)).toBe(true)
   })
+  it('constructs 16color with expected properties', () => {
+    const p = new Packed(8, 8, null, null, 16)
+    expect(p).toBeInstanceOf(Packed)
+    expect(p.store).toBeInstanceOf(Store32)
+    expect(p.depth).toBe(16)
+    expect(p.store.size).toBe(64)
+    expect(p.store.bitsPerCell).toBe(4)
+    expect(p.store.cellsPerWord).toBe(8)
+    expect(p.store.empty).toBeInstanceOf(Uint32Array)
+    expect(p.store.empty.length).toBe(8)
+    expect(p.store.empty.every(b => b === 0)).toBe(true)
+    expect(p.store.one).toBe(1)
+    expect(p.store.storeType).toBeInstanceOf(Function)
+    expect(p.store.storeType(3)).toBe(3)
+    expect(p.store.cellMask).toBe(15)
+    expect(p.store.bShift).toBe(2)
+    expect(p.store.maxBitInCell).toBe(3)
+    expect(p.width).toBe(8)
+    expect(p.height).toBe(8)
+    expect(p.store.words).toBe(8)
+    expect(p.store.bitWidth).toBe(4)
+    expect(p.bits.length).toBe(8)
 
+    expect(p.bits).toBeInstanceOf(Uint32Array)
+    expect(p.bits[0]).toBe(0)
+    expect(p.bits[p.store.words - 1]).toBe(0)
+    expect(p.bits.every(b => b === 0)).toBe(true)
+  })
+  it('constructs 256color with expected properties', () => {
+    const p = new Packed(8, 8, null, null, 256)
+    expect(p).toBeInstanceOf(Packed)
+    expect(p.store).toBeInstanceOf(Store32)
+    expect(p.depth).toBe(256)
+    expect(p.store.size).toBe(64)
+    expect(p.store.bitsPerCell).toBe(8)
+    expect(p.store.cellsPerWord).toBe(4)
+    expect(p.store.empty).toBeInstanceOf(Uint32Array)
+    expect(p.store.empty.length).toBe(16)
+    expect(p.store.empty.every(b => b === 0)).toBe(true)
+    expect(p.store.one).toBe(1)
+    expect(p.store.storeType).toBeInstanceOf(Function)
+    expect(p.store.storeType(3)).toBe(3)
+    expect(p.store.cellMask).toBe(255)
+    expect(p.store.bShift).toBe(3)
+    expect(p.store.maxBitInCell).toBe(7)
+    expect(p.width).toBe(8)
+    expect(p.height).toBe(8)
+    expect(p.store.words).toBe(16)
+    expect(p.store.bitWidth).toBe(8)
+    expect(p.bits.length).toBe(16)
+
+    expect(p.bits).toBeInstanceOf(Uint32Array)
+    expect(p.bits[0]).toBe(0)
+    expect(p.bits[p.store.words - 1]).toBe(0)
+    expect(p.bits.every(b => b === 0)).toBe(true)
+  })
   it('index and bitPos compute positions', () => {
     expect(p.index(0, 0)).toBe(0)
     expect(p.index(1, 0)).toBe(1)
@@ -53,9 +123,9 @@ describe('Packed', () => {
 
   it('leftShift and rightShift produce expected values', () => {
     const val = p.store.leftShift(3, 4)
-    expect(val).toBe((3 & p.store.CM) << 4)
+    expect(val).toBe((3 & p.store.cellMask) << 4)
     const val2 = p.store.rightShift(2, 6)
-    expect(val2).toBe((2 & p.store.CM) >> 6)
+    expect(val2).toBe((2 & p.store.cellMask) >> 6)
   })
 
   it('setRef and getRef roundtrip', () => {
@@ -174,7 +244,6 @@ describe('Packed', () => {
       `........\n....1...\n........\n........\n........\n........\n........\n........`
     )
     p.set(0, 0, 3)
-    //   p.set(6, 5, 2)
     const ascii3 = p.toAscii()
     expect(ascii3).toBe(
       `3.......\n....1...\n........\n........\n........\n........\n........\n........`
@@ -192,7 +261,8 @@ describe('Packed', () => {
     expect(ref2.shift).toBe(10)
 
     p.setRange(2, 2, 5)
-    expect(p.toAscii()).toBe(
+    const ascii = p.toAscii()
+    expect(ascii).toBe(
       `3.......\n....1...\n..1111..\n........\n........\n........\n........\n.......2`
     )
     p.clearRange(2, 3, 4)
@@ -200,5 +270,21 @@ describe('Packed', () => {
     expect(asc5).toBe(
       `3.......\n....1...\n..1..1..\n........\n........\n........\n........\n.......2`
     )
+    const p2 = new Packed(16, 2, null, null, 16)
+
+    expect(p2.depth).toBe(16)
+    expect(p2.store.size).toBe(32)
+    expect(p2.store.bitsPerCell).toBe(4)
+    expect(p2.store.cellsPerWord).toBe(8)
+    p2.set(3, 0, 5)
+    const cell3 = p2.at(3, 0)
+    expect(cell3).toBe(5)
+    p2.setRange(1, 1, 7, 9)
+    const cell7 = p2.at(7, 1)
+    expect(cell7).toBe(9)
+    const cell8 = p2.at(8, 1)
+    expect(cell8).toBe(0)
+    const ascii6 = p2.toAscii()
+    expect(ascii6).toBe(`...5............\n.9999999........`)
   })
 })

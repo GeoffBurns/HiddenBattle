@@ -4,11 +4,17 @@ import { buildTransformMaps } from './buildTransformMaps.js'
 import { Shape } from './Shape.js'
 import { Store32 } from './store32.js'
 
+function bitLength32 (n) {
+  return 32 - Math.clz32(n - 1)
+}
+
 export class Packed extends MaskBase {
-  constructor (width, height, bits, store) {
-    store = store || new Store32(4, width * height, 2, width, height)
+  constructor (width, height, bits, store, depth = 4) {
+    const bitlength = bitLength32(depth)
+    store =
+      store || new Store32(depth, width * height, bitlength, width, height)
     bits = bits || store.newWords()
-    super(Shape.rectangle(width, height), 2, bits, store)
+    super(Shape.rectangle(width, height), depth, bits, store)
     this.words = store.words
     lazy(this, 'transformMaps', () => {
       return buildTransformMaps(this.width, this.height)
@@ -31,7 +37,10 @@ export class Packed extends MaskBase {
   }
 
   setRange (r, c0, c1, color = 1) {
-    this.bits = this.store.setRangeRow(this.bits, r, c0, c1, color)
+    const i0 = this.index(c0, r)
+    const i1 = this.index(c1, r)
+
+    this.bits = this.store.setRangeRow(this.bits, i0, i1, color)
   }
   clearRange (r, c0, c1) {
     this.setRange(r, c0, c1, 0)

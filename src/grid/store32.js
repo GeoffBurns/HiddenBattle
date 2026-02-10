@@ -14,26 +14,27 @@ export class Store32 extends StoreBase {
   constructor (depth = 2, size = 0, bitLength, width, height) {
     const bitsPerCell = bitLength || bitLength32(depth)
     const cellsPerWord = 32 / bitsPerCell
-    const cellMask = (1 << bitsPerCell) - 1
     const cpwShift = Math.log2(cellsPerWord)
-    const bShift = Math.log2(bitsPerCell)
-
     const words = Math.ceil(size / (32 / bitsPerCell))
 
-    super(one, empty(words), toStoreType, depth, size, bitsPerCell)
-    this.bitsPerCell = bitsPerCell
-    this.width = width
-    this.height = height
+    super(
+      one,
+      empty(words),
+      toStoreType,
+      depth,
+      size,
+      bitsPerCell,
+      width,
+      height
+    )
+
     this.wordsPerRow = Math.ceil(width / cellsPerWord)
     this.cellsPerWord = cellsPerWord
     this.maxCellInWord = cellsPerWord - 1
-    this.cellMask = cellMask
-    this.size = size
 
     this.words = words
 
     this.cpwShift = cpwShift
-    this.bShift = bShift
   }
 
   newWords (numWords) {
@@ -146,13 +147,6 @@ export class Store32 extends StoreBase {
     return { word, shift }
   }
 
-  leftShift (color, shift) {
-    return (color & this.cellMask) << shift
-  }
-  rightShift (color, shift) {
-    return (color >>> shift) & this.cellMask
-  }
-
   setWordBits (bw, mask, shift, color) {
     return this.clearBits(bw, mask) | this.leftShift(color, shift)
   }
@@ -165,71 +159,99 @@ export class Store32 extends StoreBase {
     return bits === 32 ? 0xffffffff : this.partialRowMask(bits)
   }
 
-  setRangeRow (bb, y, x0, x1, value) {
-    if (x0 >= x1) return bb
-    value &= this.cellMask
+  setRangeRow (bb, i0, i1, color) {
+    if (i0 >= i1) return bb
+    color &= this.cellMask
 
-    const rowBase = y * this.wordsPerRow
+    const { word: startWord, shift: startPos } = this.readRef(i0) // bounds check
+    const startCell = startPos >> this.bShift
+    //const startWord =  this.wordShift(x0)
+    const { word: endWord, shift: endPos } = this.readRef(i1)
+    const endCell = endPos >> this.bShift
+    //this.wordShift(x1)
 
-    const startWord = x0 >> this.cpwShift
-    const endWord = (x1 - 1) >> this.cpwShift
-
-    const startCell = x0 & this.maxCellInWord
-    const endCell = (x1 - 1) & this.maxCellInWord
+    //const startCell = shift //this.wordMasked(x0)
+    //const endCell = this.wordMasked(x1)
 
     // ---- single word case ----
     if (startWord === endWord) {
-      const cells = endCell - startCell + 1
-      const shift = startCell << this.bShift
-      const m = this.rowCellMask(cells) << shift
-
-      const fill = value === 0 ? 0 : (m / this.cellMask) * value // replicate value
-
-      const wi = rowBase + startWord
-      bb[wi] = (bb & ~m) | (fill & m)
-      return
+      return this.setRangeInRow(bb, startWord, startCell, endCell, color)
     }
 
     // ---- first partial word ----
     {
-      const cells = this.cellsPerWord - startCell
-      const shift = startCell << this.bShift
-      const m = this.rowCellMask(cells) << shift
-
-      const fill = value === 0 ? 0 : (m / this.mask) * value
-
-      const wi = rowBase + startWord
-      bb[wi] = (bb[wi] & ~m) | (fill & m)
+      bb = this.setRangeInRow(
+        bb,
+        startWord,
+        startCell,
+        this.maxCellInWord,
+        color
+      )
     }
 
     // ---- full words ----
-    if (value === 0) {
+    if (color === 0) {
       for (let w = startWord + 1; w < endWord; w++) {
-        bb[rowBase + w] = 0
+        bb[w] = 0
       }
     } else {
       // replicate value across a full word
       let full = 0
       for (let i = 0; i < this.cellsPerWord; i++) {
-        full |= value << (i << this.bShift)
+        full |= color << this.cellShiftLeft(i)
       }
 
       for (let w = startWord + 1; w < endWord; w++) {
-        bb[rowBase + w] = full
+        bb[w] = full
       }
     }
 
     // ---- last partial word ----
     {
-      const cells = endCell + 1
-      const m = this.cellMask(cells)
-
-      const fill = value === 0 ? 0 : (m / this.mask) * value
-
-      const wi = rowBase + endWord
-      bb[wi] = (bb[wi] & ~m) | (fill & m)
+      bb = this.setRangeInRow(bb, endWord, 0, endCell + 1, color)
     }
     return bb
+  }
+  setRangeInRow (bb, word, startCell, endCell, color) {
+    bb[word] = this.setRangeInWord(startCell, endCell, color, bb[word])
+    return bb
+  }
+
+  setRangeInWord (startCell, endCell, color, word) {
+    const numCells = endCell - startCell + 1
+    const cellsSelectBMask = this.cellsSelectMask(startCell, numCells)
+    const setMask = this.cellsSetMask(cellsSelectBMask, color)
+    return (word & ~cellsSelectBMask) | setMask
+  }
+  cellsSetMask (cellsSelectBMask, color) {
+    if (color === 0) return 0
+    const unsigned = cellsSelectBMask >>> 0
+
+    const n = Number(unsigned)
+    const u2 = (n / this.cellMask) >>> 0
+    const oneRepeatMask = unsigned / this.cellMask
+    const colorRepeatMask = oneRepeatMask * color
+    // replicate value
+    const setMask = colorRepeatMask & cellsSelectBMask
+    return setMask
+  }
+
+  cellsSelectMask (startCell, numCells) {
+    const shift = this.cellShiftLeft(startCell)
+    const cellsSelectBMask = this.rowCellMask(numCells) << shift
+    return cellsSelectBMask
+  }
+
+  cellShiftLeft (startCell) {
+    return startCell << this.bShift
+  }
+
+  wordMasked (x0) {
+    return x0 & this.maxCellInWord
+  }
+
+  wordShift (x0) {
+    return x0 >>> this.cpwShift
   }
 
   clearBoardBits (bb, word, mask) {

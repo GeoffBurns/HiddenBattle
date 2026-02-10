@@ -65,7 +65,26 @@ export class MaskBase extends CanvasGrid {
     return out
   }
 
-  toAscii (symbols = ['.', '1', '2', '3']) {
+  toAscii (
+    symbols = [
+      '.',
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      'a',
+      'b',
+      'c',
+      'd',
+      'e',
+      'f'
+    ]
+  ) {
     let lines = []
 
     this.forRows(symbols, lines)
@@ -96,7 +115,7 @@ export class MaskBase extends CanvasGrid {
 
   asciiCell (symbols, y, x, row) {
     const v = this.at(x, y)
-    row += symbols[v]
+    row += symbols[v] || '?'
     return row
   }
 }
