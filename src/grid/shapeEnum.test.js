@@ -1,6 +1,6 @@
 // src/grid/Shape.test.js
 /* eslint-env jest */
-import { Shape } from './shapeEnum.js'
+import { ShapeEnum } from './shapeEnum.js'
 import { TriIndex } from './TriIndex.js'
 import { RectIndex } from './RectIndex.js'
 import { CubeIndex } from './CubeIndex.js'
@@ -11,7 +11,7 @@ describe('Shape factories', () => {
   describe('triangle', () => {
     it('creates triangle shape with correct props and indexer instances', () => {
       const side = 5
-      const s = Shape.triangle(side)
+      const s = ShapeEnum.triangle(side)
       expect(s.type).toBe('triangle')
       expect(s.side).toBe(side)
 
@@ -27,7 +27,7 @@ describe('Shape factories', () => {
     it('creates rectangle shape with correct props and indexer instances', () => {
       const width = 4
       const height = 7
-      const r = Shape.rectangle(width, height)
+      const r = ShapeEnum.rectangle(width, height)
       expect(r.type).toBe('rectangle')
       expect(r.width).toBe(width)
       expect(r.height).toBe(height)
@@ -43,7 +43,7 @@ describe('Shape factories', () => {
   describe('hexagon', () => {
     it('creates hexagon shape with correct props and cached indexer', () => {
       const radius = 3
-      const h = Shape.hexagon(radius)
+      const h = ShapeEnum.hexagon(radius)
       expect(h.type).toBe('hexagon')
       expect(h.radius).toBe(radius)
 
@@ -56,8 +56,8 @@ describe('Shape factories', () => {
 
     it('hexagon indexer instances for same radius are equal (shared instance)', () => {
       const r = 2
-      const h1 = Shape.hexagon(r)
-      const h2 = Shape.hexagon(r)
+      const h1 = ShapeEnum.hexagon(r)
+      const h2 = ShapeEnum.hexagon(r)
       // If CubeIndex caches per radius, these should be the same instance
       expect(h1.indexer).toBe(h2.indexer)
     })

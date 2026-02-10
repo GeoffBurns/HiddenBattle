@@ -1,5 +1,5 @@
-const canvas = document.getElementById('c')
-const ctx = canvas.getContext('2d')
+//const canvas = document.getElementById('c')
+//const ctx = canvas.getContext('2d')
 
 /*
 function redraw (hover = null) {
@@ -14,17 +14,23 @@ function redraw (hover = null) {
 }
 */
 
-export function drawPolyhex (ctx, bb, hex, S, offsetX, offsetY, color = '#4caf50') {
- 
-  for(const [q, r, s, val, i, bb] of hex.entries(bb)) {
+export function drawPolyhex (
+  ctx,
+  bb,
+  hex,
+  S,
+  offsetX,
+  offsetY,
+  color = '#4caf50'
+) {
+  for (const [q, r, , , , bb] of hex.entries(bb)) {
     const { x, y } = hexToPixel(q, r, S)
     drawHex(ctx, x + offsetX, y + offsetY, S, color)
   }
 }
 
 export function drawHexGrid (ctx, hex, S, offsetX, offsetY) {
-  for(const [q, r, s, val, i, bb] of hex.entries(bb)) {
- 
+  for (const [q, r, , , , bb] of hex.entries(bb)) {
     const { x, y } = hexToPixel(q, r, S)
     drawHex(ctx, x + offsetX, y + offsetY, S, 'transparent', '#ccc')
   }

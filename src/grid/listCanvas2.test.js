@@ -4,10 +4,10 @@
 
 import { ListCanvas } from './listCanvas.js'
 import { errorMsg } from './errorMsg.js'
-import { Shape } from './shape.js'
+import { ShapeEnum } from './shapeEnum.js'
 
 function getLc (x = 2, y = 2) {
-  return new ListCanvas(Shape.rectangle(x, y), [])
+  return new ListCanvas(ShapeEnum.rectangle(x, y), [])
 }
 
 describe('ListCanvas', () => {

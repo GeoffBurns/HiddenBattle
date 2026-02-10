@@ -16,7 +16,7 @@ const offsetY = 300
 
 const mask = new MaskHex(3)
 const hex = mask.indexer
-const transforms = mask.indexer.transformsMap
+//const transforms = mask.indexer.transformsMap
 
 // example shape
 let shapeMask = MaskHex.fromCoords(3, [

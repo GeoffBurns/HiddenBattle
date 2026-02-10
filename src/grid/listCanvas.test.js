@@ -2,7 +2,7 @@
 
 /* global describe, jest,  test, expect */
 
-import { Shape } from './shape.js'
+import { ShapeEnum } from './shapeEnum.js'
 
 jest.mock('./maskShape.js', () => ({
   drawSegmentTo: jest.fn(),
@@ -76,5 +76,5 @@ describe('ListCanvas', () => {
   })
 })
 function getLc (x = 2, y = 2) {
-  return new ListCanvas(Shape.rectangle(x, y), [])
+  return new ListCanvas(ShapeEnum.rectangle(x, y), [])
 }
