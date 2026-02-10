@@ -1,4 +1,4 @@
-class PlacedShips {
+export class PlacedShips {
   constructor () {
     this.ships = []
     this.undoBtn = null

@@ -46,6 +46,6 @@ const ONE = 1n
 function setBit (bb, i) {
   return bb | (ONE << BigInt(i))
 }
-function hasBit (bb, i) {
+export function has (bb, i) {
   return (bb >> BigInt(i)) & 1n
 }

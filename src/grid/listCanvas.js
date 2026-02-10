@@ -10,7 +10,7 @@ import {
 import { GridBase } from './gridBase.js'
 import { coordsToGrid, coordsToOccBig } from './maskConvert.js'
 import { Actions } from './actions.js'
-import { Shape } from './shape.js'
+import { ShapeEnum } from './shapeEnum.js'
 
 export class ListCanvas extends GridBase {
   constructor (shape, list) {
@@ -48,13 +48,13 @@ export class ListCanvas extends GridBase {
     }
   }
   static Rect (x, y, list) {
-    return new ListCanvas(Shape.rectangle(x, y), list || [])
+    return new ListCanvas(ShapeEnum.rectangle(x, y), list || [])
   }
   static Tri (s, list) {
-    return new ListCanvas(Shape.triangle(s), list || [])
+    return new ListCanvas(ShapeEnum.triangle(s), list || [])
   }
   static Hex (r, list) {
-    return new ListCanvas(Shape.hexagon(r), list || [])
+    return new ListCanvas(ShapeEnum.hexagon(r), list || [])
   }
   *values () {
     for (let i = 0; i < this.list.length; i++) {

@@ -1,8 +1,8 @@
-import { CubeIndex } from './CubeIndex'
-import { RectIndex } from './RectIndex'
-import { TriIndex } from './TriIndex'
+import { CubeIndex } from './CubeIndex.js'
+import { RectIndex } from './RectIndex.js'
+import { TriIndex } from './TriIndex.js'
 
-export const Shape = {
+export const ShapeEnum = {
   triangle: side => ({
     type: 'triangle',
     side,

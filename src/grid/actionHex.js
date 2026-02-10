@@ -1,7 +1,7 @@
 import { lazy } from '../utilities.js'
 import { CubeIndex } from './CubeIndex.js'
-import { normalizeHexShape } from './gridHelpers.js'
-import { pop, has, hasReflection } from './bitHelpers.js'
+import { normalizeHexShape } from './gridHexHelpers.js'
+///import { pop } from './bitHelpers.js'
 
 export class ActionsHex {
   constructor (radius, mask = null) {
@@ -53,7 +53,7 @@ export class ActionsHex {
     }
     return this.normalized(out)
   }
-
+  /*
   orbit (maps = this.transformMaps) {
     return [
       this.applyMap(maps.id),
@@ -86,6 +86,7 @@ export class ActionsHex {
     }
     return 'C1'
   }
+    */
   static D6_NAMES = [
     'E',
     'R60',
@@ -121,16 +122,24 @@ export class ActionsHex {
     { name: 'C6', size: 6, test: m => m === 0b00111111 },
     {
       name: 'D1',
-      size: 2,
-      test: m => pop(m) === 2 && has(m, 0) && hasReflection(m)
+      size: 2
+      // test: m => pop(m) === 2 && has(m, 0) && hasReflection(m)
     },
-    { name: 'D2', size: 4, test: m => has(m, 3) && pop(m) === 4 },
+    {
+      name: 'D2',
+      size: 4
+      //,test: m => has(m, 3) && pop(m) === 4
+    },
     {
       name: 'D3',
-      size: 6,
-      test: m => has(m, 2) && has(m, 4) && hasReflection(m)
+      size: 6
+      //  test: m => has(m, 2) && has(m, 4) && hasReflection(m)
     },
-    { name: 'D6', size: 12, test: m => pop(m) === 12 }
+    {
+      name: 'D6',
+      size: 12
+      //, test: m => pop(m) === 12
+    }
   ]
   classifyStabilizer (mask) {
     for (const g of ActionsHex.SUBGROUPS) {

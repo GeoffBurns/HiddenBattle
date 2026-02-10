@@ -1,6 +1,7 @@
 const canvas = document.getElementById('c')
 const ctx = canvas.getContext('2d')
 
+/*
 function redraw (hover = null) {
   ctx.clearRect(0, 0, 600, 600)
   drawHexGrid(ctx, hex, S, offsetX, offsetY)
@@ -11,23 +12,25 @@ function redraw (hover = null) {
     drawHex(ctx, x + offsetX, y + offsetY, S, 'rgba(255,0,0,0.4)')
   }
 }
+*/
 
-function drawPolyhex (ctx, bb, hex, S, offsetX, offsetY, color = '#4caf50') {
-  forEachBit(bb, i => {
-    const [q, r] = hex.coords[i]
+export function drawPolyhex (ctx, bb, hex, S, offsetX, offsetY, color = '#4caf50') {
+ 
+  for(const [q, r, s, val, i, bb] of hex.entries(bb)) {
     const { x, y } = hexToPixel(q, r, S)
     drawHex(ctx, x + offsetX, y + offsetY, S, color)
-  })
+  }
 }
 
-function drawHexGrid (ctx, hex, S, offsetX, offsetY) {
-  for (const [q, r] of hex.coords) {
+export function drawHexGrid (ctx, hex, S, offsetX, offsetY) {
+  for(const [q, r, s, val, i, bb] of hex.entries(bb)) {
+ 
     const { x, y } = hexToPixel(q, r, S)
     drawHex(ctx, x + offsetX, y + offsetY, S, 'transparent', '#ccc')
   }
 }
 
-function hitTestPolyhex (px, py, S, offsetX, offsetY, hex, bb) {
+export function hitTestPolyhex (px, py, S, offsetX, offsetY, hex, bb) {
   const x = px - offsetX
   const y = py - offsetY
 

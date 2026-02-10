@@ -41,7 +41,7 @@ function normalized (bb, cube) {
   }
   return normalizedBits
 }
-function normalizeHexShape (cells) {
+export function normalizeHexShape (cells) {
   let minQ = Infinity
   let minR = Infinity
   let minS = Infinity

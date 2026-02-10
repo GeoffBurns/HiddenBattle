@@ -1,6 +1,6 @@
 // src/grid/Shape.test.js
 /* eslint-env jest */
-import { Shape } from './Shape.js'
+import { Shape } from './shapeEnum.js'
 import { TriIndex } from './TriIndex.js'
 import { RectIndex } from './RectIndex.js'
 import { CubeIndex } from './CubeIndex.js'

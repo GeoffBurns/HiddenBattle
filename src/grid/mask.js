@@ -1,8 +1,8 @@
 import { MaskBase } from './MaskBase.js'
-import { Shape } from './Shape.js'
+import { ShapeEnum } from './shapeEnum.js'
 export class Mask extends MaskBase {
   constructor (width, height, bits, store) {
-    super(Shape.rectangle(width, height), 1, bits, store)
+    super(ShapeEnum.rectangle(width, height), 1, bits, store)
   }
 
   get actions () {

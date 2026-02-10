@@ -1,7 +1,7 @@
 import { MaskBase } from './MaskBase'
 import { lazy } from '../utilities.js'
 import { buildTransformMaps } from './buildTransformMaps.js'
-import { Shape } from './Shape.js'
+import { ShapeEnum } from './shapeEnum.js'
 import { Store32 } from './store32.js'
 
 function bitLength32 (n) {
@@ -14,7 +14,7 @@ export class Packed extends MaskBase {
     store =
       store || new Store32(depth, width * height, bitlength, width, height)
     bits = bits || store.newWords()
-    super(Shape.rectangle(width, height), depth, bits, store)
+    super(ShapeEnum.rectangle(width, height), depth, bits, store)
     this.words = store.words
     lazy(this, 'transformMaps', () => {
       return buildTransformMaps(this.width, this.height)
