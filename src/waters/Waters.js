@@ -15,6 +15,7 @@ import { randomPlaceShape } from '../utils.js'
 import { LoadOut } from './LoadOut.js'
 import { Ship } from '../ships/Ship.js'
 import { WeaponSystem } from '../weapon/WeaponSystem.js'
+import { steps } from './steps.js'
 
 function popFirst (arr, predicate, obj) {
   // find index of first match
@@ -52,26 +53,6 @@ const Warning = {
   })
 }
 
-const WeaponMode = Object.freeze({
-  sourceSelect: 'SELECT',
-  targetAim: 'AIM',
-  othersTurn: 'OTHERS'
-})
-class steps {
-  constructor () {
-    this.source = null
-    this.sourceHint = null
-    this.sourceShadow = null
-    this.target = null
-    this.mode = WeaponMode.othersTurn
-  }
-
-  addSource (source, hint, shadow) {
-    this.source = source
-    this.sourceHint = hint
-    this.sourceShadow = shadow
-  }
-}
 export class Waters {
   constructor (ui) {
     assembleTerrains()

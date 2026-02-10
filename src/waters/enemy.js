@@ -4,6 +4,7 @@ import { gameStatus } from './StatusUI.js'
 import { enemyUI } from './enemyUI.js'
 import { LoadOut } from './LoadOut.js'
 import { Waters } from './Waters.js'
+import { Player } from './steps.js'
 
 class Enemy extends Waters {
   constructor (enemyUI) {
@@ -14,8 +15,18 @@ class Enemy extends Waters {
     this.timeoutId = null
     this.weaponHander = null
     this.revealHander = null
+    this.enemyWaters = true
+    this.steps.player = Player.enemy
+    this.steps.onEndTurn = this.onEndTurn.bind(this)
   }
-
+  onEndTurn () {
+    if (this?.opponent && !this.opponent.boardDestroyed) {
+      this.timeoutId = setTimeout(() => {
+        this.timeoutId = null
+        this.opponent.seekStep()
+      }, 1700)
+    }
+  }
   cursorChange (oldCursor, newCursor) {
     this.updateMode()
     if (newCursor === oldCursor) return
@@ -180,13 +191,7 @@ class Enemy extends Waters {
     }
     this.fireAt2(weapon, effect)
     this.updateUI()
-    if (this?.opponent && !this.opponent.boardDestroyed) {
-      this.timeoutId = setTimeout(() => {
-        this.timeoutId = null
-        this.opponent.seekStep()
-      }, 1700)
-      //
-    }
+    this.steps.endTurn()
     return true
   }
   fireAt2 (weapon, effect) {

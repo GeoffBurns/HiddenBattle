@@ -8,6 +8,7 @@ export class Friend extends Waters {
   constructor (friendUI) {
     super(friendUI)
     this.testContinue = true
+    this.friendlyWaters = true
   }
 
   randomHit (hits) {
