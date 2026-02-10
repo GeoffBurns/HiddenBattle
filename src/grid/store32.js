@@ -227,8 +227,6 @@ export class Store32 extends StoreBase {
     if (color === 0) return 0
     const unsigned = cellsSelectBMask >>> 0
 
-    const n = Number(unsigned)
-    const u2 = (n / this.cellMask) >>> 0
     const oneRepeatMask = unsigned / this.cellMask
     const colorRepeatMask = oneRepeatMask * color
     // replicate value

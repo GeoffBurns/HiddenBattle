@@ -1,5 +1,5 @@
 import { MaskBase } from './MaskBase.js'
-import { Shape } from './shape.js'
+import { Shape } from './Shape.js'
 export class Mask extends MaskBase {
   constructor (width, height, bits, store) {
     super(Shape.rectangle(width, height), 1, bits, store)
@@ -125,7 +125,7 @@ export class Mask extends MaskBase {
     return mask
   }
 
-  edgeMasks = function () {
+  edgeMasks () {
     const e = this.store.empty
     let left = e,
       right = e,
@@ -134,14 +134,14 @@ export class Mask extends MaskBase {
 
     // top & bottom rows
     for (let x = 0; x < this.width; x++) {
-      this.store.addBit(top, this.index(x, 0))
-      this.store.addBit(bottom, this.index(x, this.height - 1))
+      top = this.store.addBit(top, this.index(x, 0))
+      bottom = this.store.addBit(bottom, this.index(x, this.height - 1))
     }
 
     // left & right columns
     for (let y = 0; y < this.height; y++) {
-      this.store.addBit(left, this.index(0, y))
-      this.store.addBit(right, this.index(this.width - 1, y))
+      left = this.store.addBit(left, this.index(0, y))
+      right = this.store.addBit(right, this.index(this.width - 1, y))
     }
     return { left, right, top, bottom }
   }

@@ -73,7 +73,8 @@ export class StoreBase {
   }
   addBit (bb, i) {
     const mask = this.bitMask(i)
-    return bb | mask
+    const result = bb | mask
+    return result
   }
 
   check (color = 1) {
