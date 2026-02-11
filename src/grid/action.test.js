@@ -18,7 +18,7 @@ function serializedData (data) {
     return value // Return other values unchanged
   })
 }
-
+// Jest test suite
 describe('Actions', () => {
   let mask
   let actions

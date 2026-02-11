@@ -79,7 +79,7 @@ jest.mock('../variants/Blinker.js', () => ({
 jest.mock('../weapon/WeaponSystem.js', () => ({
   WeaponSystem: jest.fn().mockImplementation(weapon => ({ weapon }))
 }))
-
+// Jest test suite
 describe('Shape', () => {
   let mockCells
   let shape
@@ -103,6 +103,7 @@ describe('Shape', () => {
     )
   })
 
+  // Jest test suite
   describe('token', () => {
     it('should export correct token', () => {
       expect(token).toBe('geoffs-hidden-battle')

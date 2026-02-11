@@ -1,7 +1,9 @@
 :root {
     --rail-cursor-image: url('../images/space/rail32.png');
     --bolt-cursor-image: url('../images/space/bolt32.png');
+    --bolt-grey-cursor-image: url('../images/space/boltol32.png');
     --missile-cursor-image: url('../images/space/missile32.png');
+    --missile-grey-cursor-image: url('../images/space/missileol32.png');
     --white-rail-image: url('../images/space/whiterail26.png');
     --black-rail-image: url('../images/space/blackrail26.png');
     --flying-missile-image: url('../images/space/flyingmissile40.png');
@@ -31,13 +33,24 @@
     cursor: var(--rail-cursor-image) 26 26, pointer;
 }
 
+.board.rail.not-step {
+    cursor: var(--bolt-grey-cursor-image) 26 26, pointer;
+}
+
 .board.bolt {
     cursor: var(--bolt-cursor-image) 26 26, pointer;
 }
 
+.board.bolt.not-step {
+    cursor: var(--bolt-grey-cursor-image) 26 26, pointer;
+}
 
 .board.missile {
     cursor: var(--missile-cursor-image) 6 6, pointer;
+}
+
+.board.missile.board.bolt.not-step {
+    cursor: var(--missile-grey-cursor-image) 6 6, pointer;
 }
 
 .cell.launch.turn3 {

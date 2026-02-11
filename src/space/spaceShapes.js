@@ -1,4 +1,4 @@
-import { all } from '../terrain/terrain.js'
+import { all } from './space.js'
 import { Shape } from '../ships/Shape.js'
 import {
   spaceAndAsteroids,
