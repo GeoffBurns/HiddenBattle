@@ -44,8 +44,11 @@ export class StatusUI {
       this.list.classList.add('hidden')
     }
   }
-  display (mode, game) {
+  showMode (mode) {
     this.mode.textContent = mode
+  }
+  display (mode, game) {
+    this.showMode(mode)
     if (game) {
       this.info(game)
     }
@@ -58,6 +61,7 @@ export class StatusUI {
       return
     const weapon = wps.weapon
     const selected = selectedWps ? 1 : 0
+    gameStatus.showMode(weapon?.name || 'Single Shot')
     this.icon1.className = 'mode-icon tally-box'
     this.icon2.className = 'mode-icon tally-box'
     let idxUsed = idx
@@ -77,7 +81,7 @@ export class StatusUI {
       idxUsed = this.displaySingleShotStatus()
     }
     const timerId = setTimeout(() => {
-      this.display('', weapon.stepHint(idxUsed))
+      this.info(weapon.stepHint(idxUsed))
     }, 1000)
     return timerId
   }

@@ -49,7 +49,7 @@
     cursor: var(--missile-cursor-image) 6 6, pointer;
 }
 
-.board.missile.board.bolt.not-step {
+.board.missile.not-step {
     cursor: var(--missile-grey-cursor-image) 6 6, pointer;
 }
 

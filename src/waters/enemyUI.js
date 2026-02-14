@@ -9,7 +9,7 @@ class EnemyUI extends WatersUI {
     this.revealBtn = document.getElementById('revealBtn')
   }
   displayFleetSunk () {
-    gameStatus.display('Fleet Destroyed', 'All  - Well Done!')
+    gameStatus.display('Fleet Destroyed', 'All Units Destroyed - Well Done!')
     this.board.classList.add('destroyed')
     trackLevelEnd(bh.map, true)
   }
@@ -35,7 +35,18 @@ class EnemyUI extends WatersUI {
   reset () {
     this.board.innerHTML = ''
     this.board.classList.remove('destroyed')
-    gameStatus.display('Single Shot Mode', 'Click On Square To Fire')
+    gameStatus.showMode('Single Shot')
+    gameStatus.info('Click On Square To Fire')
+  }
+  cellUseAmmo (r, c) {
+    const cell = this.gridCellAt(r, c)
+    this.useAmmoInCell(cell)
+  }
+  useAmmoInCell (cell) {
+    const dataset = cell.dataset
+    cell.classList.remove('active')
+    cell.classList.add('empty')
+    dataset.ammo = 0
   }
 }
 export const enemyUI = new EnemyUI()

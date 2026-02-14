@@ -286,7 +286,9 @@ export class Waters {
   }
   randomWeaponId () {
     const randomShip = randomElement(this.loadOut.weaponSystem().armedShips())
-    if (!randomShip) {
+    if (randomShip) {
+      this.steps.addShip(randomShip)
+    } else {
       return {
         launchR: null,
         launchC: null,
@@ -295,30 +297,57 @@ export class Waters {
         hintC: null
       }
     }
+
+    const [r, c] = this.sourceHint(randomShip)
+    if (r === null || c === null) {
+      return this.selectWeaponId(null, 0, 0, 'random', randomShip)
+    }
+
+    const cell = this.shadowSource(r, c)
+    return this.selectWeaponId(cell, r, c, 'random', randomShip)
+  }
+
+  sourceHint (randomShip) {
     const cells = randomShip.cells
     const surround = [...this.UI.surroundCells(cells)]
     if (surround.length === 0) {
-      this.UI.gridCellAt(0, 0)
-      return this.selectWeaponId(null, 0, 0, 'random', randomShip)
+      console.warn(
+        'no surround cells found for random weapon hint, using 0,0 as hint'
+      )
+      this.addHint(this.UI, 0, 0, this.UI.gridCellAt(0, 0))
+      return [null, null]
     }
     const hintKey = randomElement(surround)
     const [r, c] = parsePair(hintKey)
+    this.steps.addHint(this.UI, r, c, this.UI.gridCellAt(r, c))
+    return [r, c]
+  }
+
+  shadowSource (r, c) {
     const opponent = this.opponent
-    const cell = opponent
-      ? opponent.UI.gridCellAt(r, c)
-      : this.UI.gridCellAt(0, 0)
-    return this.selectWeaponId(cell, r, c, 'random', randomShip)
+    if (opponent) {
+      const oppoCell = opponent.UI.gridCellAt(r, c)
+      this.steps.addShadow(opponent.UI, r, c, oppoCell)
+      return oppoCell
+    } else {
+      // no shadow -  this.addShadow(this.UI, r, c, this.UI.gridCellAt(r, c))
+      return this.UI.gridCellAt(r, c)
+    }
   }
 
   selectAndArmWps (rack, oppo, launchR, launchC, hintR, hintC) {
     const weapon = rack?.weapon
     const letter = weapon?.letter
+    this.steps.addRack(
+      rack,
+      weapon,
+      letter,
+      weapon?.id,
+      launchR,
+      launchC,
+      rack?.cell
+    )
     if (letter) {
-      const old = this.loadOut.selectedWeapon
-      if (old) {
-        const [ro, co] = old.launchCoord
-        this.deactivateWeapon(ro, co)
-      }
       this.loadOut.switchTo(letter)
       if (weapon.postSelectCursor === 0) {
         this.loadOut.clearCoords()
@@ -329,31 +358,11 @@ export class Waters {
       rack.launchCoord = [launchR, launchC]
       rack.hintCoord = [hintR, hintC]
       this.loadOut.launch = (coords, onEnd) => {
-        oppo.UI.cellUseAmmo(launchR, launchC)
-        this.deactivateWeapon(launchR, launchC)
-        if (weapon.givesHint) {
-          oppo.UI.cellHintReveal(hintR, hintC)
-        }
+        this.steps.fire()
         this.launchTo(coords, hintR, hintC, rack, onEnd)
       }
       this.loadOut.selectedWeapon = rack
-      if (oppo?.showShips) {
-        oppo?.UI?.deactivateWeapons?.()
-        oppo?.UI?.cellWeaponActive?.(launchR, launchC)
-        if (weapon.postSelectCursor > 0) {
-          this.UI.deactivateWeapons()
-          this.UI.cellWeaponActive(launchR, launchC, '', weapon.tag)
-        }
-      }
-      if (this.enemyWaters) {
-        this.updateWeaponStatus()
-      }
     }
-  }
-
-  deactivateWeapon (ro, co) {
-    this.opponent?.UI?.cellWeaponDeactivate?.(ro, co)
-    this.UI.cellWeaponDeactivate(ro, co)
   }
 
   selectAttachedWeapon (cell, r, c, oppo) {
@@ -365,16 +374,7 @@ export class Waters {
 
     this.selectAndArmWeaponId(weaponId, oppo, launchR, launchC, hintR, hintC)
   }
-  updateWeaponStatus () {
-    gameStatus.displayAmmoStatus(
-      this.loadOut.weaponSystem(),
-      bh.maps,
-      // this.loadOut.cursorIndex(),
-      null,
-      this.loadOut.coords.length,
-      this.loadOut.selectedWeapon
-    )
-  }
+
   randomAttachedWeapon (oppo) {
     const { launchR, launchC, weaponId, hintR, hintC } = this.randomWeaponId()
 
@@ -407,6 +407,9 @@ export class Waters {
       const [key, weapon] = randomElement(ship.weaponEntries())
       const [launchR, launchC] = parsePair(key)
       return { launchR, launchC, weaponId: weapon.id, hintR, hintC }
+    }
+    if (cell === null) {
+      return { launchR: 0, launchC: 0, weaponId: -1, hintR, hintC }
     }
     const keyIds = keyListFromCell(cell, 'keyIds')
     if (!keyIds) {
@@ -442,7 +445,7 @@ export class Waters {
     return true
   }
 
-  lauchSelectedWeapon (r, c) {
+  launchSelectedWeapon (r, c) {
     if (this.loadOut.isArmed()) {
       this.loadOut.aim(bh.map, r, c, this.loadOut.selectedWeapon)
       return true
@@ -482,14 +485,7 @@ export class Waters {
   }
   launchWeapon (wps, coords, onEnd, weapon) {
     const [hintR, hintC] = wps.hintCoord
-    const [launchR, launchC] = wps.launchCoord
-    const oppo = this.opponent
-    if (!oppo) return
-    oppo.UI.cellUseAmmo(launchR, launchC)
-
-    if (weapon.givesHint) {
-      oppo.UI.cellHintReveal(hintR, hintC)
-    }
+    this.steps.fire()
     this.launchTo(coords, hintR, hintC, wps, onEnd)
   }
 
@@ -736,15 +732,9 @@ export class Waters {
     if (this.isRevealed || this.boardDestroyed) {
       return
     }
-    const { wps, cursorIdx } = this.updateWeapon(wps1)
-    gameStatus.displayAmmoStatus(
-      wps,
-      bh.maps,
-      null,
-      // cursorIdx,
-      this.loadOut.coords.length,
-      this.loadOut.selectedWeapon
-    )
+    this.updateWeapon(wps1)
+
+    this.updateWeaponStatus(this.loadOut.selectedWeapon)
   }
   updateWeapon (wps1) {
     const wps = wps1 || this.loadOut.weaponSystem()

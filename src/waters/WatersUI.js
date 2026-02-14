@@ -334,21 +334,12 @@ export class WatersUI {
     cell.classList.remove('wake')
     cell.textContent = ''
   }
-  cellWeaponDeactivate (r, c) {
+  cellWeaponDeactivate (r, c, shadowWeapon) {
     const cell = this.gridCellAt(r, c)
-
+    if (shadowWeapon) {
+      cell.classList.remove('weapon')
+    }
     deactivateWeapon(cell)
-  }
-  cellUseAmmo (r, c) {
-    const cell = this.gridCellAt(r, c)
-    this.useAmmoInCell(cell)
-  }
-  useAmmoInCell (cell) {
-    if (!this.showShips) return
-    const dataset = cell.dataset
-    cell.classList.remove('active')
-    cell.classList.add('empty')
-    dataset.ammo = 0
   }
 
   cellMiss (r, c) {

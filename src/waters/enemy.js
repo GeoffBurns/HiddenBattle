@@ -19,7 +19,28 @@ class Enemy extends Waters {
     this.steps.player = Player.enemy
     this.steps.onEndTurn = this.onEndTurn.bind(this)
     this.steps.onBeginTurn = this.onBeginTurn.bind(this)
+    this.steps.onDeactivate = this.deactivateWeapon.bind(this)
+    this.steps.onActivate = this.onActivate.bind(this)
+    this.steps.onSelect = this.onSelect.bind(this)
+    this.steps.onChangeWeapon = this.onChangeWeapon.bind(this)
   }
+
+  onSelect () {
+    this.UI.board.classList.add('targetting')
+    this.UI.board.classList.remove('not-step')
+  }
+  onActivate (rack, weapon, _wletter, _weaponId, r, c, _cell) {
+    const oppo = this.opponent
+    oppo?.UI?.cellWeaponActive?.(r, c)
+    if (weapon.postSelectCursor > 0) {
+      this.UI.cellWeaponActive(r, c, '', weapon.tag)
+    }
+    this.updateWeaponStatus(rack)
+  }
+  onChangeWeapon (wletter) {
+    this.loadOut.switchTo(wletter)
+  }
+
   onEndTurn () {
     if (this?.opponent && !this.opponent.boardDestroyed) {
       const spinner = document.getElementById('spinner')
@@ -31,13 +52,16 @@ class Enemy extends Waters {
         spinner.src = './images/loading.gif'
       }
     }
-
+    gameStatus.showMode("Enemy's Turn")
+    this.UI.board.classList.remove('targetting')
+    this.UI.board.classList.add('not-step')
+    this.steps.clearSource()
     this.timeoutId = setTimeout(() => {
       this.timeoutId = null
       this.opponent.seekStep()
       this.timeoutId = setTimeout(() => {
         this.timeoutId = null
-        this.steps.beginTurn()
+        //     this.steps.beginTurn()
       }, 500)
     }, 1700)
   }
@@ -48,6 +72,15 @@ class Enemy extends Waters {
       //
       spinner.classList.remove('waiting')
       spinner.classList.add('hidden')
+    }
+
+    if (this.boardDestroyed || this.isRevealed) {
+      this.steps.select()
+    } else {
+      gameStatus.showMode('Your Turn')
+      if (!bh.terrain.hasAttachedWeapons) {
+        this.steps.select()
+      }
     }
   }
   cursorChange (oldCursor, newCursor) {
@@ -166,7 +199,7 @@ class Enemy extends Waters {
     this.UI.removeHighlightAoE()
     this.setWeaponHanders()
 
-    if (this.lauchSelectedWeapon(r, c)) return
+    if (this.launchSelectedWeapon(r, c)) return
 
     if (this.launchRandomWeapon(r, c, bh.seekingMode)) return
     this.loadOut.launch = LoadOut.launchDefault.bind(this, this.UI)
@@ -236,11 +269,25 @@ class Enemy extends Waters {
     ))
     // update status
     this.updateResultsOfBomb(hits, sunks, reveals)
-
     this.updateWeaponStatus()
     this.flash()
   }
+  deactivateWeapon (ro, co) {
+    if (ro === undefined || co === undefined) return
+    this.opponent?.UI?.cellWeaponDeactivate?.(ro, co, true)
+    this.UI.cellWeaponDeactivate(ro, co)
+  }
 
+  updateWeaponStatus (rack) {
+    gameStatus.displayAmmoStatus(
+      this.loadOut.weaponSystem(),
+      bh.maps,
+      // this.loadOut.cursorIndex(),
+      null,
+      this.loadOut.coords.length,
+      rack
+    )
+  }
   dropBomb2 (weapon, effect, hits, sunks, reveals) {
     const map = bh.map
     for (const position of effect) {

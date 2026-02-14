@@ -21,7 +21,7 @@ export class FriendUI extends PlacementUI {
   }
 
   displayFleetSunk () {
-    gameStatus.display('Your Fleet is Destroyed', '')
+    gameStatus.info('Your Fleet is Destroyed')
     this.board.classList.add('destroyed')
     trackLevelEnd(bh.map, false)
   }
@@ -115,7 +115,8 @@ export class FriendUI extends PlacementUI {
     this.stopBtn.classList.add('hidden')
     this.seekBtn.classList.add('hidden')
   }
-
+  cellUseAmmo () {}
+  useAmmoInCell () {}
   gotoNextStageAfterPlacement () {
     if (bh.test) {
       this.readyMode()

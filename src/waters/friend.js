@@ -3,12 +3,21 @@ import { makeKey, shuffleArray } from '../utilities.js'
 import { gameStatus } from './StatusUI.js'
 import { setupDragHandlers } from '../selection/dragndrop.js'
 import { Waters } from './Waters.js'
+import { Player } from './steps.js'
 
 export class Friend extends Waters {
   constructor (friendUI) {
     super(friendUI)
     this.testContinue = true
     this.friendlyWaters = true
+    this.steps.player = Player.friend
+    this.steps.onEndTurn = this.onEndTurn.bind(this)
+  }
+
+  onEndTurn () {
+    if (this?.opponent && !this.opponent.boardDestroyed) {
+      this.opponent.onBeginTurn()
+    }
   }
 
   randomHit (hits) {
@@ -103,6 +112,7 @@ export class Friend extends Waters {
       }
     }
     if (hit) this.flash('long')
+    this.steps.endTurn()
   }
 
   randomBomb (seeking) {
@@ -354,12 +364,15 @@ export class Friend extends Waters {
 
     this.selectShot([...this.score.semi], hits, seeking)
   }
+  updateWeaponStatus () {}
   updateMode (wps) {
     if (this.isRevealed || this.boardDestroyed) {
       return
     }
     this.updateWeapon(wps)
   }
+
+  deactivateWeapon () {}
   resetModel () {
     this.score.reset()
     this.resetMap()

@@ -633,31 +633,31 @@
     transition: opacity 0.25s ease;
 }
 
-.cell.destroy-vunerable::after {
+.board:not(.not-step) .cell.destroy-vunerable::after {
     background: #c9e673;
 }
 
-.cell.destroy-normal::after {
+.board:not(.not-step) .cell.destroy-normal::after {
     background: #f5b44c;
 }
 
-.cell.destroy-hardened::after {
+.board:not(.not-step) .cell.destroy-hardened::after {
     background: #6c0135 !important;
 }
 
-.cell.reveal-vunerable {
+.board:not(.not-step) .cell.reveal-vunerable {
     background: #73bce6 !important;
 }
 
-.cell.reveal-normal::after {
+.board:not(.not-step) .cell.reveal-normal::after {
     background: #4f4cf5 !important;
 }
 
-.cell.reveal-hardened {
+.board:not(.not-step) .cell.reveal-hardened {
     background: #540181 !important;
 }
 
-.cell.weapon-path::after {
+.board:not(.not-step) .cell.weapon-path::after {
     background: #a6f9e1 !important;
 }
 

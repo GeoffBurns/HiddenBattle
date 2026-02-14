@@ -5,6 +5,15 @@
     font-weight: bold;
     color: #111;
     font-size: 150%;
+    place-items: center;
+}
+
+.chevron-box summary .mode-status {
+    display: flex;
+    gap: 32px;
+    margin-right: 10px;
+    text-align: right;
+    place-items: center;
 }
 
 .status.right {
@@ -31,7 +40,7 @@
     margin-bottom: 10px;
     margin-top: 10px;
     color: #111;
-    font-size: 90%;
+    font-size: 110%;
     width: 100%;
 }
 

@@ -2,9 +2,10 @@ import { bh } from '../terrain/terrain.js'
 import { WeaponSystem, AttachedWeaponSystems } from '../weapon/WeaponSystem.js'
 
 export class LoadOut {
-  constructor (weapons, ships, viewModel) {
+  constructor (weapons, ships, viewModel, steps) {
     this.OutOfAllAmmo = Function.prototype
     this.OutOfAmmo = Function.prototype
+    this.steps = steps
     this.destroy = Function.prototype
     this.reveal = Function.prototype
     this.onCursorChange = Function.prototype
