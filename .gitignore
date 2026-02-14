@@ -2,3 +2,5 @@
 /src/node_modules
 /staticAnalysis
 /utils/exporters/data
+.env
+/output
