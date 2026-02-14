@@ -143,8 +143,11 @@ export class Kinetic extends Weapon {
 
     const r1 = coords[1][0]
     const c1 = coords[1][1]
-
-    return getIntercepts(r, c, r1, c1)
+    const { x0, y0, x1, y1 } = getIntercepts(r, c, r1, c1)
+    return [
+      [y0, x0],
+      [y1, x1]
+    ]
   }
 
   splash (map, coords) {

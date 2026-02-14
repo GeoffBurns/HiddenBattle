@@ -345,8 +345,9 @@ export class Waters {
           this.UI.cellWeaponActive(launchR, launchC, '', weapon.tag)
         }
       }
-
-      this.updateWeaponStatus()
+      if (this.enemyWaters) {
+        this.updateWeaponStatus()
+      }
     }
   }
 

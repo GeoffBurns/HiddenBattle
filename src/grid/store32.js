@@ -31,9 +31,7 @@ export class Store32 extends StoreBase {
     this.wordsPerRow = Math.ceil(width / cellsPerWord)
     this.cellsPerWord = cellsPerWord
     this.maxCellInWord = cellsPerWord - 1
-
     this.words = words
-
     this.cpwShift = cpwShift
   }
 
@@ -159,28 +157,24 @@ export class Store32 extends StoreBase {
     return bits === 32 ? 0xffffffff : this.partialRowMask(bits)
   }
 
-  setRangeRow (bb, i0, i1, color) {
+  setRange (bb, i0, i1, color) {
     if (i0 >= i1) return bb
     color &= this.cellMask
 
     const { word: startWord, shift: startPos } = this.readRef(i0) // bounds check
     const startCell = startPos >> this.bShift
-    //const startWord =  this.wordShift(x0)
+
     const { word: endWord, shift: endPos } = this.readRef(i1)
     const endCell = endPos >> this.bShift
-    //this.wordShift(x1)
-
-    //const startCell = shift //this.wordMasked(x0)
-    //const endCell = this.wordMasked(x1)
 
     // ---- single word case ----
     if (startWord === endWord) {
-      return this.setRangeInRow(bb, startWord, startCell, endCell, color)
+      return this.setRangeToWord(bb, startWord, startCell, endCell, color)
     }
 
     // ---- first partial word ----
     {
-      bb = this.setRangeInRow(
+      bb = this.setRangeToWord(
         bb,
         startWord,
         startCell,
@@ -208,11 +202,11 @@ export class Store32 extends StoreBase {
 
     // ---- last partial word ----
     {
-      bb = this.setRangeInRow(bb, endWord, 0, endCell + 1, color)
+      bb = this.setRangeToWord(bb, endWord, 0, endCell + 1, color)
     }
     return bb
   }
-  setRangeInRow (bb, word, startCell, endCell, color) {
+  setRangeToWord (bb, word, startCell, endCell, color) {
     bb[word] = this.setRangeInWord(startCell, endCell, color, bb[word])
     return bb
   }
@@ -255,6 +249,7 @@ export class Store32 extends StoreBase {
   clearBoardBits (bb, word, mask) {
     return bb[word] & ~mask
   }
+
   /*
   boundingBox (h, w, bb) {
     let minRow = h
@@ -275,6 +270,128 @@ export class Store32 extends StoreBase {
     */
 }
 
+function occupancy1Bit (src, W, H, bitsPerCell) {
+  const cellsPerWord = 32 / bitsPerCell
+  const cellMask = (1 << bitsPerCell) - 1
+
+  const nCells = W * H
+  const outWords = Math.ceil(nCells / 32)
+  const out = new Uint32Array(outWords)
+
+  let outBit = 0
+
+  for (let i = 0; i < src.length; i++) {
+    let w = src[i]
+    for (let c = 0; c < cellsPerWord && outBit < nCells; c++) {
+      if ((w & cellMask) !== 0) {
+        out[outBit >>> 5] |= 1 << (outBit & 31)
+      }
+      w >>>= bitsPerCell
+      outBit++
+    }
+  }
+  return out
+}
 function empty (numWords) {
   return new Uint32Array(numWords)
+}
+function shiftBits (src, shift) {
+  if (shift === 0) return src.slice()
+
+  const words = src.length
+  const out = new Uint32Array(words)
+
+  const wordShift = shift >> 5
+  const bitShift = shift & 31
+
+  if (shift > 0) {
+    for (let i = words - 1; i >= 0; i--) {
+      let v = 0
+      const s = i - wordShift
+      if (s >= 0) {
+        v = src[s] << bitShift
+        if (bitShift && s - 1 >= 0) v |= src[s - 1] >>> (32 - bitShift)
+      }
+      out[i] = v
+    }
+  } else {
+    const wShift = -wordShift
+    const bShift = -shift & 31
+    for (let i = 0; i < words; i++) {
+      let v = 0
+      const s = i + wShift
+      if (s < words) {
+        v = src[s] >>> bShift
+        if (bShift && s + 1 < words) v |= src[s + 1] << (32 - bShift)
+      }
+      out[i] = v
+    }
+  }
+  return out
+}
+
+function dilate1D_horizontal (bb, W, H, radius, masks) {
+  const { notLeft, notRight } = masks
+
+  let out = bb.slice()
+
+  for (let r = 1; r <= radius; r++) {
+    const left = shiftBits(out, -1)
+    const right = shiftBits(out, +1)
+
+    for (let i = 0; i < out.length; i++) {
+      out[i] |= left[i] & notLeft[i]
+      out[i] |= right[i] & notRight[i]
+    }
+  }
+  return out
+}
+
+function dilate1D_vertical (bb, W, H, radius) {
+  let out = bb.slice()
+
+  for (let r = 1; r <= radius; r++) {
+    const up = shiftBits(out, -W)
+    const down = shiftBits(out, +W)
+
+    for (let i = 0; i < out.length; i++) {
+      out[i] |= up[i] | down[i]
+    }
+  }
+  return out
+}
+
+function dilateSeparable (bb, W, H, radius, masks) {
+  const h = dilate1D_horizontal(bb, W, H, radius, masks)
+  const v = dilate1D_vertical(h, W, H, radius)
+  return v
+}
+function rotateRowBits (src, W, H, shift) {
+  const out = new Uint32Array(src.length)
+
+  for (let y = 0; y < H; y++) {
+    const rowStart = y * W
+    for (let x = 0; x < W; x++) {
+      const fromX = (x - (shift % W) + W) % W
+      const from = rowStart + fromX
+      const to = rowStart + x
+
+      if ((src[from >>> 5] >>> (from & 31)) & 1) {
+        out[to >>> 5] |= 1 << (to & 31)
+      }
+    }
+  }
+  return out
+}
+
+function dilate1D_horizontal_wrap (bb, W, H, radius) {
+  let out = bb.slice()
+  for (let r = 1; r <= radius; r++) {
+    const left = rotateRowBits(out, W, H, -1)
+    const right = rotateRowBits(out, W, H, +1)
+    for (let i = 0; i < out.length; i++) {
+      out[i] |= left[i] | right[i]
+    }
+  }
+  return out
 }

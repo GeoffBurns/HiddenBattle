@@ -30,7 +30,9 @@ export class Missile extends Megabomb {
     ammo = ammo || this.ammo
     return new Missile(ammo)
   }
-
+  redoCoords (_map, base, coords) {
+    return [base, coords[0]]
+  }
   aoe (_map, coords) {
     if (coords.length < 1) return []
     const [r, c] = coords[0]
