@@ -2,10 +2,10 @@ import { bh } from './terrain/terrain.js'
 import { WatersUI } from './waters/WatersUI.js'
 import { Waters } from './waters/Waters.js'
 import { ScoreUI } from './waters/ScoreUI.js'
-import { setupMapListOptions } from './setupOptions.js'
-import { switchTo } from './setupTabs.js'
+import { setupMapListOptions } from './navbar/setupOptions.js'
+import { switchTo } from './navbar/setupTabs.js'
 import { switchToEdit, fetchNavBar } from './navbar/navbar.js'
-import { trackClick } from './gtag.js'
+import { trackClick } from './navbar/gtag.js'
 class MapList {
   constructor (id) {
     this.listId = id || 'list-container'

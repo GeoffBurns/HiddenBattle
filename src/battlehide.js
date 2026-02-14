@@ -62,7 +62,7 @@ function highlightAoE (model, r, c) {
   viewModel.removeHighlightAoE()
   const newCoords = [...coords, [r, c]]
   if (!weapon || weapon.points > newCoords.length) return
-  const cells = weapon.aoe(map, newCoords)
+  const cells = weapon.splashAoe(map, newCoords)
   for (const [rr, cc, power] of cells) {
     if (map.inBounds(rr, cc)) {
       const cellClass = bh.spashTags[power]

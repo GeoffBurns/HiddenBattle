@@ -44,7 +44,7 @@ function drawRayInDirection (x0, y0, dxDir, dyDir, canvas, color) {
     canvas.width,
     canvas.height
   )) {
-    canvas.set(x, y, color)
+    canvas.set(y, x, color)
   }
 }
 function interceptInDirection (x0, y0, dxDir, dyDir, canvas) {
@@ -94,7 +94,7 @@ export function drawSegmentTo (x0, y0, x1, y1, canvas, color) {
     canvas.height
   )) {
     //if (!this.inBounds(x, y)) break
-    canvas.set(x, y, color)
+    canvas.set(y, x, color)
     if (x === dxDir && y === dyDir) break
   }
 }
@@ -113,7 +113,7 @@ export function drawSegmentUpTo (x0, y0, x1, y1, canvas, color) {
     //if (!this.inBounds(x, y)) break
 
     if (x === dxDir && y === dyDir) break
-    canvas.set(x, y, color)
+    canvas.set(y, x, color)
   }
 }
 function initLineParams (x1, x0, y1, y0) {
@@ -149,7 +149,7 @@ export function drawSegmentFor (x0, y0, x1, y1, distance, canvas, color) {
     canvas.height
   )) {
     //if (!this.inBounds(x, y)) break
-    canvas.set(x, y, color)
+    canvas.set(y, x, color)
 
     if (steps >= distance) break
     // if (x === dxDir && y === dyDir) break
@@ -205,7 +205,7 @@ export function drawPie (
     radius,
     canvas,
     (canvas, cosAngle, vLen, x, y) => {
-      canvas.set(x, y, color)
+      canvas.set(y, x, color)
     },
     spreadDeg
   )
@@ -232,10 +232,10 @@ export function drawPie2 (
     canvas,
     (canvas, cosAngle, vLen, x, y) => {
       if (cosAngle > narrowLimit) {
-        canvas.set(x, y, 2)
+        canvas.set(y, x, 2)
       } //if (cosAngle > spreadLimit)
       else {
-        canvas.set(x, y, 1)
+        canvas.set(y, x, 1)
       }
     },
     spread

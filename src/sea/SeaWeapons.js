@@ -72,9 +72,9 @@ function getIntercepts (y1, x1, y2, x2) {
   const points = getListCanvas()
   return points.intercepts(x1, y1, x2, y2)
 }
-function getExtendedLinePoints (y1, x1, y2, x2) {
+function getExtendedLinePoints (y1, x1, y2, x2, color) {
   const points = getListCanvas()
-  points.drawLineInfinite(x1, y1, x2, y2)
+  points.drawLineInfinite(x1, y1, x2, y2, color)
   return points.list
 }
 function getLinePoints (x1, y1, x2, y2) {
@@ -126,15 +126,17 @@ export class Kinetic extends Weapon {
     ammo = ammo || this.ammo
     return new Kinetic(ammo)
   }
-
-  aoe (map, coords) {
+  splashAoe (map, coords) {
+    return this.aoe(map, coords, 20)
+  }
+  aoe (map, coords, power = 2) {
     const r = coords[0][0]
     const c = coords[0][1]
 
     const r1 = coords[1][0]
     const c1 = coords[1][1]
 
-    return getExtendedLinePoints(r, c, r1, c1)
+    return getExtendedLinePoints(r, c, r1, c1, power)
   }
 
   redoCoords (map, base, coords) {

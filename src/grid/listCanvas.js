@@ -93,8 +93,8 @@ export class ListCanvas extends GridBase {
   drawRay (x0, y0, x1, y1) {
     drawRay(x0, y0, x1, y1, this)
   }
-  drawLineInfinite (x0, y0, x1, y1) {
-    drawLineInfinite(x0, y0, x1, y1, this)
+  drawLineInfinite (x0, y0, x1, y1, color) {
+    drawLineInfinite(x0, y0, x1, y1, this, color)
   }
   get grid () {
     this._grid = coordsToGrid(this.list, this.width, this.height)
