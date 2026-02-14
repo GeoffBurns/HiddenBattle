@@ -219,7 +219,8 @@ class Enemy extends Waters {
     if (this.loadOut.isNotArming()) return
 
     const cell = oppo.UI.gridCellAt(hintR, hintC)
-
+    this.steps.addHint(oppo.UI, hintR, hintC, cell)
+    this.shadowSource(hintR, hintC, this)
     this.selectAttachedWeapon(cell, hintR, hintC, oppo)
   }
 

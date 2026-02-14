@@ -38,15 +38,14 @@ class EnemyUI extends WatersUI {
     gameStatus.showMode('Single Shot')
     gameStatus.info('Click On Square To Fire')
   }
-  cellUseAmmo (r, c) {
-    const cell = this.gridCellAt(r, c)
-    this.useAmmoInCell(cell)
+  cellUseAmmo () {}
+  useAmmoInCell () {}
+
+  removeShadowWeapon (cell) {
+    cell.classList.remove('weapon')
   }
-  useAmmoInCell (cell) {
-    const dataset = cell.dataset
-    cell.classList.remove('active')
-    cell.classList.add('empty')
-    dataset.ammo = 0
+  addContrast (cell) {
+    cell.classList.add('contrast')
   }
 }
 export const enemyUI = new EnemyUI()

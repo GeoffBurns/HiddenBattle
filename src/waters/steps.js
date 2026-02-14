@@ -31,6 +31,11 @@ export class steps {
   }
 
   fire () {
+    if (!bh.terrain.hasUnattachedWeapons && this.sourceShip === null) {
+      console.warn(
+        'Terrain does not have unattached weapons, but a weapon was fired without a source ship'
+      )
+    }
     if (!this.source) return
     this.source.board.cellUseAmmo(this.source.r, this.source.c)
     if (this.sourceRack?.weapon?.givesHint) {
@@ -87,21 +92,14 @@ export class steps {
   }
 
   addHint (board, r, c, cell) {
-    if (!bh.terrain.hasUnttachedWeapons && this.sourceShip === null) {
-      console.warn(
-        'Terrain does not have unattached weapons, but a hint was added to steps without a source ship'
-      )
-    }
     this.sourceHint = { board, r, c, cell }
   }
   addShadow (board, r, c, cell) {
     this.sourceShadow = { board, r, c, cell }
   }
 
-  addSource (source, hint, shadow) {
-    this.source = source
-    this.sourceHint = hint
-    this.sourceShadow = shadow
+  addSource (board, r, c, cell) {
+    this.source = { board, r, c, cell }
   }
 
   endTurn () {

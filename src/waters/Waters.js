@@ -314,7 +314,7 @@ export class Waters {
       console.warn(
         'no surround cells found for random weapon hint, using 0,0 as hint'
       )
-      this.addHint(this.UI, 0, 0, this.UI.gridCellAt(0, 0))
+      this.steps.addHint(this.UI, 0, 0, this.UI.gridCellAt(0, 0))
       return [null, null]
     }
     const hintKey = randomElement(surround)
@@ -323,8 +323,8 @@ export class Waters {
     return [r, c]
   }
 
-  shadowSource (r, c) {
-    const opponent = this.opponent
+  shadowSource (r, c, oppo) {
+    const opponent = oppo || this.opponent
     if (opponent) {
       const oppoCell = opponent.UI.gridCellAt(r, c)
       this.steps.addShadow(opponent.UI, r, c, oppoCell)
@@ -338,6 +338,7 @@ export class Waters {
   selectAndArmWps (rack, oppo, launchR, launchC, hintR, hintC) {
     const weapon = rack?.weapon
     const letter = weapon?.letter
+    this.addSource(oppo, launchR, launchC, rack)
     this.steps.addRack(
       rack,
       weapon,
@@ -356,6 +357,7 @@ export class Waters {
       }
 
       rack.launchCoord = [launchR, launchC]
+
       rack.hintCoord = [hintR, hintC]
       this.loadOut.launch = (coords, onEnd) => {
         this.steps.fire()
@@ -365,11 +367,23 @@ export class Waters {
     }
   }
 
+  addSource (oppo, launchR, launchC, rack) {
+    if (this.steps.source === null) {
+      this.steps.addSource(oppo.UI, launchR, launchC, rack?.cell)
+      console.warn(
+        'no source found when selecting and arming weapon, adding source with launch coords'
+      )
+    }
+  }
+
   selectAttachedWeapon (cell, r, c, oppo) {
     const { launchR, launchC, weaponId, hintR, hintC } = this.selectWeaponId(
       cell,
       r,
-      c
+      c,
+      false,
+      null,
+      oppo
     )
 
     this.selectAndArmWeaponId(weaponId, oppo, launchR, launchC, hintR, hintC)
@@ -402,17 +416,21 @@ export class Waters {
     return false
   }
 
-  selectWeaponId (cell, hintR, hintC, random, ship) {
+  selectWeaponId (cell, hintR, hintC, random, ship, oppo) {
     if (ship) {
       const [key, weapon] = randomElement(ship.weaponEntries())
+
       const [launchR, launchC] = parsePair(key)
+
       return { launchR, launchC, weaponId: weapon.id, hintR, hintC }
     }
     if (cell === null) {
+      this.steps.addSource(this.UI, 0, 0, cell || this.UI.gridCellAt(0, 0))
       return { launchR: 0, launchC: 0, weaponId: -1, hintR, hintC }
     }
     const keyIds = keyListFromCell(cell, 'keyIds')
     if (!keyIds) {
+      this.steps.addSource(this.UI, 0, 0, cell || this.UI.gridCellAt(0, 0))
       return { launchR: 0, launchC: 0, weaponId: -1, hintR, hintC }
     }
     const loaded = this.loadOut.getLoadedWeapons().map(w => w.id)
@@ -427,7 +445,12 @@ export class Waters {
       return this.randomWeaponId()
     }
     const [launchR, launchC, weaponId] = parseTriple(wkey)
-
+    this.steps.addSource(
+      oppo.UI,
+      launchR,
+      launchC,
+      cell || oppo.UI.gridCellAt(launchR, launchC)
+    )
     return { launchR, launchC, weaponId, hintR, hintC }
   }
 
@@ -483,10 +506,10 @@ export class Waters {
       this.opponent?.UI
     )
   }
-  launchWeapon (wps, coords, onEnd, weapon) {
-    const [hintR, hintC] = wps.hintCoord
+  launchWeapon (wps, coords, onEnd) {
+    const { r, c } = this.steps.sourceHint || { r: 0, c: 0 }
     this.steps.fire()
-    this.launchTo(coords, hintR, hintC, wps, onEnd)
+    this.launchTo(coords, r, c, wps, onEnd)
   }
 
   setupAttachedAim () {

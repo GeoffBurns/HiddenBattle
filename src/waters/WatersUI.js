@@ -323,9 +323,7 @@ export class WatersUI {
   cellWeaponActive (r, c, turn, extra) {
     const cell = this.gridCellAt(r, c)
     cell.classList.add('weapon', 'active')
-    if (!this.showShips) {
-      cell.classList.add('contrast')
-    }
+    this.addContrast(cell)
 
     if (extra) {
       cell.classList.add(extra)
@@ -334,11 +332,12 @@ export class WatersUI {
     cell.classList.remove('wake')
     cell.textContent = ''
   }
-  cellWeaponDeactivate (r, c, shadowWeapon) {
+
+  cellWeaponDeactivate (r, c) {
     const cell = this.gridCellAt(r, c)
-    if (shadowWeapon) {
-      cell.classList.remove('weapon')
-    }
+
+    this.removeShadowWeapon(cell)
+
     deactivateWeapon(cell)
   }
 
