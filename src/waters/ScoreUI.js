@@ -28,33 +28,33 @@ export class ScoreUI {
   }
   display (ships, shots, reveals, hints) {
     if (this.shots && shots > 0) {
-      this.shotsLabel.classList.remove('hidden')
+      this.shotsLabel?.classList?.remove('hidden')
       this.shots.textContent = shots.toString()
     } else {
-      this.shotsLabel.classList.add('hidden')
+      this.shotsLabel?.classList?.add('hidden')
     }
 
     const hits = ships.reduce((sum, s) => sum + s.hits.size, 0)
     if (this.hits && hits > 0) {
-      this.hitsLabel.classList.remove('hidden')
+      this.hitsLabel?.classList?.remove('hidden')
       this.hits.textContent = hits.toString()
     } else {
-      this.hitsLabel.classList.add('hidden')
+      this.hitsLabel?.classList?.add('hidden')
     }
     this.hits.textContent = hits.toString()
     const sunkCount = ships.filter(s => s.sunk).length
     this.sunk.textContent = `${sunkCount} / ${ships.length}`
     if (this.hints && hints > 0) {
-      this.hintsLabel.classList.remove('hidden')
+      this.hintsLabel?.classList?.remove('hidden')
       this.hints.textContent = hints.toString()
     } else {
-      this.hintsLabel.classList.add('hidden')
+      this.hintsLabel?.classList?.add('hidden')
     }
     if (this.reveals && reveals > 0) {
-      this.revealsLabel.classList.remove('hidden')
+      this.revealsLabel?.classList?.remove('hidden')
       this.reveals.textContent = reveals.toString()
     } else {
-      this.revealsLabel.classList.add('hidden')
+      this.revealsLabel?.classList?.add('hidden')
     }
   }
   createZoneTitle (labelTxt, bag) {

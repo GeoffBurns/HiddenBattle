@@ -439,11 +439,17 @@ export class Waters {
   }
 
   selectWeaponId (cell, hintR, hintC, random, ship, oppo) {
+    oppo = oppo || this.opponent
     if (ship) {
       const [key, weapon] = randomElement(ship.weaponEntries())
 
       const [launchR, launchC] = parsePair(key)
-
+      this.steps.addSource(
+        oppo.UI,
+        launchR,
+        launchC,
+        cell || oppo.UI.gridCellAt(launchR, launchC)
+      )
       return { launchR, launchC, weaponId: weapon.id, hintR, hintC }
     }
     if (cell === null) {

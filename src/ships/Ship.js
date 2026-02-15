@@ -169,15 +169,13 @@ export class Ship {
         wps.hit = true
         model.loadOut.useAmmo(wps)
         const cell = viewModel.gridCellAt(...parsePair(key))
-        viewModel.useAmmoInCell(cell)
+        viewModel.useAmmoInCell(cell, damaged)
         if (weapon.volatile) {
           info = 'Magazine Detonated'
           weapon.animateDetonation(cell, viewModel.cellSizeScreen())
-          if (!this.sunk) {
-            this.sunk = true
-            const { list, misses } = this.destroy(model)
-            return { letter: this.letter, info, damaged, list, misses }
-          }
+          this.sunk = true
+          const { list, misses } = this.destroy(model)
+          return { letter: this.letter, info, damaged, list, misses }
         }
       }
     }

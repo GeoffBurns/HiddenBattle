@@ -30,6 +30,29 @@ export class Missile extends Megabomb {
     ammo = ammo || this.ammo
     return new Missile(ammo)
   }
+
+  launchTo (coords, r, c, onEnd, map, viewModel, opposingViewModel) {
+    if (!opposingViewModel) {
+      super.launchTo(coords, r, c, onEnd, map, viewModel, opposingViewModel)
+      return
+    }
+    const target = coords[0]
+
+    const start1 = opposingViewModel.gridCellAt(r, c)
+    const end1 = viewModel.gridCellAt(target[0], target[1])
+
+    this.animateFlying(
+      start1,
+      end1,
+      () => {
+        onEnd()
+      },
+      viewModel.cellSizeScreen(),
+      map,
+      viewModel
+    )
+  }
+
   redoCoords (_map, base, coords) {
     return [base, coords[0]]
   }

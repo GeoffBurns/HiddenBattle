@@ -152,7 +152,14 @@ export class WatersUI {
   displaySunkCell (cell, letter) {
     this.setShipCellColors(cell, letter)
     cell.classList.add('emn-sunk')
-    cell.textContent = letter
+    if (
+      cell.classList.contains('damaged') ||
+      cell.classList.contains('skull')
+    ) {
+      cell.textContent = ''
+    } else {
+      cell.textContent = letter
+    }
   }
   setShipCellColors (cell, letter) {
     const maps = bh.maps
@@ -260,6 +267,7 @@ export class WatersUI {
     this.clearCell(cell)
     cell.classList.add('frd-sunk')
     this.cellHitBase(cell)
+    cell.classList.remove('frd-hit')
   }
 
   cellHitBase (cell, damaged) {
@@ -268,13 +276,19 @@ export class WatersUI {
       'semi-miss',
       'wake',
       'weapon',
+      'turn2',
+      'turn3',
+      'turn4',
       'empty',
       'active'
     )
-    cell.classList.remove(...bh.terrain.weapons.tags)
+    const tags = bh.terrain.weapons.tags
+    const cursors = bh.terrain.weapons.cursors
+    cell.classList.remove(...tags)
+    cell.classList.remove(...cursors)
     cell.classList.add('frd-hit')
     if (damaged) {
-      cell.classList.add('damaged')
+      cell.classList.add(damaged)
     }
     cell.textContent = ''
   }

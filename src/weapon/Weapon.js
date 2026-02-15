@@ -309,7 +309,7 @@ export class Weapon {
     pointer.style.setProperty('--end-x', `${end.x}px`)
     pointer.style.setProperty('--end-y', `${end.y}px`)
     pointer.style.setProperty('--angle', `${angle}deg`)
-    pointer.style.setProperty('--duration', '0.6s')
+    pointer.style.setProperty('--duration', '0.7s')
 
     container.appendChild(pointer)
     return pointer
@@ -346,5 +346,11 @@ export class WeaponCatelogue {
   }
   get tags () {
     return this.weapons.map(w => w.tag)
+  }
+
+  get cursors () {
+    return this.weapons.flatMap(w => {
+      return [...w.cursors, w.launchCursor]
+    })
   }
 }

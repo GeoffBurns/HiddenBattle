@@ -44,16 +44,21 @@ class Enemy extends Waters {
     this.opponent?.UI?.score?.hintReveal?.(r, c)
   }
   onEndTurn () {
-    if (this?.opponent && !this.opponent.boardDestroyed) {
-      const spinner = document.getElementById('spinner')
-      if (spinner) {
-        //
-        spinner.classList.add('waiting')
-        spinner.classList.remove('hidden')
-        spinner.src = ''
-        spinner.src = './images/loading.gif'
-      }
+    if (
+      this.opponent === null ||
+      this.opponent === undefined ||
+      this.opponent?.boardDestroyed
+    )
+      return
+    const spinner = document.getElementById('spinner')
+    if (spinner) {
+      //
+      spinner.classList.add('waiting')
+      spinner.classList.remove('hidden')
+      spinner.src = ''
+      spinner.src = './images/loading.gif'
     }
+
     gameStatus.showMode("Enemy's Turn")
     this.UI.board.classList.remove('targetting')
     this.UI.board.classList.add('not-step')

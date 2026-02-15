@@ -85,16 +85,26 @@
                     <div class="tally-col" id="enemy-tallyBox"></div>
                   </div>
                   <div class="info-container">
-                    <div class="info">
-                      Shots: <span id="enemy-shots">0 </span>
+                    <div class="info" id="enemy-shots-label">
+                      Shots: <span class="no-wrap" id="enemy-shots">0 </span>
                     </div>
-                    <div class="info">
-                      Hits: <span id="enemy-hits">0 </span>
+                    <div class="info" id="enemy-hits-label">
+                      Hits: <span class="no-wrap" id="enemy-hits">0 </span>
                     </div>
-                    <div class="info">
-                      Sunk: <span id="enemy-sunk">0 / 8</span>
+                    <div class="info hidden" id="enemy-reveals-label">
+                      Reveals: <span id="enemy-reveals">0 </span>
                     </div>
-                    <div class="info" style="display: none">
+                    <div class="info hidden" id="enemy-hints-label">
+                      Hints: <span id="enemy-hints">0 </span>
+                    </div>
+                    <div class="info" id="enemy-sunk-label">
+                      Sunk: <span class="no-wrap" id="enemy-sunk">0 / 8</span>
+                    </div>
+                    <div
+                      class="info"
+                      id="enemy-placed-label"
+                      style="display: none"
+                    >
                       Placed: <span class="no-wrap" id="enemy-placed">0 </span>
                     </div>
                   </div>

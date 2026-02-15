@@ -118,14 +118,19 @@ export class FriendUI extends PlacementUI {
     this.stopBtn.classList.add('hidden')
     this.seekBtn.classList.add('hidden')
   }
-  cellUseAmmo (r, c) {
+  cellUseAmmo (r, c, damage) {
     const cell = this.gridCellAt(r, c)
-    this.useAmmoInCell(cell)
+    this.useAmmoInCell(cell, damage)
   }
-  useAmmoInCell (cell) {
+  useAmmoInCell (cell, damage) {
     const dataset = cell.dataset
     cell.classList.remove('active')
-    cell.classList.add('empty')
+    if (damage) {
+      cell.classList.add(damage)
+      cell.classList.remove('empty', 'weapon')
+    } else {
+      cell.classList.add('empty')
+    }
     dataset.ammo = 0
   }
   addContrast () {}
