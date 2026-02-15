@@ -198,6 +198,8 @@ export class Weapon {
 
     // append inner explosion to wrapper and add to DOM so wrapper positioning is used
     explody1.appendChild(explody)
+
+    container.classList.add(shake)
     // DESTROY at end
     explody.addEventListener(
       'animationend',

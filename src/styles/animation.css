@@ -383,7 +383,7 @@
     position: absolute;
     inset: 0;
     /* shorthand for top/right/bottom/left: 0 */
-    margin: 5px 5px 5px 5px;
+    margin: 2px 2px 2px 2px;
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
