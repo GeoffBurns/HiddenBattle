@@ -18,8 +18,8 @@ export function setupMapControl (
   return targetMap
 }
 function setMapSelector (
-  // boardSetup = Function.prototype,
-  // refresh = Function.prototype,
+  boardSetup = Function.prototype,
+  refresh = Function.prototype,
   mapName
 ) {
   const maps = bh.maps
