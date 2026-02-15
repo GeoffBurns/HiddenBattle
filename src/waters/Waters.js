@@ -839,6 +839,7 @@ export class Waters {
     } else if (hits === 0 && reveals > 0) {
       this.displayInfo(messageInfo + this.revealDescription(reveals))
     } else if (hits === 0) {
+      if (weapon.letter === '-') return // don't display miss for bomb splash
       if (this.opponent) {
         this.displayInfo(
           messageInfo + `The ${weapon.name} missed ${this.preamble0} ships`
