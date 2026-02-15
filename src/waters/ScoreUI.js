@@ -8,24 +8,54 @@ export class ScoreUI {
     this.shots = document.getElementById(playerPrefix + '-shots')
     this.hits = document.getElementById(playerPrefix + '-hits')
     this.sunk = document.getElementById(playerPrefix + '-sunk')
+    this.hints = document.getElementById(playerPrefix + '-hints')
+    this.reveals = document.getElementById(playerPrefix + '-reveals')
     this.placed = document.getElementById(playerPrefix + '-placed')
     this.weaponsPlaced = document.getElementById(playerPrefix + '-weapons')
     this.zone = document.getElementById(playerPrefix + '-zone')
     this.shotsLabel = document.getElementById(playerPrefix + '-shots-label')
     this.hitsLabel = document.getElementById(playerPrefix + '-hits-label')
     this.sunkLabel = document.getElementById(playerPrefix + '-sunk-label')
+    this.hintsLabel = document.getElementById(playerPrefix + '-hints-label')
+    this.revealsLabel = document.getElementById(playerPrefix + '-reveals-label')
+    this.placedLabel = document.getElementById(playerPrefix + '-placed-label')
+    this.weaponsLabel = document.getElementById(playerPrefix + '-weapons-label')
     this.placedLabel = document.getElementById(playerPrefix + '-placed-label')
     this.weaponsLabel = document.getElementById(playerPrefix + '-weapons-label')
     this.zoneLabel = document.getElementById(playerPrefix + '-zone-label')
     this.tallyBox = document.getElementById(playerPrefix + '-tallyBox')
     this.zoneSync = []
   }
-  display (ships, shots) {
-    this.shots.textContent = shots.toString()
+  display (ships, shots, reveals, hints) {
+    if (this.shots && shots > 0) {
+      this.shotsLabel.classList.remove('hidden')
+      this.shots.textContent = shots.toString()
+    } else {
+      this.shotsLabel.classList.add('hidden')
+    }
+
     const hits = ships.reduce((sum, s) => sum + s.hits.size, 0)
+    if (this.hits && hits > 0) {
+      this.hitsLabel.classList.remove('hidden')
+      this.hits.textContent = hits.toString()
+    } else {
+      this.hitsLabel.classList.add('hidden')
+    }
     this.hits.textContent = hits.toString()
     const sunkCount = ships.filter(s => s.sunk).length
     this.sunk.textContent = `${sunkCount} / ${ships.length}`
+    if (this.hints && hints > 0) {
+      this.hintsLabel.classList.remove('hidden')
+      this.hints.textContent = hints.toString()
+    } else {
+      this.hintsLabel.classList.add('hidden')
+    }
+    if (this.reveals && reveals > 0) {
+      this.revealsLabel.classList.remove('hidden')
+      this.reveals.textContent = reveals.toString()
+    } else {
+      this.revealsLabel.classList.add('hidden')
+    }
   }
   createZoneTitle (labelTxt, bag) {
     return this.createZoneEntry(labelTxt, bag, 'b', 'line-height:1.2;')
@@ -186,6 +216,7 @@ export class ScoreUI {
       this.createZoneItem.bind(this)
     )
   }
+
   resetTallyBox () {
     this.tallyBox.innerHTML = ''
   }

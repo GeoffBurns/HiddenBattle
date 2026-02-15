@@ -29,7 +29,7 @@ function len2 (x, y) {
 }
 export function drawRay (x0, y0, x1, y1, canvas, color) {
   const { dxDir, dyDir } = direction(x1, x0, y1, y0)
-  drawRayInDirection(x0, y0, dxDir, dyDir, canvas)
+  drawRayInDirection(x0, y0, dxDir, dyDir, canvas, color)
 }
 function drawRayInDirection (x0, y0, dxDir, dyDir, canvas, color) {
   const { dx, dy, sx, sy } = initLineDirectionParans(dxDir, dyDir)

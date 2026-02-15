@@ -137,52 +137,57 @@ export class Ship {
     return shape.placeCells(variant, r0, c0)
   }
   destroy (model) {
+    let list = []
+    let misses = []
+
     for (const cell of this.cells) {
       const key = `${cell[0]},${cell[1]}`
-      if (!this.hits.has(key)) {
-        this.hitAt(key, Function.prototype, model)
+      if (this.hits.has(key)) {
+        misses.push({ key, cell, damaged: 'burnt' })
+      } else {
+        const { letter, info, damaged } = this.hitAt(key, model)
+        list.push({ key, cell, damaged: damaged || 'burnt' })
       }
     }
+    return { list, misses }
   }
 
-  hitAt (key, onSink = Function.prototype, model) {
+  hitAt (key, model) {
     this.hits.add(key)
     const wps = this.weapons[key]
     let info = null
+    let damaged = null
     if (wps) {
       const filled = wps.ammo > 0
       const weapon = wps.weapon
+      damaged = 'skull'
       if (!filled) {
         wps.damaged = true
+        damaged = 'damaged'
       } else {
         const viewModel = model.UI
         wps.hit = true
         model.loadOut.useAmmo(wps)
         const cell = viewModel.gridCellAt(...parsePair(key))
-
         viewModel.useAmmoInCell(cell)
         if (weapon.volatile) {
-          info = 'Magazine Detonated '
+          info = 'Magazine Detonated'
           weapon.animateDetonation(cell, viewModel.cellSizeScreen())
           if (!this.sunk) {
             this.sunk = true
-            this.destroy(model)
-            onSink(this, 'Magazine Detonated ')
-            return true
-          } else {
-            //       model.updateMode(wps)
+            const { list, misses } = this.destroy(model)
+            return { letter: this.letter, info, damaged, list, misses }
           }
-        } else {
-          //       model.updateMode(wps)
         }
       }
     }
+    const list = []
+    const misses = []
     if (this.hits.size === this.cells.length) {
       this.sunk = true
-      onSink(this, info)
-      return true
+      return { letter: this.letter, info, damaged, list, misses }
     }
-    return false
+    return { letter: '', info, damaged, list, misses }
   }
 
   place (placed) {

@@ -24,6 +24,7 @@ export class steps {
     this.onChangeWeapon = Function.prototype
     this.onActivate = Function.prototype
     this.onDeactivate = Function.prototype
+    this.onHint = Function.prototype
   }
   select () {
     this.mode = WeaponMode.targetAim
@@ -40,6 +41,7 @@ export class steps {
     this.source.board.cellUseAmmo(this.source.r, this.source.c)
     if (this.sourceRack?.weapon?.givesHint) {
       this.sourceHint.board.cellHintReveal(this.sourceHint.r, this.sourceHint.c)
+      this.onHint(this.sourceHint.r, this.sourceHint.c)
     }
   }
   addRack (rack, weapon, wletter, weaponId, r, c, cell) {

@@ -90,8 +90,8 @@ export class ListCanvas extends GridBase {
   drawPie (x0, y0, x1, y1, radius) {
     drawPie2(x0, y0, x1, y1, radius, this, 22.5)
   }
-  drawRay (x0, y0, x1, y1) {
-    drawRay(x0, y0, x1, y1, this)
+  drawRay (x0, y0, x1, y1, color) {
+    drawRay(x0, y0, x1, y1, this, color)
   }
   drawLineInfinite (x0, y0, x1, y1, color) {
     drawLineInfinite(x0, y0, x1, y1, this, color)

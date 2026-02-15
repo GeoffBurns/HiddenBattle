@@ -26,10 +26,9 @@ export class FriendUI extends PlacementUI {
     trackLevelEnd(bh.map, false)
   }
 
-  cellHit (r, c) {
+  cellHit (r, c, damaged) {
     const cell = this.gridCellAt(r, c)
-    this.cellHitBase(cell)
-    gameStatus.info('You where hit!')
+    this.cellHitBase(cell, damaged)
   }
   placeMode () {
     this.placingShips = true
@@ -42,6 +41,8 @@ export class FriendUI extends PlacementUI {
     this.score.shotsLabel.classList.add('hidden')
     this.score.hitsLabel.classList.add('hidden')
     this.score.sunkLabel.classList.add('hidden')
+    this.score.revealsLabel.classList.add('hidden')
+    this.score.hintsLabel.classList.add('hidden')
     this.score.placedLabel.classList.remove('hidden')
     this.showTransformBtns()
     this.stopBtn.classList.add('hidden')
@@ -85,9 +86,11 @@ export class FriendUI extends PlacementUI {
 
   unreadyMode () {
     this.stopBtn.classList.remove('hidden')
-    this.score.shotsLabel.classList.remove('hidden')
-    this.score.hitsLabel.classList.remove('hidden')
+    // this.score.shotsLabel.classList.remove('hidden')
+    // this.score.hitsLabel.classList.remove('hidden')
     this.score.sunkLabel.classList.remove('hidden')
+    //this.score.revealsLabel.classList.remove('hidden')
+    // this.score.hintsLabel.classList.remove('hidden')
     this.score.placedLabel.classList.add('hidden')
     this.hideTransformBtns()
     this.hideShipTrays()

@@ -151,7 +151,7 @@ export class WatersUI {
   }
   displaySunkCell (cell, letter) {
     this.setShipCellColors(cell, letter)
-
+    cell.classList.add('emn-sunk')
     cell.textContent = letter
   }
   setShipCellColors (cell, letter) {
@@ -210,6 +210,7 @@ export class WatersUI {
       'hit',
       'frd-hit',
       'frd-sunk',
+      'emn-sunk',
       'miss',
       'semi',
       'wake',
@@ -236,6 +237,9 @@ export class WatersUI {
       'miss',
       'placed',
       'weapon',
+      'burnt',
+      'damaged',
+      'skull',
       'empty',
       'turn2',
       'turn3',
@@ -258,7 +262,7 @@ export class WatersUI {
     this.cellHitBase(cell)
   }
 
-  cellHitBase (cell) {
+  cellHitBase (cell, damaged) {
     cell.classList.remove(
       'semi',
       'semi-miss',
@@ -269,6 +273,9 @@ export class WatersUI {
     )
     cell.classList.remove(...bh.terrain.weapons.tags)
     cell.classList.add('frd-hit')
+    if (damaged) {
+      cell.classList.add('damaged')
+    }
     cell.textContent = ''
   }
   cellSunkAt (r, c, letter) {
@@ -291,6 +298,7 @@ export class WatersUI {
     cell.classList.add('hit')
     cell.textContent = ''
   }
+
   cellSemiReveal (r, c) {
     const cell = this.gridCellAt(r, c)
 
@@ -299,11 +307,11 @@ export class WatersUI {
       cell.classList.contains('miss') ||
       cell.classList.contains('hit')
     )
-      return { hit: false, sunk: '', reveal: false }
+      return { hits: 0, shots: 0, reveals: 0, sunk: '', info: '' }
     cell.classList.add('semi')
     cell.classList.remove('wake')
     cell.textContent = ''
-    return { hit: false, sunk: '', reveal: true }
+    return { hits: 0, shots: 1, reveals: 1, sunk: '', info: '' }
   }
 
   cellHintReveal (r, c) {

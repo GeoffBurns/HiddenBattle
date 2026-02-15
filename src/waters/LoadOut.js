@@ -84,7 +84,12 @@ export class LoadOut {
   weaponSystem () {
     return this.weaponSystems[this.index]
   }
-
+  SShotWps () {
+    return this.weaponSystems[0]
+  }
+  SShot () {
+    return this.weaponSystems[0].weapon
+  }
   weapon () {
     return this.weaponSystem().weapon
   }
@@ -183,6 +188,9 @@ export class LoadOut {
   getRack () {
     return this.ships[0]?.loadedWeapon()
   }
+  getShipByWeaponId (id) {
+    return this.ships.find(s => s.getRackById(id) !== undefined)
+  }
   getRackById (id) {
     // const wps = this.ships.find(w => w.getRackById(id) !== null)
     return this.getLoadedWeapons().find(w => w.id === id)
@@ -196,10 +204,7 @@ export class LoadOut {
     const ship = this.ships.find(w => w.id === id)
     return ship
   }
-  getShipByWeaponId (id) {
-    const ship = this.ships.find(w => w.getRackById(id) !== null)
-    return ship
-  }
+
   getLoadedWeapons () {
     const r = this.ships.flatMap(w => w.loadedWeapons())
     return r

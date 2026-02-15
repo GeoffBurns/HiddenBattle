@@ -24,8 +24,8 @@ class EnemyUI extends WatersUI {
   }
 
   displayAsSunk (cell, letter) {
-    this.displaySunkCell(cell, letter)
     this.clearCell(cell)
+    this.displaySunkCell(cell, letter)
   }
 
   cellSunkAt (r, c, letter) {

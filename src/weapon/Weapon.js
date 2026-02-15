@@ -77,7 +77,9 @@ export class Weapon {
   info () {
     return `${this.name} (${this.letter})`
   }
-
+  splashAoe (map, coords) {
+    return this.aoe(map, coords)
+  }
   addSplash () {
     throw Error('override in derided class')
   }
@@ -322,10 +324,7 @@ export class StandardShot extends Weapon {
     this.hints = ['Click On Square To Fire']
     this.buttonHtml = '<span class="shortcut">S</span>ingle Shot'
   }
-  splashAoe (map, coords) {
-    return  this.aoe (map, coords)
-  }
-  
+
   aoe (_map, coords) {
     return [[coords[0][0], coords[0][1], 4]]
   }

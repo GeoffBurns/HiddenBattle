@@ -260,7 +260,7 @@ export class Waters {
     this.hasAttachedWeapons = this.weaponShips.length > 0
     if (bh.seekingMode && this.hasAttachedWeapons) {
       this.weaponShips = map.extraArmedFleetForMap
-      this.loadOut = this.makeLoadOut(map)
+      this.loadOut = this.makeLoadOut(map, this.weaponShips)
     } else if (oppo) {
       const weaponShips = oppo.ships.filter(s => s.hasWeapon())
       this.loadOut = this.makeLoadOut(map, weaponShips)
@@ -298,7 +298,7 @@ export class Waters {
       }
     }
 
-    const [r, c] = this.sourceHint(randomShip)
+    const [r, c] = this.randomSourceHint(randomShip, this.opponent)
     if (r === null || c === null) {
       return this.selectWeaponId(null, 0, 0, 'random', randomShip)
     }
@@ -307,9 +307,16 @@ export class Waters {
     return this.selectWeaponId(cell, r, c, 'random', randomShip)
   }
 
-  sourceHint (randomShip) {
-    const cells = randomShip.cells
-    const surround = [...this.UI.surroundCells(cells)]
+  sourceHint (randomShip, oppo) {
+    if (this.steps.sourceHint)
+      return [this.steps.sourceHint.r, this.steps.sourceHint.c]
+    const opponent = oppo || this.opponent
+
+    return this.randomSourceHint(randomShip, opponent)
+  }
+
+  randomSourceHint (randomShip, opponent) {
+    const surround = this.surround(randomShip, opponent)
     if (surround.length === 0) {
       console.warn(
         'no surround cells found for random weapon hint, using 0,0 as hint'
@@ -319,8 +326,15 @@ export class Waters {
     }
     const hintKey = randomElement(surround)
     const [r, c] = parsePair(hintKey)
-    this.steps.addHint(this.UI, r, c, this.UI.gridCellAt(r, c))
+    this.steps.addHint(opponent.UI, r, c, opponent.UI.gridCellAt(r, c))
     return [r, c]
+  }
+
+  surround (randomShip, opponent) {
+    if (!opponent) return []
+    const cells = randomShip.cells
+    const surround = [...opponent.UI.surroundCells(cells)]
+    return surround
   }
 
   shadowSource (r, c, oppo) {
@@ -338,6 +352,7 @@ export class Waters {
   selectAndArmWps (rack, oppo, launchR, launchC, hintR, hintC) {
     const weapon = rack?.weapon
     const letter = weapon?.letter
+
     this.addSource(oppo, launchR, launchC, rack)
     this.steps.addRack(
       rack,
@@ -373,6 +388,13 @@ export class Waters {
       console.warn(
         'no source found when selecting and arming weapon, adding source with launch coords'
       )
+    }
+    if (!bh.terrain.hasUnattachedWeapons && this.sourceShip === null) {
+      console.warn(
+        'Terrain does not have unattached weapons, but a weapon is without a source ship'
+      )
+      const ship = this.loadOut.getShipByWeaponId(rack?.id)
+      this.steps.addShip(ship)
     }
   }
 
@@ -451,6 +473,12 @@ export class Waters {
       launchC,
       cell || oppo.UI.gridCellAt(launchR, launchC)
     )
+    ship = this.loadOut.getShipByWeaponId(weaponId)
+    if (ship) {
+      this.steps.addShip(ship)
+      const [r, c] = this.sourceHint(ship)
+      this.shadowSource(r, c)
+    }
     return { launchR, launchC, weaponId, hintR, hintC }
   }
 
@@ -657,7 +685,7 @@ export class Waters {
     return this.shipCellGrid[r]?.[c]
   }
   markSunk (ship, info) {
-    this.sunkWarning(ship, info)
+    // this.sunkWarning(ship, info)
     this.UI.displaySurround(
       ship.cells,
       ship.letter,
@@ -670,9 +698,9 @@ export class Waters {
     return this.markSunk.bind(this)
   }
 
-  markHit (key, r, c) {
+  markHit (key, r, c, damaged) {
     this.score.semi.delete(key)
-    this.UI.cellHit(r, c)
+    this.UI.cellHit(r, c, damaged)
   }
 
   getShipFromCell (shipCell) {
@@ -697,38 +725,16 @@ export class Waters {
     this.displayInfo(info + this.sunkDescription(ship))
   }
 
-  checkForHit (r, c, key, shipCell) {
+  checkForHit (weapon, r, c, power, key, shipCell) {
     if (!shipCell) {
-      return
-    }
-
-    const hitShip = this.getShipFromCell(shipCell)
-    if (!hitShip) {
-      this.UI.cellMiss(r, c)
-      return { hit: false, sunk: '' }
-    }
-    const sunkLetter = this.showHit(key, r, c, hitShip)
-
-    return { hit: true, sunkLetter: sunkLetter }
-  }
-
-  showHit (key, r, c, hitShip) {
-    this.markHit(key, r, c)
-    const sunk = hitShip.hitAt(key, this.onSunk, this)
-    const sunkLetter = sunk ? hitShip.letter : ''
-    return sunkLetter
-  }
-
-  checkForHit2 (weapon, r, c, power, key, shipCell) {
-    if (!shipCell) {
-      return
+      return { hits: 0, shots: 0, reveals: 0, sunk: '', info: '' }
     }
 
     const hitShip = this.getShipFromCell(shipCell)
 
     if (!hitShip) {
       this.UI.cellMiss(r, c)
-      return { hit: false, sunk: '', reveal: false }
+      return { hits: 0, shots: 1, reveals: 0, sunk: '', info: '' }
     }
 
     const shape = bh.shapesByLetter(shipCell.letter)
@@ -739,16 +745,37 @@ export class Waters {
     }
 
     if (protection > power) {
-      return { hit: false, sunk: '', reveal: false }
+      return { hits: 0, shots: 0, reveals: 0, sunk: '', info: '' }
     }
-
+    let shots = 0
     if (power < 1) {
       this.score.shot.add(key)
+      shots = 1
     }
 
-    const sunkLetter = this.showHit(key, r, c, hitShip)
+    return this.showHit(key, r, c, hitShip, shots)
+  }
 
-    return { hit: true, sunkLetter: sunkLetter }
+  showHit (key, r, c, hitShip, shots) {
+    const { letter, info, damaged, list, misses } = hitShip.hitAt(key, this)
+    this.markHit(key, r, c, damaged)
+    let i = 1
+    let j = shots
+    for (const { key, cell, damaged } of list) {
+      this.score.shot.add(key)
+      i++
+      j++
+      this.markHit(key, cell[0], cell[1], damaged)
+    }
+    for (const { key, cell, damaged } of misses) {
+      this.score.shot.add(key)
+      j++
+      this.UI.cellMiss(cell[0], cell[1], damaged)
+    }
+    if (hitShip.sunk) {
+      this.markSunk(hitShip, info)
+    }
+    return { hits: i, shots: j, reveals: 0, sunk: letter, info }
   }
 
   updateMode (wps1) {
@@ -768,24 +795,16 @@ export class Waters {
     return { wps, cursorIdx }
   }
 
-  fireShot2 (weapon, r, c, power, key) {
+  fireShot (weapon, r, c, power, key) {
     const shipCell = this.shipCellAt(r, c)
     if (!shipCell) {
       if (power > 0) {
         this.UI.cellMiss(r, c)
+        return { hits: 0, shots: 1, reveals: 0, sunk: '', info: '' }
       }
-      return { hit: false, sunk: '' }
+      return { hits: 0, shots: 0, reveals: 0, sunk: '', info: '' }
     }
-    return this.checkForHit2(weapon, r, c, power, key, shipCell)
-  }
-
-  fireShot (r, c, key) {
-    const shipCell = this.shipCellAt(r, c)
-    if (!shipCell) {
-      this.UI.cellMiss(r, c)
-      return { hit: false, sunk: '' }
-    }
-    return this.checkForHit(r, c, key, shipCell)
+    return this.checkForHit(weapon, r, c, power, key, shipCell)
   }
 
   hitDescription (hits) {
@@ -797,32 +816,38 @@ export class Waters {
   }
   revealDescription (reveals) {
     if (this.opponent) {
-      return this.preamble + ' positions revealed (x' + reveals.toString() + ')'
+      return this.preamble + 'revealed (x' + reveals.toString() + ')'
     } else {
-      return reveals.toString() + ' positions revealed'
+      return reveals.toString() + 'revealed'
     }
   }
 
-  updateResultsOfBomb (hits, sunks, reveals = 0) {
+  updateResultsOfBomb (weapon, hits, sunks, reveals = 0, info = '') {
+    const messageInfo = info ? info + ' ' : ''
     if (this.boardDestroyed) {
       // already handled  in updateUI
     } else if (hits === 0 && reveals > 0) {
-      this.displayInfo(this.revealDescription(reveals))
+      this.displayInfo(messageInfo + this.revealDescription(reveals))
     } else if (hits === 0) {
       if (this.opponent) {
-        this.displayInfo('The Mega Bomb missed ' + this.preamble0 + ' ships')
+        this.displayInfo(
+          messageInfo + `The ${weapon.name} missed ${this.preamble0} ships`
+        )
       } else {
-        this.displayInfo('The Mega Bomb missed everything!')
+        this.displayInfo(messageInfo + `The ${weapon.name} missed everything!`)
       }
     } else if (sunks.length === 0) {
       let message = this.hitDescription(hits)
       if (reveals > 0) {
         message += ` and ${this.revealDescription(reveals)}`
       }
-      this.displayInfo(message)
+      this.displayInfo(messageInfo + message)
     } else if (sunks.length === 1) {
       this.displayInfo(
-        this.hitDescription(hits) + ' and ' + this.sunkLetterDescription(sunks)
+        messageInfo +
+          this.hitDescription(hits) +
+          ' and ' +
+          this.sunkLetterDescription(sunks)
       )
     } else {
       let message = this.hitDescription(hits) + ','
@@ -830,7 +855,7 @@ export class Waters {
         message += ' and ' + this.sunkLetterDescription(sunk)
       }
       message += ' Destroyed'
-      this.displayInfo(message)
+      this.displayInfo(messageInfo + message)
     }
   }
   effectById (id, tempEffect) {
@@ -862,17 +887,17 @@ export class Waters {
     }
   }
 
-  processShot2 (weapon, r, c, power) {
+  processShot (weapon, r, c, power) {
     if (power > 0) this.flame(r, c, weapon.hasFlash)
 
     const key =
       power > 0 ? this.score.createShotKey(r, c) : this.score.newShotKey(r, c)
     if (key === null) {
       // if we are here, it is because of carpet bomb, so we can just
-      return { hit: false, sunk: '' }
+      return { hits: 0, shots: 0, reveals: 0, sunk: '', info: '' }
     }
 
-    const result = this.fireShot2(weapon, r, c, power, key)
+    const result = this.fireShot(weapon, r, c, power, key)
 
     this.updateUI(this.ships)
     return result
@@ -882,15 +907,15 @@ export class Waters {
     this.updateTally(
       ships,
       this.loadOut.limitedAllSystems(),
-      this.score.noOfShots()
+      ...this.score.counts()
     )
   }
-  updateTally (ships, weaponSystems, noOfShots) {
+  updateTally (ships, weaponSystems, noOfShots, reveals, hints) {
     ships = ships || this.ships
     if (this.UI.placing && this.UI.placeTally) {
       this.UI.placeTally(ships)
     } else {
-      this.UI.score.display(ships, noOfShots)
+      this.UI.score.display(ships, noOfShots, reveals, hints)
       this.UI.score.buildTally(ships, weaponSystems, this.UI)
     }
   }

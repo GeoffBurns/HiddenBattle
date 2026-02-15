@@ -77,9 +77,10 @@ function getExtendedLinePoints (y1, x1, y2, x2, color) {
   points.drawLineInfinite(x1, y1, x2, y2, color)
   return points.list
 }
-function getLinePoints (x1, y1, x2, y2) {
+function getLinePoints (y1, x1, y2, x2, color) {
   const points = getListCanvas()
-  points.drawSegmentTo(x1, y1, x2, y2)
+  // points.drawSegmentTo(x1, y1, x2, y2, color)
+  points.drawRay(x1, y1, x2, y2, color)
   return points.list
 }
 export class Kinetic extends Weapon {
@@ -129,7 +130,7 @@ export class Kinetic extends Weapon {
   splashAoe (map, coords) {
     return this.aoe(map, coords, 20)
   }
-  aoe (map, coords, power = 2) {
+  aoe (map, coords, power = 1) {
     const r = coords[0][0]
     const c = coords[0][1]
 
@@ -210,15 +211,17 @@ export class Torpedo extends Weapon {
     ammo = ammo || this.ammo
     return new Torpedo(ammo)
   }
-
-  aoe (map, coords) {
+  splashAoe (map, coords) {
+    return this.aoe(map, coords, 20)
+  }
+  aoe (map, coords, power = 1) {
     const r = coords[0][0]
     const c = coords[0][1]
 
     const r1 = coords[1][0]
     const c1 = coords[1][1]
 
-    const line = getLinePoints(r, c, r1, c1)
+    const line = getLinePoints(r, c, r1, c1, power)
     const landIdx = line.findIndex(([r, c]) => map.isLand(r, c))
 
     if (landIdx >= 0) {
@@ -228,9 +231,9 @@ export class Torpedo extends Weapon {
   }
   redoCoords (map, base, coords) {
     const line = this.aoe(map, coords)
-
     return [line[0], line.at(-1)]
   }
+
   addSplash (map, r, c, power, newEffect) {
     const noCheck = map === null || map === undefined
     if (noCheck || (map.inBounds(r, c) && !map.isLand(r, c)))

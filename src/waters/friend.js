@@ -27,14 +27,25 @@ export class Friend extends Waters {
     const pick = Math.floor(Math.random() * len)
     return hits[pick]
   }
-  chase (hits, seeking) {
+  chase (allReadyHit, seeking, hint) {
+    let result = null
     for (let i = 0; i < 30; i++) {
-      const [r, c] = this.randomHit(hits)
+      const [r, c] = this.randomHit(allReadyHit)
       for (let j = 0; j < 15; j++) {
         if (this.isCancelled(seeking)) return
-        if (this.walkShot(r, c)) return
+        result = this.walkShot(r, c, hint)
+        if (result?.shots && result.shots > 0) return
       }
     }
+    const { hits, sunks, reveals, info, shots } = result
+    this.updateResultsOfBomb(
+      this.loadOut.SShot(),
+      hits,
+      sunks,
+      reveals,
+      info,
+      shots
+    )
   }
   isCancelled (seeking) {
     if (seeking && (!this.testContinue || this.boardDestroyed)) {
@@ -44,75 +55,86 @@ export class Friend extends Waters {
     return false
   }
 
-  seekHit (r, c) {
-    if (!bh.inBounds(r, c)) return false
-
-    this.flame(r, c, false)
-    const key = this.score.createShotKey(r, c)
-    if (key === null) {
-      // if we are here, it is because of carpet bomb, so we can just
-      return false
-    }
-
-    this.fireShot(r, c, key)
-    this.updateUI(this.ships)
-    return true
+  sShot (r, c) {
+    const sShot = this.loadOut.SShot()
+    return this.seekHit(sShot, r, c, 4)
   }
 
-  seekHit2 (weapon, r, c, power) {
-    if (!bh.inBounds(r, c)) return false
+  seekHit (weapon, r, c, power) {
+    if (!bh.inBounds(r, c))
+      return { hits: 0, shots: 0, reveals: 0, sunk: '', info: '' }
 
     if (power > 0) this.flame(r, c, weapon.hasFlash)
     const key =
       power > 0 ? this.score.createShotKey(r, c) : this.score.newShotKey(r, c)
     if (key === null) {
       // if we are here, it is because of carpet bomb, so we can just
-      return false
+      return { hits: 0, shots: 0, reveals: 0, sunk: '', info: '' }
     }
 
-    const { hit } = this.fireShot2(weapon, r, c, power, key)
+    const result = this.fireShot(weapon, r, c, power, key)
     this.updateUI(this.ships)
-    return hit
+    return result
   }
 
-  walkShot (r, c) {
-    const dir = bh.isLand(r, c) ? 5 : 4
+  walkShot (r, c, hint) {
+    const diagonal = bh.terrain.bodyTag === 'space' || bh.isLand(r, c)
+    const dir = hint ? 6 : diagonal ? 5 : 4
     const p = Math.floor(Math.random() * dir)
     switch (p) {
       case 0:
-        return this.seekHit(r, c + 1, false)
+        return this.sShot(r, c + 1, false)
       case 1:
-        return this.seekHit(r, c - 1, false)
+        return this.sShot(r, c - 1, false)
       case 2:
-        return this.seekHit(r + 1, c, false)
+        return this.sShot(r + 1, c, false)
       case 3:
-        return this.seekHit(r - 1, c, false)
+        return this.sShot(r - 1, c, false)
       case 4:
         switch (Math.floor(Math.random() * 4)) {
           case 0:
-            return this.seekHit(r + 1, c + 1, false)
+            return this.sShot(r + 1, c + 1, false)
           case 1:
-            return this.seekHit(r - 1, c - 1, false)
+            return this.sShot(r - 1, c - 1, false)
           case 2:
-            return this.seekHit(r + 1, c - 1, false)
+            return this.sShot(r + 1, c - 1, false)
           case 3:
-            return this.seekHit(r - 1, c + 1, false)
+            return this.sShot(r - 1, c + 1, false)
         }
+        break
+      case 5:
+        return this.sShot(r, c, false)
     }
   }
   seekBomb (weapon, effect) {
+    const { hits, sunks, reveals, info, shots } = this.seekBombRaw(
+      weapon,
+      effect
+    )
+    this.updateResultsOfBomb(weapon, hits, sunks, reveals, info, shots)
+  }
+  seekBombRaw (weapon, effect) {
     const map = bh.map
     this.updateUI()
-    let hit = false
+    let hits = 0
+    let reveals = 0
+    let sunks = ''
+    let info = ''
+    let shots = 0
     for (const position of effect) {
       const [r, c, power] = position
 
       if (map.inBounds(r, c)) {
-        if (this.seekHit2(weapon, r, c, power)) hit = true
+        const result = this.seekHit(weapon, r, c, power)
+        if (result?.hits) hits += result.hits
+        if (result?.sunk) sunks += result.sunk
+        if (result?.reveals) reveals += result.reveals
+        if (result?.shots) shots += result.shots
+        if (result?.info) info += result.info + ' '
       }
     }
-    if (hit) this.flash('long')
-    this.steps.endTurn()
+    if (hits > 0) this.flash('long')
+    return { hits, sunks, reveals, info, shots }
   }
 
   randomBomb (seeking) {
@@ -154,23 +176,9 @@ export class Friend extends Waters {
     /// this.loadOut.aim(map, r, map.cols - 1)
   }
 
-  randomSeekOld (seeking) {
-    const maxAttempts = 130
-    const map = bh.map
-
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      if (this.isCancelled(seeking)) return
-      const r = Math.floor(Math.random() * map.rows)
-      const c = Math.floor(Math.random() * map.cols)
-
-      if (this.seekHit(r, c, false)) {
-        return
-      }
-    }
-  }
   randomSeek (seeking) {
     const maxAttempts = 13
-
+    let result = null
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       if (this.isCancelled(seeking)) return
       const loc = this.randomLoc()
@@ -182,10 +190,18 @@ export class Friend extends Waters {
         this.testContinue = false
         return
       }
-      if (this.seekHit(loc[0], loc[1], false)) {
-        return
-      }
+      result = this.sShot(loc[0], loc[1], false)
+      if (result?.shots && result.shots > 0) return
     }
+    const { hits, sunks, reveals, info, shots } = result
+    this.updateResultsOfBomb(
+      this.loadOut.SShot(),
+      hits,
+      sunks,
+      reveals,
+      info,
+      shots
+    )
   }
 
   restartBoard () {
@@ -333,14 +349,26 @@ export class Friend extends Waters {
     }
   }
 
-  selectShot (semis, hits, seeking) {
+  selectShot (semis, hits, hints, seeking) {
     if (semis.length > 0) {
       this.loadOut.switchToSShot()
       const [r, c] = semis[0].split(',').map(x => parseInt(x))
-      this.seekHit(r, c, false)
+      const result = this.sShot(r, c, false)
+      const { hits, sunks, reveals, info, shots } = result
+      this.updateResultsOfBomb(
+        this.loadOut.SShot(),
+        hits,
+        sunks,
+        reveals,
+        info,
+        shots
+      )
     } else if (hits.length > 0) {
       this.loadOut.switchToSShot()
-      this.chase(hits, seeking)
+      this.chase(hits, seeking, false)
+    } else if (hints.length > 0) {
+      this.loadOut.switchToSShot()
+      this.chase(hints, seeking, true)
     } else {
       const op = this.loadOut.switchToPrefered()
       if (op) {
@@ -359,10 +387,20 @@ export class Friend extends Waters {
       return [r, c]
     })
   }
+
+  getHints () {
+    const hints = this.score.hint
+    return [...hints].map(h => {
+      const [r, c] = h.split(',').map(n => Number.parseInt(n))
+      return [r, c]
+    })
+  }
   seekStep (seeking) {
     const hits = this.getHits()
+    const hints = this.getHints()
 
-    this.selectShot([...this.score.semi], hits, seeking)
+    this.selectShot([...this.score.semi], hits, hints, seeking)
+    this.steps.endTurn()
   }
   updateWeaponStatus () {}
   updateMode (wps) {

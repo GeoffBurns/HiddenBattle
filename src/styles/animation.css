@@ -287,7 +287,7 @@
     /* sits above cell content */
 }
 
-.cell.hint::after {
+.cell.hint:not(.semi)::after {
     content: '!';
     position: absolute;
     inset: 0;
@@ -308,6 +308,10 @@
     /* sits above cell content */
 }
 
+.cell.hint.miss:not(.semi)::after {
+    content: '◎';
+}
+
 .cell.frd-hit::after {
     content: 'X';
     font-size: 130%;
@@ -315,6 +319,37 @@
     font-weight: 900;
     color: #380101;
     transition: opacity 0.1s ease-in-out;
+}
+
+.cell.miss.burnt:not(.target)::after {
+    content: '⨳';
+    background: #7183a6;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.cell.hit.burnt.target::after .cell.hit.burnt::after,
+.cell.frd-hit.burnt::after {
+    content: '⨳';
+}
+
+.cell.enm-sunk.burnt::after {
+    content: '⨳';
+    color: #380101;
+}
+
+
+.cell.hit.skull::after,
+.cell.frd-sunk.skull::after,
+.cell.enm-sunk.skull::after,
+.cell.frd-hit.skull::after {
+    content: '';
+    background-image: url('../images/skull28.png');
+}
+
+.cell.enm-sunk.damaged::after,
+.cell.frd-sunk.damaged::after {
+    content: '';
+    background-image: url('../images/skullol28.png');
 }
 
 .cell.frd-sunk {

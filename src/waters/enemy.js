@@ -40,7 +40,9 @@ class Enemy extends Waters {
   onChangeWeapon (wletter) {
     this.loadOut.switchTo(wletter)
   }
-
+  onHint (r, c) {
+    this.opponent?.UI?.score?.hintReveal?.(r, c)
+  }
   onEndTurn () {
     if (this?.opponent && !this.opponent.boardDestroyed) {
       const spinner = document.getElementById('spinner')
@@ -73,7 +75,7 @@ class Enemy extends Waters {
       spinner.classList.remove('waiting')
       spinner.classList.add('hidden')
     }
-
+    gameStatus.showMode('')
     if (this.boardDestroyed || this.isRevealed) {
       this.steps.select()
     } else {
@@ -171,7 +173,7 @@ class Enemy extends Waters {
   updateUI (ships) {
     ships = ships || this.ships
     // stats
-    this.UI.score.display(ships, this.score.noOfShots())
+    this.UI.score.display(ships, ...this.score.counts())
     // mode
 
     // buttons
@@ -254,22 +256,26 @@ class Enemy extends Waters {
   fireAt2 (weapon, effect) {
     this.updateMode()
     // Mega Bomb mode: affect 3x3 area centered on (r,c)
-    this.processCarpetBomb2(weapon, effect)
+    this.processCarpetBomb(weapon, effect)
   }
 
-  processCarpetBomb2 (weapon, effect) {
+  processCarpetBomb (weapon, effect) {
     let hits = 0
     let reveals = 0
     let sunks = ''
-    ;({ hits, sunks, reveals } = this.dropBomb2(
+    let info = ''
+    let shots = 0
+    ;({ hits, sunks, reveals, info, shots } = this.dropBomb(
       weapon,
       effect,
       hits,
       sunks,
-      reveals
+      reveals,
+      info,
+      shots
     ))
     // update status
-    this.updateResultsOfBomb(hits, sunks, reveals)
+    this.updateResultsOfBomb(weapon, hits, sunks, reveals, info, shots)
     this.updateWeaponStatus()
     this.flash()
   }
@@ -289,24 +295,27 @@ class Enemy extends Waters {
       rack
     )
   }
-  dropBomb2 (weapon, effect, hits, sunks, reveals) {
+  dropBomb (weapon, effect, hits, sunks, reveals, info, shots) {
     const map = bh.map
+
     for (const position of effect) {
       const [r, c, power] = position
 
       if (map.inBounds(r, c)) {
-        const result = this.processShot2(weapon, r, c, power)
-        if (result?.hit) hits++
-        if (result?.sunkLetter) sunks += result.sunkLetter
-        if (result?.reveal) reveals++
+        const result = this.processShot(weapon, r, c, power)
+        if (result?.hits) hits += result.hits
+        if (result?.sunk) sunks += result.sunk
+        if (result?.reveals) reveals += result.reveals
+        if (result?.shots) shots += result.shots
+        if (result?.info) info += result.info + ' '
       }
     }
-    return { hits, sunks, reveals }
+    return { hits, sunks, reveals, info, shots }
   }
 
   onClickWeaponMode () {
     this.switchMode()
-    this.updateMode()
+    this.updateMode(this.loadOut.weaponSystem())
   }
   onClickReveal () {
     if (!this.isRevealed) {
