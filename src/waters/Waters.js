@@ -681,6 +681,8 @@ export class Waters {
     this.displayInfo('All ' + this.preamble0 + ' Ships Destroyed!')
     this.UI.displayFleetSunk()
     this.boardDestroyed = true
+    this.stopWaiting?.()
+    this.opponent?.stopWaiting()
   }
   checkFleetSunk () {
     if (this.ships.every(s => s.sunk)) {
@@ -786,6 +788,8 @@ export class Waters {
 
   updateMode (wps1) {
     if (this.isRevealed || this.boardDestroyed) {
+      this.stopWaiting?.()
+      this.opponent?.stopWaiting()
       return
     }
     this.updateWeapon(wps1)

@@ -47,9 +47,22 @@ class Enemy extends Waters {
     if (
       this.opponent === null ||
       this.opponent === undefined ||
-      this.opponent?.boardDestroyed
+      this.opponent?.boardDestroyed ||
+      this.opponent?.isRevealed
     )
       return
+    this.waitForOpponent()
+    this.timeoutId = setTimeout(() => {
+      this.timeoutId = null
+      this.opponent.seekStep()
+      this.timeoutId = setTimeout(() => {
+        this.timeoutId = null
+        //     this.steps.beginTurn()
+      }, 500)
+    }, 1700)
+  }
+
+  waitForOpponent () {
     const spinner = document.getElementById('spinner')
     if (spinner) {
       //
@@ -63,24 +76,10 @@ class Enemy extends Waters {
     this.UI.board.classList.remove('targetting')
     this.UI.board.classList.add('not-step')
     this.steps.clearSource()
-    this.timeoutId = setTimeout(() => {
-      this.timeoutId = null
-      this.opponent.seekStep()
-      this.timeoutId = setTimeout(() => {
-        this.timeoutId = null
-        //     this.steps.beginTurn()
-      }, 500)
-    }, 1700)
   }
 
   onBeginTurn () {
-    const spinner = document.getElementById('spinner')
-    if (spinner) {
-      //
-      spinner.classList.remove('waiting')
-      spinner.classList.add('hidden')
-    }
-    gameStatus.showMode('')
+    this.stopWaiting()
     if (this.boardDestroyed || this.isRevealed) {
       this.steps.select()
     } else {
@@ -90,6 +89,16 @@ class Enemy extends Waters {
       }
     }
   }
+  stopWaiting () {
+    const spinner = document.getElementById('spinner')
+    if (spinner) {
+      //
+      spinner.classList.remove('waiting')
+      spinner.classList.add('hidden')
+    }
+    gameStatus.showMode('')
+  }
+
   cursorChange (oldCursor, newCursor) {
     this.updateMode()
     if (newCursor === oldCursor) return
@@ -170,7 +179,8 @@ class Enemy extends Waters {
   revealAll () {
     this.UI.clearClasses()
     this.UI.revealAll(this.ships)
-
+    this.stopWaiting?.()
+    this.opponent?.stopWaiting?.()
     this.boardDestroyed = true
     this.isRevealed = true
   }
@@ -180,7 +190,7 @@ class Enemy extends Waters {
     // stats
     this.UI.score.display(ships, ...this.score.counts())
     // mode
-
+    this.stopWaiting()
     // buttons
     this.UI.weaponBtn.disabled =
       this.boardDestroyed || this.isRevealed || this.hasNoAmmo()

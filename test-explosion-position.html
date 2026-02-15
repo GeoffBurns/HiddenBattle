@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Explosion Position Test</title>
+    <link rel="stylesheet" href="src/styles/cells.css" />
+    <style>
+      :root {
+        --space-explode-image: linear-gradient(
+          135deg,
+          #ff6b00,
+          #ff0000,
+          #ffff00
+        );
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #222;
+        color: #fff;
+      }
+      .test-container {
+        display: flex;
+        gap: 40px;
+        margin: 20px 0;
+      }
+      .test-case {
+        flex: 1;
+        min-width: 400px;
+      }
+      .board-container {
+        position: relative;
+        width: 400px;
+        height: 400px;
+        background: #0e1530;
+        border: 2px solid #1b2746;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      .test-board {
+        display: grid;
+        grid-template-columns: repeat(8, 50px);
+        grid-template-rows: repeat(8, 50px);
+        gap: 0;
+        padding: 20px;
+      }
+      .cell {
+        width: 50px;
+        height: 50px;
+        background: #1a3a6d;
+        border: 1px solid #024;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+      .cell.target {
+        background: #3a6d1a;
+        border: 2px solid #0f0;
+      }
+      #battleship-game-container {
+        position: relative;
+        width: 400px;
+        height: 400px;
+        background: #0e1530;
+        border: 2px solid #1b2746;
+        border-radius: 10px;
+        overflow: visible;
+        margin: 20px 0;
+      }
+      .explosion-wrapper {
+        position: absolute !important;
+      }
+      .explosion {
+        transform: translate(-50%, -50%) !important;
+      }
+      /* Debug styling for test */
+      .explosion {
+        background-size: 128px 128px !important;
+        border: 2px solid #ff0 !important;
+      }
+      .test-info {
+        background: rgb(255, 255, 238, 0.1);
+        padding: 15px;
+        border-radius: 8px;
+        margin: 10px 0;
+        border: 1px solid #ffc;
+      }
+      .controls {
+        margin: 20px 0;
+      }
+      button {
+        padding: 10px 20px;
+        margin: 5px;
+        background: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      button:hover {
+        background: #45a049;
+      }
+      .debug-info {
+        background: #111;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 12px;
+        max-height: 200px;
+        overflow-y: auto;
+        color: #0f0;
+      }
+      h2 {
+        color: #ffc;
+        margin-top: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Explosion Position Test</h1>
+
+    <div class="test-container">
+      <div class="test-case">
+        <h2>Target Grid</h2>
+        <p>
+          Click on a cell to set the target, then fire to test explosion
+          positioning.
+        </p>
+        <div class="board-container">
+          <div class="test-board" id="target-board"></div>
+        </div>
+        <div class="controls">
+          <button onclick="fireExplosion()">Fire Explosion</button>
+          <button onclick="resetTest()">Reset</button>
+        </div>
+        <div class="test-info">
+          <div>Target Cell: <span id="target-info">None selected</span></div>
+          <div>
+            Explosion Center: <span id="explosion-info">Not fired</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="test-case">
+        <h2>Animation Container</h2>
+        <p>Explosion should appear centered on the target cell.</p>
+        <div id="battleship-game-container"></div>
+        <div class="debug-info" id="debug-log"></div>
+      </div>
+    </div>
+
+    <script>
+      let selectedCell = null
+      let selectedCoords = null
+
+      // Initialize target board
+      function initBoard() {
+        const board = document.getElementById('target-board')
+        board.innerHTML = ''
+        for (let i = 0; i < 64; i++) {
+          const cell = document.createElement('div')
+          cell.className = 'cell'
+          cell.textContent = i
+          cell.dataset.index = i
+          cell.onclick = () => selectCell(cell, i)
+          board.appendChild(cell)
+        }
+      }
+
+      function selectCell(cell, index) {
+        if (selectedCell) selectedCell.classList.remove('target')
+        selectedCell = cell
+        selectedCell.classList.add('target')
+        selectedCoords = [Math.floor(index / 8), index % 8]
+        document.getElementById(
+          'target-info'
+        ).textContent = `Row ${selectedCoords[0]}, Col ${selectedCoords[1]} (cell ${index})`
+      }
+
+      function getCellPosition(index) {
+        const row = Math.floor(index / 8)
+        const col = index % 8
+        // Each cell is 50px with 20px padding
+        const x = 20 + col * 50 + 25 // +25 for center
+        const y = 20 + row * 50 + 25 // +25 for center
+        return { x, y }
+      }
+
+      function fireExplosion() {
+        if (!selectedCell) {
+          alert('Please select a target cell first')
+          return
+        }
+
+        const index = parseInt(selectedCell.dataset.index)
+        const targetPos = getCellPosition(index)
+
+        log(`🎯 Target: Row ${selectedCoords[0]}, Col ${selectedCoords[1]}`)
+        log(`📍 Target Position: x=${targetPos.x}, y=${targetPos.y}`)
+
+        // Create a test explosion using the Weapon logic
+        const container = document.getElementById('battleship-game-container')
+        container.innerHTML = ''
+
+        // Simulate the animate explosion with wrapper
+        const explody1 = document.createElement('div')
+        const explody = document.createElement('div')
+
+        explody1.className = 'explosion-wrapper'
+        explody.className = 'explosion space'
+
+        // Set wrapper positioning - convert to absolute for test container
+        const offsetX = targetPos.x - 64
+        const offsetY = targetPos.y - 64
+        explody1.style.left = `${offsetX}px`
+        explody1.style.top = `${offsetY}px`
+        explody.style.setProperty('--scale-start', '0.3')
+        explody.style.setProperty('--scale-end', '1.6')
+
+        // Append explosion to wrapper
+        explody1.appendChild(explody)
+
+        // Add to container
+        container.appendChild(explody1)
+
+        log(
+          `✓ Explosion wrapper created at (${targetPos.x - 64}px, ${
+            targetPos.y - 64
+          }px)`
+        )
+
+        // Get bounding rect to verify positioning
+        explody.getBoundingClientRect()
+
+        requestAnimationFrame(() => {
+          explody.classList.add('play')
+          const rect = explody1.getBoundingClientRect()
+          const containerRect = container.getBoundingClientRect()
+          const relativeX = rect.left - containerRect.left
+          const relativeY = rect.top - containerRect.top
+
+          log(
+            `📦 Wrapper rendered at: (${Math.round(relativeX)}px, ${Math.round(
+              relativeY
+            )}px)`
+          )
+          log(`✨ Expected center: (${targetPos.x}px, ${targetPos.y}px)`)
+          document.getElementById(
+            'explosion-info'
+          ).textContent = `Wrapper: (${Math.round(relativeX)}, ${Math.round(
+            relativeY
+          )}) Center: (${targetPos.x}, ${targetPos.y})`
+
+          // Highlight target cell
+          const targetCell = document.querySelector(`[data-index="${index}"]`)
+          if (targetCell) {
+            targetCell.style.boxShadow = '0 0 20px #0f0 inset'
+          }
+        })
+      }
+
+      function resetTest() {
+        if (selectedCell) selectedCell.classList.remove('target')
+        selectedCell = null
+        selectedCoords = null
+        document.getElementById('target-info').textContent = 'None selected'
+        document.getElementById('explosion-info').textContent = 'Not fired'
+        document.getElementById('battleship-game-container').innerHTML = ''
+        document.getElementById('debug-log').innerHTML = ''
+        initBoard()
+      }
+
+      function log(message) {
+        const debugLog = document.getElementById('debug-log')
+        const line = document.createElement('div')
+        line.textContent = message
+        debugLog.appendChild(line)
+        debugLog.scrollTop = debugLog.scrollHeight
+      }
+
+      // Initialize on load
+      window.addEventListener('DOMContentLoaded', initBoard)
+    </script>
+  </body>
+</html>

@@ -409,7 +409,7 @@ export class Friend extends Waters {
     }
     this.updateWeapon(wps)
   }
-
+  stopWaiting () {}
   deactivateWeapon () {}
   resetModel () {
     this.score.reset()

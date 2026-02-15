@@ -151,7 +151,7 @@ export class WatersUI {
   }
   displaySunkCell (cell, letter) {
     this.setShipCellColors(cell, letter)
-    cell.classList.add('emn-sunk')
+    cell.classList.add('enm-sunk')
     if (
       cell.classList.contains('damaged') ||
       cell.classList.contains('skull')
@@ -217,7 +217,7 @@ export class WatersUI {
       'hit',
       'frd-hit',
       'frd-sunk',
-      'emn-sunk',
+      'enm-sunk',
       'miss',
       'semi',
       'wake',

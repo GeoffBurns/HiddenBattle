@@ -179,33 +179,41 @@ export class Weapon {
     const scale = (cellSize * this.splashSize * mod) / 128
     explody1.className = 'explosion-wrapper'
     explody.className = 'explosion ' + type
-    explody1.style.setProperty('--x', `${end.x - 64}px`)
-    explody1.style.setProperty('--y', `${end.y - 64}px`)
+
+    // Convert viewport coordinates to container-relative coordinates
+    const containerRect = container.getBoundingClientRect()
+    const relX = end.x - containerRect.left
+    const relY = end.y - containerRect.top
+    explody1.style.setProperty('--x', `${relX}px`)
+    explody1.style.setProperty('--y', `${relY}px`)
     explody.style.setProperty('--scale-start', `${scale * 0.6}`)
     explody.style.setProperty('--scale-end', `${scale * 1.6}`)
 
-    //console.log(explody)
-    //explody.style.outline = '2px solid red'
-    //explody1.appendChild(explody)
+    // Position explosion to fill wrapper (override fixed position from CSS)
+    explody.style.position = 'absolute'
+    explody.style.inset = '0'
+    explody.style.transform = 'none'
+    explody.style.width = '100%'
+    explody.style.height = '100%'
+
+    // append inner explosion to wrapper and add to DOM so wrapper positioning is used
+    explody1.appendChild(explody)
     // DESTROY at end
     explody.addEventListener(
       'animationend',
       () => {
         container.classList.remove(shake)
-        //  explody.className = ''
-        explody.remove()
-        // explody1.remove()
+        explody1.remove()
         if (onEnd) onEnd()
       },
       { once: true }
     )
 
-    container.appendChild(explody)
-    //
+    container.appendChild(explody1)
+    // force style recalc then start animation
     explody.getBoundingClientRect()
     requestAnimationFrame(() => {
       explody.classList.add('play')
-      //   container.classList.add(shake)
     })
   }
 
@@ -310,7 +318,7 @@ export class Weapon {
     pointer.style.setProperty('--end-y', `${end.y}px`)
     pointer.style.setProperty('--angle', `${angle}deg`)
     pointer.style.setProperty('--duration', '0.7s')
-
+    console.log(pointer)
     container.appendChild(pointer)
     return pointer
   }
