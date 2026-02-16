@@ -2,7 +2,7 @@ import { makeKey } from '../utilities.js'
 import { bh, oldToken, SubTerrainTrackers } from './terrain.js'
 import { standardShot } from '../weapon/Weapon.js'
 import { Megabomb } from '../sea/SeaWeapons.js'
-import { lazy } from '../utilities.js'
+import { lazy, randomElement } from '../utilities.js'
 import { Mask } from '../grid/mask.js'
 
 // geometry helper
@@ -73,6 +73,33 @@ export class BhMap {
       s => Array(shipNum[s.letter] || 0).fill(s) || []
     )
     return repeatShapes
+  }
+  randomEdge (r, c) {
+    let edge = null
+    let list = []
+
+    if (r !== undefined) {
+      edge = r < this.rows / 2 ? 1 : 0
+      list.push(edge)
+    }
+    if (c !== undefined) {
+      edge = c < this.cols / 2 ? 3 : 2
+      list.push(edge)
+    }
+    if (list.length > 0) {
+      edge = randomElement(list)
+    }
+
+    return this.randomEdgeFor(edge)
+  }
+
+  randomEdgeFor (edge) {
+    edge = edge || Math.floor(Math.random() * 4)
+    if (edge === 0) return [0, Math.floor(Math.random() * this.cols)]
+    if (edge === 1)
+      return [this.rows - 1, Math.floor(Math.random() * this.cols)]
+    if (edge === 2) return [Math.floor(Math.random() * this.rows), 0]
+    return [Math.floor(Math.random() * this.rows), this.cols - 1]
   }
 
   inBounds (r, c) {

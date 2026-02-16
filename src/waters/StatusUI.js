@@ -1,5 +1,5 @@
 const MAX_LINES = 20
-
+import { randomElement } from '../utilities.js'
 export class StatusUI {
   constructor () {
     this.mode = document.getElementById('modeStatus')
@@ -16,11 +16,115 @@ export class StatusUI {
     this.chevronBox = document.getElementById('chevron-box')
     this.chevron = document.getElementById('chevron')
     this.important = false
+    this.scoreQueue = []
+    this.tipsQueue = []
+    this.currentNote = null
+    this.timer = null
+    this.waiting = false
   }
   clear () {
     this.display('', '')
   }
+  get newTip () {
+    if (this.tipsQueue.length === 0) return null
+    return randomElement(this.tipsQueue)
+  }
+  nextInQueue () {
+    const next = this.scoreQueue.shift()
+    if (next) {
+      this.current = next.item
+      this.show(next.item, next.isImportant)
+      this.waitFor(2500)
+    } else if (this.scoreQueue.length === 0) {
+      this.addTipToQueue()
+    }
+  }
+  addTipToQueue () {
+    this.waiting = true
+    this.timer = setTimeout(() => {
+      this.timer = null
+      const old = this.current
+      this.current = null
+      this.waiting = false
+      const tip = this.newTip
+      if (this.scoreQueue.length > 0) {
+        this.waiting = false
+        this.nextInQueue()
+      } else if (tip && tip !== old) {
+        this.showSoon(tip, false, 3000)
+      } else {
+        this.addTipToQueue()
+      }
+    }, 1500)
+  }
 
+  showImediately (newItem) {
+    if (this.current === newItem) return
+    clearTimeout(this.timer)
+    this.timer = null
+    this.showSoon(newItem, true, 2500)
+  }
+  showSoonish (newItem, isImportant = false, duration = 2500) {
+    if (this.current === newItem) return
+    if (this.scoreQueue.length > 0) {
+      return this.addToQueue(newItem, isImportant)
+    }
+    this.showSoon(newItem, isImportant, duration)
+  }
+  addToQueue (newItem, isImportant = false) {
+    this.scoreQueue.push({ item: newItem, isImportant })
+    if (this.waiting) {
+      clearTimeout(this.timer)
+      this.timer = null
+      this.waiting = false
+      this.nextInQueue()
+    }
+  }
+  showSoon (newItem, isImportant = false, duration = 2500) {
+    if (this.current === newItem && !isImportant) return
+    if (this.timer === null) {
+      this.show(newItem, isImportant)
+      this.waitFor(duration)
+    } else {
+      this.addToQueue(newItem, isImportant)
+    }
+  }
+  clearQueue () {
+    this.scoreQueue = []
+    this.tipsQueue = []
+    clearTimeout(this.timer)
+    this.timer = null
+    this.info('')
+  }
+  clearMode () {
+    this.mode.textContent = ''
+  }
+  show (newItem, isImportant) {
+    this.current = newItem
+    this.infoBase(newItem)
+    this.important = isImportant
+  }
+  waitFor (duration) {
+    clearTimeout(this.timer)
+    this.timer = null
+    this.timer = setTimeout(() => {
+      this.current = null
+      this.nextInQueue()
+    }, duration)
+  }
+  addScore (scoreText) {
+    this.scoreQueue.push(scoreText)
+  }
+  setTips (tips, showFirst) {
+    this.tipsQueue = tips
+    const firstTip = showFirst || this.newTip || tips[0]
+    if (firstTip) {
+      this.showSoon(firstTip, false, 3000)
+    }
+  }
+  addTip (tip) {
+    this.tipsQueue.push(tip)
+  }
   prependLine (text) {
     if (!text || text === '' || text === 'Single Shot Mode') return
     const line = document.createElement('div')
@@ -50,7 +154,7 @@ export class StatusUI {
   display (mode, game) {
     this.showMode(mode)
     if (game) {
-      this.info(game)
+      this.addToQueue(game, false)
     }
   }
   displayAmmoStatus (wps, maps, idx = -1, numCoords = -1, selectedWps = null) {
@@ -80,10 +184,9 @@ export class StatusUI {
     } else {
       idxUsed = this.displaySingleShotStatus()
     }
-    const timerId = setTimeout(() => {
-      this.info(weapon.stepHint(idxUsed))
-    }, 1000)
-    return timerId
+    this.addToQueue(weapon.stepHint(idxUsed), false)
+
+    return
   }
   displayLimitedAmmoStatus (wps, ammo, weapon, numCoords, maps, letter, select) {
     this.displayAmmoLeft(wps, ammo)
@@ -164,7 +267,14 @@ export class StatusUI {
     this.total.textContent = '∞'
     this.left.textContent = '∞'
   }
-
+  flush () {
+    this.scoreQueue = this.scoreQueue.filter(
+      ({ item, isImportant }) => isImportant
+    )
+    if (!this.important) {
+      this.game.textContent = ''
+    }
+  }
   info (game) {
     this.infoBase(game)
     this.important = false

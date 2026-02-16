@@ -144,14 +144,15 @@ class Enemy extends Waters {
         }
       }
       if (ok) {
-        gameStatus.info('Click On Square To Fire')
+        gameStatus.setTips(['Click On Square To Fire'])
         this.disableBtns(false)
         return
       }
     }
 
-    gameStatus.info2(
-      `Having difficulty placing all ships (${(attempt1 + 1) * 25} attempts)`
+    gameStatus.addToQueue(
+      `Having difficulty placing all ships (${(attempt1 + 1) * 25} attempts)`,
+      true
     )
 
     if (attempt1 < 10) {
@@ -163,7 +164,7 @@ class Enemy extends Waters {
 
     this.disableBtns(false)
 
-    gameStatus.info2('Failed to place all ships after many attempts')
+    gameStatus.addToQueue('Failed to place all ships after many attempts', true)
     this.boardDestroyed = true
     throw new Error('Failed to place all ships after many attempts')
   }
@@ -202,11 +203,11 @@ class Enemy extends Waters {
     if (this.boardDestroyed || this.isRevealed || this.loadOut.checkNoAmmo())
       return false
     if (this.timeoutId) {
-      gameStatus.info('Wait For Enemy To Finish Their Turn')
+      gameStatus.addToQueue('Wait For Enemy To Finish Their Turn', false)
       return false
     }
     if (this?.opponent?.boardDestroyed) {
-      gameStatus.info('Game Over - No More Shots Allowed')
+      gameStatus.addToQueue('Game Over - No More Shots Allowed', true)
       return false
     }
     return true
@@ -256,11 +257,11 @@ class Enemy extends Waters {
       effect.length === 1 &&
       !this.score.newShotKey(effect[0][0], effect[0][1])
     ) {
-      gameStatus.info('Already Shot Here - Try Again')
+      gameStatus.addToQueue('Already Shot Here - Try Again', false)
       return false
     }
     if (effect.length === 0) {
-      gameStatus.info('Has no effect - Try Again')
+      gameStatus.addToQueue('Has no effect - Try Again', false)
       return false
     }
     this.fireAt2(weapon, effect)

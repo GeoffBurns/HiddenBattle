@@ -613,37 +613,13 @@ export class WatersUI {
     this.clearVisualsBase('all', this.clearPlaceCell.bind(this))
   }
   showNotice (notice) {
-    clearInterval(noticeTimerId)
-    noticeTimerId = null
-    gameStatus.info(notice)
-    // turn off tips
-    noticeTimerId = setInterval(() => {
-      // turn on tips
-      clearInterval(noticeTimerId)
-      noticeTimerId = null
-    }, 2000)
+    gameStatus.addToQueue(notice, false)
   }
   showTips () {
-    gameStatus.clear()
-    let index = 0
-
-    gameStatus.info(this.tips[0])
-    tipsTimerId = setInterval(() => {
-      if (tipsTimerId === false) {
-        clearInterval(tipsTimerId)
-        tipsTimerId = null
-      } else {
-        if (noticeTimerId) return
-        gameStatus.info(this.tips[index])
-        index = (index + 1) % this.tips.length
-      }
-    }, 13000)
+    gameStatus.setTips(this.tips, null)
   }
   hideTips () {
-    if (tipsTimerId) {
-      clearInterval(tipsTimerId)
-      tipsTimerId = null
-    }
+    gameStatus.clearQueue()
   }
   deactivateWeapons () {
     for (const cell of this.board.children) {

@@ -68,10 +68,12 @@ export class CustomUI extends PlacementUI {
     for (const panel of panels) {
       panel.classList.remove('alt')
     }
-    gameStatus.clear()
-    gameStatus.info(
+
+    gameStatus.setTips(
+      this.tips,
       `drag blocks across map to create or destroy ${landString()}`
     )
+
     this.tips = [
       `drag blocks across map to create or destroy ${landString()}`,
       `press accept button when the ${seaString()} and ${landString()} is to your liking`
@@ -110,13 +112,15 @@ export class CustomUI extends PlacementUI {
     this.showStatus()
     this.standardPanels()
 
-    gameStatus.info('drag ships to the map grid to add them to your map')
+    gameStatus.setTips(
+      this.s,
+      'drag ships to the map grid to add them to your map'
+    )
     this.s = [
       'drag ships to the map grid to add them to your map',
       'drag weapons on to the map to increase the ammunition available',
       'drag weapons tally-boxes back to the tray to remove a weapon'
     ]
-    this.showTips()
   }
 }
 

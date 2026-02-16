@@ -222,9 +222,19 @@ export class Friend extends Waters {
     }
     this.armWeapons()
   }
-
+  launchTo (coords, rr, cc, currentWeapon, onEnd) {
+    currentWeapon.weapon.cursorLaunchTo(
+      coords,
+      rr,
+      cc,
+      onEnd,
+      bh.map,
+      this.UI,
+      this.opponent?.UI
+    )
+  }
   test () {
-    gameStatus.display('', '')
+    gameStatus.flush()
     this.UI.testMode()
     this.UI.testBtn.disabled = true
     this.UI.seekBtn.disabled = true

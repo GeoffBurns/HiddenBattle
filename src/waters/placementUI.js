@@ -39,7 +39,7 @@ export class PlacementUI extends WatersUI {
     gameStatus.mode.classList.remove('hidden')
     gameStatus.line.classList.remove('hidden', 'small')
     gameStatus.line.classList.add('medium')
-    gameStatus.clear()
+    gameStatus.clearQueue()
   }
   standardPanels () {
     const panels = document.getElementsByClassName('panel')

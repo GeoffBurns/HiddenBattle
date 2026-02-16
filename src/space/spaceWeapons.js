@@ -1,3 +1,4 @@
+import { bh } from '../terrain/terrain.js'
 import { Megabomb, Kinetic, Torpedo, Sweep } from '../sea/SeaWeapons.js'
 import { WeaponCatelogue as WeaponCatalogue } from '../weapon/Weapon.js'
 

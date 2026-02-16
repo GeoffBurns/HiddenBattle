@@ -26,6 +26,7 @@ export class ScoreUI {
     this.tallyBox = document.getElementById(playerPrefix + '-tallyBox')
     this.zoneSync = []
   }
+
   display (ships, shots, reveals, hints) {
     if (this.shots && shots > 0) {
       this.shotsLabel?.classList?.remove('hidden')
@@ -57,6 +58,7 @@ export class ScoreUI {
       this.revealsLabel?.classList?.add('hidden')
     }
   }
+
   createZoneTitle (labelTxt, bag) {
     return this.createZoneEntry(labelTxt, bag, 'b', 'line-height:1.2;')
   }

@@ -76,6 +76,45 @@
     cursor: var(--bomb-cursor-image) 26 26, pointer;
 }
 
+.flying-weapon.cursor.strike {
+    background-image: var(--strike-cursor-image);
+
+}
+
+.flying-weapon.cursor.satelite {
+    background-image: var(--satelite-cursor-image);
+
+}
+
+.flying-weapon.cursor.cluster {
+    background-image: var(--cluster-cursor-image);
+
+}
+
+.flying-weapon.cursor.torpedo {
+    background-image: var(--torpedo-cursor-image);
+
+}
+
+.flying-weapon.cursor.periscope {
+    background-image: var(--periscope-cursor-image);
+
+}
+
+.flying-weapon.cursor.dish {
+    background-image: var(--dish-cursor-image);
+
+}
+
+.flying-weapon.cursor.sweep {
+    background-image: var(--sweep-cursor-image);
+
+}
+
+.flying-weapon.cursor.bomb {
+    background-image: var(--bomb-cursor-image);
+
+}
 
 .flying-weapon.megabomb {
     background-image: var(--flying-bomb-image);

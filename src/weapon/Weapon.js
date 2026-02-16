@@ -109,7 +109,34 @@ export class Weapon {
   redoCoords (_map, base, coords) {
     return [base, coords[0]]
   }
+  cursorLaunchTo (coords, rr, cc, onEnd, map, viewModel, opposingViewModel) {
+    map = map || bh.map
+    const [[r, c], target] = this.redoCoords(map, [rr, cc], coords)
+    const [sr, sc] = map.randomEdge(...target)
+    const start1 = opposingViewModel.gridCellAt(sr, sc)
+    const end1 = viewModel.gridCellAt(...target)
 
+    this.animateFlying(
+      start1,
+      end1,
+      this.launchTo.bind(
+        this,
+        coords,
+        r,
+        c,
+        onEnd,
+        map,
+        viewModel,
+        opposingViewModel
+      ),
+      viewModel.cellSizeScreen(),
+      map,
+      viewModel,
+      0,
+      0.9,
+      'cursor ' + this.cursors.at(-1)
+    )
+  }
   launchTo (coords, rr, cc, onEnd, map, viewModel, opposingViewModel) {
     const [[r, c], target] = this.redoCoords(map, [rr, cc], coords)
     let sourceCell = null
@@ -219,7 +246,17 @@ export class Weapon {
     })
   }
 
-  animateFlying (source, target, onEnd, cellSz, map, viewModel) {
+  animateFlying (
+    source,
+    target,
+    onEnd,
+    cellSz,
+    map,
+    viewModel,
+    rotation,
+    duration = 0.7,
+    classname
+  ) {
     const { container, end, start, cellSize } = this.initAnimate(
       cellSz,
       target,
@@ -239,7 +276,14 @@ export class Weapon {
     )
       return
 
-    const pointer = this.animateFlyingBase(end, start, container)
+    const pointer = this.animateFlyingBase(
+      end,
+      start,
+      container,
+      rotation,
+      duration,
+      classname
+    )
 
     this.finishAnimate(
       pointer,
@@ -306,20 +350,28 @@ export class Weapon {
     return { container, end, start, cellSize }
   }
 
-  animateFlyingBase (end, start, container) {
+  animateFlyingBase (
+    end,
+    start,
+    container,
+    rotation,
+    duration = 0.7,
+    classname
+  ) {
     const dx = end.x - start.x
     const dy = end.y - start.y
-    const angle = (Math.atan2(dy, dx) * 180) / Math.PI
+    const angle = rotation || (Math.atan2(dy, dx) * 180) / Math.PI
 
     const pointer = document.createElement('div')
-    pointer.className = 'flying-weapon ' + this.classname
+    classname = classname || this.classname
+    pointer.className = 'flying-weapon ' + classname
 
     pointer.style.setProperty('--start-x', `${start.x}px`)
     pointer.style.setProperty('--start-y', `${start.y}px`)
     pointer.style.setProperty('--end-x', `${end.x}px`)
     pointer.style.setProperty('--end-y', `${end.y}px`)
     pointer.style.setProperty('--angle', `${angle}deg`)
-    pointer.style.setProperty('--duration', '0.7s')
+    pointer.style.setProperty('--duration', `${duration}s`)
     console.log(pointer)
     container.appendChild(pointer)
     return pointer
